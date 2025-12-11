@@ -41,9 +41,6 @@ public class AprilTagCamera extends SubsystemBase {
 	private EstimatedRobotPose m_pose;
 	private Transform3d cameraToRobotPose;
 
-	// Tunable thresholds to discard bad estimates
-	// Reprojection error measures how reliable a multi-tag estimate is (lower = better)
-	// Ambiguity measures how reliable a single-tag estimate is (lower = better)
 	private final double ambiguityThreshold;
 	private final double distanceThreshold;
 	private final double reprojectionErrorThreshold;
@@ -51,27 +48,20 @@ public class AprilTagCamera extends SubsystemBase {
 	private double reprojError = 0;
 	private double tagDist = 0;
 
-	/** cameraPose - includes angle and translation from robot center (based on CAD) */
 	public AprilTagCamera(String name, Transform3d cameraPose) {
 		cameraName = name;
 
 		cameraToRobotPose = cameraPose;
 		m_camera = new PhotonCamera(NetworkTableInstance.getDefault(), name);
 
-		// Set pose estimator strategies
-		// Multi-tag PnP on coprocessor - used when one camera sees multiple tags
-		// Lowest ambiguity - one-tag strategy, selects pose estimate with lowest ambiguity
 		m_poseEstimator =
 				new PhotonPoseEstimator(m_tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameraPose);
 		m_poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-
-		// Set threshold constants
 		ambiguityThreshold = cameraName == "HP_Cam" ? 0.07 : 0.15;
 		distanceThreshold = maxTagDistanceThreshold;
 		reprojectionErrorThreshold = 0.5;
 	}
 
-	/** if the camera has any number of targets */
 	public boolean hasTarget() {
 		List<PhotonTrackedTarget> targets = m_result.getTargets();
 		return (!targets.isEmpty());
@@ -116,12 +106,11 @@ public class AprilTagCamera extends SubsystemBase {
 		}
 	}
 
-	/** height in meters of the chosen tag */
+	// height in meters of the chosen tag
 	public double getAprilTagHeight(int id) {
 		return m_tagLayout.getTagPose(id).get().getZ();
 	}
 
-	/** returns pose estimate from multi tag strategy */
 	public Optional<Pose2d> getMultiTagResult() {
 		Optional<MultiTargetPNPResult> target = m_result.getMultiTagResult();
 		if (target.isPresent()) {
@@ -138,7 +127,6 @@ public class AprilTagCamera extends SubsystemBase {
 		return m_poseEstimator.getPrimaryStrategy();
 	}
 
-	/** returns target of specified id if it can be seen */
 	public Optional<PhotonTrackedTarget> getTarget(int id) {
 		List<PhotonTrackedTarget> targets = m_result.getTargets();
 		for (PhotonTrackedTarget target : targets) {
@@ -156,7 +144,6 @@ public class AprilTagCamera extends SubsystemBase {
 		return Optional.of(m_result.getBestTarget());
 	}
 
-	/** return distance between camera and specified tag */
 	public OptionalDouble getRange(int id) {
 		PhotonTrackedTarget target = getTarget(id).isPresent() ? getTarget(id).get() : null;
 		if (target == null) {
@@ -168,7 +155,6 @@ public class AprilTagCamera extends SubsystemBase {
 						cameraToRobotPose.getZ(), targetHeight, 0, Units.degreesToRadians(target.getPitch())));
 	}
 
-	/** get horizontal offset from frame center of specified tag (right negative) */
 	public OptionalDouble getX(int id) {
 		if (getTarget(id).isEmpty()) {
 			return OptionalDouble.empty();
@@ -187,7 +173,6 @@ public class AprilTagCamera extends SubsystemBase {
 		}
 	}
 
-	/** get vertical offset from frame center of specified tag (up positive) */
 	public OptionalDouble getY(int id) {
 		if (getTarget(id).isEmpty()) {
 			return OptionalDouble.empty();
@@ -206,7 +191,6 @@ public class AprilTagCamera extends SubsystemBase {
 		}
 	}
 
-	/** get rotation of specific tag (ccw positive) */
 	public OptionalDouble getSkew(int id) {
 		if (getTarget(id).isEmpty()) {
 			return OptionalDouble.empty();
@@ -216,7 +200,6 @@ public class AprilTagCamera extends SubsystemBase {
 		}
 	}
 
-	/** get measure of how upright specified tag is (up positive) */
 	public OptionalDouble getPitch(int id) {
 		if (getTarget(id).isEmpty()) {
 			return OptionalDouble.empty();
@@ -235,7 +218,6 @@ public class AprilTagCamera extends SubsystemBase {
 		}
 	}
 
-	/** return area of smallest tag currently seen */
 	public OptionalDouble minTagArea() {
 		double minArea = Double.MAX_VALUE;
 		for (PhotonTrackedTarget target : m_result.getTargets()) {
@@ -251,7 +233,6 @@ public class AprilTagCamera extends SubsystemBase {
 		}
 	}
 
-	/** return distance to farthest tag currently seen */
 	public OptionalDouble maxTagDist(Pose2d currentPose) {
 		double maxDist = Double.MIN_VALUE;
 		for (PhotonTrackedTarget target : m_result.getTargets()) {
@@ -303,20 +284,14 @@ public class AprilTagCamera extends SubsystemBase {
 		return m_result.getTimestampSeconds();
 	}
 
-	/** update pose estimator with current readings */
 	public void updatePoseEstimator(Pose2d currentPose) {
 		if (m_poseEstimator != null) {
 			Optional<EstimatedRobotPose> pose;
-
-			// process newly seen tags
 			List<PhotonPipelineResult> m_unreadResults;
 			m_unreadResults = m_camera.getAllUnreadResults();
-
 			if (!m_unreadResults.isEmpty()) {
 				// gets the latest unread result
 				m_result = m_unreadResults.get(m_unreadResults.size() - 1);
-
-				// get distance and reprojection error/ambiguity for current target
 				tagDist = 1;
 				reprojError = 1;
 				ambiguity = 1;
@@ -333,21 +308,17 @@ public class AprilTagCamera extends SubsystemBase {
 				}
 
 				for (PhotonTrackedTarget target : m_result.getTargets()) {
-					// discard estimates from processor tags
 					if (target.getFiducialId() == 3 || target.getFiducialId() == 16) {
 						m_pose = null;
 						return;
 					}
 				}
-
-				// discard estimate if tag(s) are too far away
 				if (maxTagDist(currentPose).isPresent()
 						&& maxTagDist(currentPose).getAsDouble() > distanceThreshold) {
 					m_pose = null;
 					return;
 				}
 
-				// discard multi-tag estimate if reprojection error is too high
 				if (m_result.getMultiTagResult().isPresent()
 						&& m_result.getMultiTagResult().get().estimatedPose.bestReprojErr
 								> reprojectionErrorThreshold) {
@@ -355,13 +326,11 @@ public class AprilTagCamera extends SubsystemBase {
 					return;
 				}
 
-				// discard single-tag estimate if ambiguity is too high
 				if (getBestTarget().isPresent()
 						&& getBestTarget().get().poseAmbiguity > ambiguityThreshold) {
 					m_pose = null;
 					return;
 				}
-
 				pose = m_poseEstimator.update(m_result);
 			} else { // Latest result is a duplicate
 				pose = Optional.empty();
@@ -374,7 +343,6 @@ public class AprilTagCamera extends SubsystemBase {
 		}
 	}
 
-	/** return theoretical pose of specified tag */
 	private Pose3d getTagPose(int id) {
 		return m_tagLayout.getTagPose(id).get();
 	}
@@ -391,7 +359,6 @@ public class AprilTagCamera extends SubsystemBase {
 		return reprojError;
 	}
 
-	/** return array of theoretical poses of all seen tags */
 	public Pose3d[] getSeenTags() {
 		List<Pose3d> targets = new ArrayList<>();
 		if (getAllTagIds().isPresent()) {
@@ -402,7 +369,14 @@ public class AprilTagCamera extends SubsystemBase {
 		return targets.toArray(new Pose3d[targets.size()]);
 	}
 
-	/** add heading data (from gyro), needed for certain strategies */
+	public Pose2d getVisionPose() {
+		if (m_pose != null) {
+			return m_pose.estimatedPose.toPose2d();
+		} else {
+			return null;
+		}
+	}
+
 	public void updateHeading(Rotation2d heading) {
 		m_poseEstimator.addHeadingData(Timer.getFPGATimestamp(), heading);
 	}

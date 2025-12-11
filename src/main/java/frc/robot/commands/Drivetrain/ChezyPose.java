@@ -7,35 +7,21 @@ package frc.robot.commands.Drivetrain;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.lib.util.FieldPose;
-import frc.lib.util.PeddieBounds;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.controllers.ChezyController;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ChezyPose extends Command {
 	private final Swerve m_Swerve;
-	private FieldPose targetPose = null;
 
 	private Pose2d targetPose2d = null;
 
 	private boolean holdPose;
 	private final ChezyController m_ChezyController;
 
-	/** Creates a new ChezyPose. */
-	public ChezyPose(FieldPose pose, boolean hold) {
-		m_Swerve = RobotContainer.getSwerve();
-		m_ChezyController = m_Swerve.getChezyController();
-		targetPose = pose;
-		holdPose = hold;
-		// Use addRequirements() here to declare subsystem dependencies.
-		addRequirements(m_Swerve);
-	}
-
-	public ChezyPose(Pose2d pose, boolean hold) {
-		m_Swerve = RobotContainer.getSwerve();
-		m_ChezyController = m_Swerve.getChezyController();
+	public ChezyPose(Swerve swerve, ChezyController controller, Pose2d pose, boolean hold) {
+		m_Swerve = swerve;
+		m_ChezyController = controller;
 		targetPose2d = pose;
 		holdPose = hold;
 		// Use addRequirements() here to declare subsystem dependencies.
@@ -49,7 +35,7 @@ public class ChezyPose extends Command {
 			// FieldPose nearestPose =
 			//     new FieldPose(
 			//         Alliance.Blue, PeddieBounds.nearestElement(m_Swerve.getPose()), Offset.LEFT);
-			targetPose2d = PeddieBounds.fieldElementToPose2d(targetPose);
+			// targetPose2d = PeddieBounds.fieldElementToPose2d(m_Swerve, targetPose);
 		}
 		m_ChezyController.reset(targetPose2d);
 	}

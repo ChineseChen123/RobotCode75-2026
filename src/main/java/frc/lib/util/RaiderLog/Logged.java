@@ -1,17 +1,24 @@
 package frc.lib.util.RaiderLog;
 
-import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import java.lang.annotation.*;
 
-/** Example usage:
- * @Logged(key = "speed", importance = Importance.INFO)
- * private double speed = 0.0;
- */
-
-@Target({ElementType.METHOD, ElementType.FIELD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Logged {
-	String key(); // e.g. "speed"
+
+	public enum Importance {
+		DEBUG(0),
+		INFO(1),
+		CRITICAL(2);
+
+		public final int level;
+
+		Importance(int level) {
+			this.level = level;
+		}
+	}
+
+	String name(); // e.g. "speed"
 
 	Importance importance() default Importance.DEBUG;
 }

@@ -15,7 +15,7 @@ import frc.robot.subsystems.Drivetrain.Swerve;
 public class RotationController {
 	private double output;
 
-	private Swerve m_swerve;
+	private final Swerve swerve;
 
 	private PIDController controller;
 
@@ -24,29 +24,28 @@ public class RotationController {
 				new PIDController(
 						kp, 0, // no I term
 						kd);
-		
-		// makes -pi equal to pi to prevent rotating in the wrong direction
 		controller.enableContinuousInput(-Math.PI, Math.PI);
 
 		controller.setTolerance(toleranceRadians);
-		this.m_swerve = RobotContainer.getSwerve();
+		this.swerve = RobotContainer.getSwerve();
 	}
 
 	public double getOutput() {
 		return output;
 	}
 
-	/** updates PIDController with our current heading and target heading */
 	public void update(Rotation2d setpoint) {
-		if (m_swerve == null) {
-			m_swerve = RobotContainer.getSwerve(); // initialize swerve if not done already
-		}
 		controller.setSetpoint(setpoint.getRadians());
 		this.output =
-				controller.calculate(m_swerve.getHeading().getRadians(), setpoint.getRadians()) + 0.03;
+				controller.calculate(swerve.getHeading().getRadians(), setpoint.getRadians()) + 0.03;
 	}
 
-	/** returns whether we are at our target heading */
+	public void update(Rotation2d setpoint, double p, double d) {
+		// Update controller
+		controller.setPID(p, 0, d);
+		update(setpoint);
+	}
+
 	public boolean atGoal() {
 		return controller.atSetpoint() || this.output <= 0.03;
 	}

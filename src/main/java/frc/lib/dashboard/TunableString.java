@@ -2,28 +2,28 @@ package frc.lib.dashboard;
 
 import static frc.robot.Constants.RobotConstants.TUNING_MODE;
 
-import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringEntry;
 
 /**
  * Tunable Number takes in a number type and publishes an entry to a topic called "tuning" to be
  * used with advantagescope
  */
-public class TunableNumber {
+public class TunableString {
 
 	private NetworkTableInstance instance = NetworkTableInstance.getDefault();
 	private NetworkTable table = instance.getTable("Tuning");
-	private DoubleEntry entry;
-	private double defaultValue;
+	private StringEntry entry;
+	private String defaultValue;
 
-	public TunableNumber(String path, double number) {
-		entry = table.getDoubleTopic('/' + path).getEntry(number);
-		entry.set(number);
-		defaultValue = number;
+	public TunableString(String path, String string) {
+		entry = table.getStringTopic('/' + path).getEntry(string);
+		entry.set(string);
+		defaultValue = string;
 	}
 
-	public double getNumber() {
+	public String getString() {
 		return TUNING_MODE ? entry.get() : defaultValue;
 	}
 }

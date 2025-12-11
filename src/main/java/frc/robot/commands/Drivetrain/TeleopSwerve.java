@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import java.util.function.DoubleSupplier;
 
@@ -20,16 +19,16 @@ public class TeleopSwerve extends Command {
 	private DoubleSupplier rotationSup;
 
 	public TeleopSwerve(
-			DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
+			Swerve m_Swerve,
+			DoubleSupplier translationSup,
+			DoubleSupplier strafeSup,
+			DoubleSupplier rotationSup) {
+		this.m_Swerve = m_Swerve;
 		// get all values to drive the robot (x,y,z)
 		this.translationSup = translationSup;
 		this.strafeSup = strafeSup;
 		this.rotationSup = rotationSup;
-	}
 
-	@Override
-	public void initialize() {
-		m_Swerve = RobotContainer.getSwerve();
 		addRequirements(m_Swerve);
 	}
 
@@ -51,16 +50,14 @@ public class TeleopSwerve extends Command {
 		if (m_Swerve.getFieldRelative()) {
 			if (DriverStation.getAlliance().get() == Alliance.Blue) {
 				translation2d =
-						new Translation2d(DriverInput[0], DriverInput[1])
-								.times(maxVelocity.in(MetersPerSecond));
+						new Translation2d(DriverInput[0], DriverInput[1]).times(maxSpeed.in(MetersPerSecond));
 			} else {
 				translation2d =
-						new Translation2d(-DriverInput[0], -DriverInput[1])
-								.times(maxVelocity.in(MetersPerSecond));
+						new Translation2d(-DriverInput[0], -DriverInput[1]).times(maxSpeed.in(MetersPerSecond));
 			}
 		} else {
 			translation2d =
-					new Translation2d(DriverInput[0], DriverInput[1]).times(maxVelocity.in(MetersPerSecond));
+					new Translation2d(DriverInput[0], DriverInput[1]).times(maxSpeed.in(MetersPerSecond));
 		}
 
 		m_Swerve.drive(translation2d, DriverInput[2] * maxAngularVelocity.in(RadiansPerSecond));

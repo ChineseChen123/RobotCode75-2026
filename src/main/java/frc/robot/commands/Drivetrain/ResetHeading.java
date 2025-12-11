@@ -6,50 +6,55 @@ package frc.robot.commands.Drivetrain;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
 
 /** resets the heading of the robot (should not be used often) */
-public class ResetHeadingToSimilarFace extends Command {
+public class ResetHeading extends Command {
 	/** Creates a new ResetHeading. */
 	private final Swerve m_Swerve;
 
-	private double targetHeading;
-
-	public ResetHeadingToSimilarFace() {
-		m_Swerve = RobotContainer.getSwerve();
+	public ResetHeading(Swerve swerve) {
+		m_Swerve = swerve;
 		addRequirements(m_Swerve);
 	}
 
 	// Called when the command is initially scheduled.
 	@Override
-	public void initialize() {
-		targetHeading = Math.round(m_Swerve.getHeading().getDegrees() / 60.0) * 60.0;
-	}
+	public void initialize() {}
 
 	// Called every time the scheduler runs while the command is scheduled.
 	@Override
 	public void execute() {
-		m_Swerve.zeroGyro(Rotation2d.fromDegrees(targetHeading));
-		m_Swerve.setPose(
-				new Pose2d(
-						m_Swerve.getPose().getX(),
-						m_Swerve.getPose().getY(),
-						Rotation2d.fromDegrees(targetHeading)));
 		// resets the gyro and pose based on the gyro
+		if (DriverStation.getAlliance().get() == Alliance.Blue) {
+			m_Swerve.zeroGyro(Rotation2d.fromDegrees(0));
+			m_Swerve.setPose(
+					new Pose2d(
+							m_Swerve.getPose().getX(), m_Swerve.getPose().getY(), Rotation2d.fromDegrees(0)));
+		} else {
+			m_Swerve.zeroGyro(Rotation2d.fromDegrees(180));
+			m_Swerve.setPose(
+					new Pose2d(
+							m_Swerve.getPose().getX(), m_Swerve.getPose().getY(), Rotation2d.fromDegrees(180)));
+		}
 	}
 
 	// Called once the command ends or is interrupted.
 	@Override
-	public void end(boolean interrupted) {}
+	public void end(boolean interrupted) {
+		System.out.println("Gyro reset");
+	}
 
 	// Returns true when the command should end.
 	@Override
 	public boolean isFinished() {
 		boolean resetted = false;
 		// see if the pose has actually reset
-		if (m_Swerve.getPose().getRotation().getDegrees() == targetHeading) {
+		if (m_Swerve.getPose().getRotation().getDegrees()
+				== (DriverStation.getAlliance().get() == Alliance.Blue ? 0 : 180)) {
 			resetted = true;
 		} else {
 			resetted = false;

@@ -1,11 +1,10 @@
 package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static frc.robot.Constants.IOConstants.oneDriver;
+import static frc.robot.Constants.DrivetrainConstants.*;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -29,21 +28,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.lib.util.FieldPose.Offset;
-import frc.lib.util.PeddieBounds;
 import frc.lib.util.RaiderLog.Logged;
-import frc.lib.util.RaiderLog.RaiderLog.Importance;
+import frc.lib.util.RaiderLog.Logged.Importance;
+import frc.lib.util.RaiderLog.RaiderLog;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.Drivetrain.controllers.AutoAlign.HPAlign;
-import frc.robot.subsystems.Drivetrain.controllers.AutoAlign.ReefAlign;
-import frc.robot.subsystems.Drivetrain.controllers.AutoAlign.RotateHPStation;
-import frc.robot.subsystems.Drivetrain.controllers.AutoAlign.RotateSimilarFace;
-import frc.robot.subsystems.Drivetrain.controllers.ChezyController;
-import frc.robot.subsystems.Drivetrain.controllers.RotationController;
-import frc.robot.subsystems.Drivetrain.controllers.YoloController;
+import frc.robot.commands.Drivetrain.TeleopSwerve;
+import frc.robot.state.Driver;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
 public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> implements Subsystem {
@@ -58,13 +49,11 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	private static final Rotation2d kRedPerspective = Rotation2d.k180deg;
 	private boolean appliedOperatorPerspective = false;
 
-	// ── Gyro ──────────────────────────────────────────────────────────────────────
-	private final Pigeon2 m_Pigeon2;
+	// ── HW ────────────────────────────────────────────────────────────────────────
+	private final Pigeon2 gyro;
 
 	// ── Control state ─────────────────────────────────────────────────────────────
-	// @Input(key = "Field Relative", importance = Importance.DEBUG)
 	private boolean fieldRelative = true;
-
 	private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
 	private Pose2d samplePose = new Pose2d();
 
@@ -83,14 +72,10 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 					.withDriveRequestType(DriveRequestType.OpenLoopVoltage)
 					.withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
-	// ── Movement controllers ─────────────────────────────────────────────────────────
+	// ── Auto controllers ─────────────────────────────────────────────────────────
 	private final PIDController xController = new PIDController(2.65, 0, 0);
 	private final PIDController yController = new PIDController(3.9, 0, 0);
 	private final PIDController rController = new PIDController(3.05, 0, 0);
-
-	private static final ChezyController m_ChezyController = new ChezyController();
-	private static final YoloController m_YoloController = new YoloController();
-	private static final RotationController m_RotationController = new RotationController();
 
 	// ── Cameras ───────────────────────────────────────────────────────────────────
 
@@ -120,30 +105,14 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 				visionStdDev,
 				modules);
 
-		// Pigeon already instantiated by Phoenix Swerve API
-		m_Pigeon2 = this.getPigeon2();
-		m_Pigeon2.getConfigurator().apply(new Pigeon2Configuration());
+		gyro = this.getPigeon2();
 		zeroGyro();
 
-		rController.enableContinuousInput(-Math.PI, Math.PI);
-
-		estimatedPosesFromCameras = new Pose2d[1];
+		estimatedPosesFromCameras = null;
 
 		if (Utils.isSimulation()) startSimThread();
-	}
 
-	// ── Controller getters ────────────────────────────────────────────────────────
-
-	public ChezyController getChezyController() {
-		return m_ChezyController;
-	}
-
-	public YoloController getYoloController() {
-		return m_YoloController;
-	}
-
-	public RotationController getRotationController() {
-		return m_RotationController;
+		RaiderLog.register("Swerve", this);
 	}
 
 	// ── Driving API ───────────────────────────────────────────────────────────────
@@ -170,8 +139,13 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	/** Convenience for toggling frame. */
+	public void toggleRobotRelative() {
+		fieldRelative = false;
+	}
+
+	/** Convenience for toggling frame. */
 	public void toggleFieldRelative() {
-		fieldRelative = !fieldRelative;
+		fieldRelative = true;
 	}
 
 	public boolean getFieldRelative() {
@@ -194,6 +168,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	public void followSwerveSample(SwerveSample sample) {
 		this.samplePose = sample.getPose();
 		final Pose2d pose = getPose();
+
 		final double vx = sample.vx + xController.calculate(pose.getX(), sample.x);
 		final double vy = sample.vy + yController.calculate(pose.getY(), sample.y);
 		final double omega =
@@ -205,7 +180,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	// ── Pose / state ─────────────────────────────────────────────────────────────
 
 	/** Current odometry pose. */
-	@Logged(key = "Pose", importance = Importance.CRITICAL)
+	@Logged(name = "Pose", importance = Importance.CRITICAL)
 	public Pose2d getPose() {
 		return this.getState().Pose;
 	}
@@ -216,13 +191,13 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	/** Processed module states (velocity + angle). */
-	@Logged(key = "Module States", importance = Importance.INFO)
+	@Logged(name = "Module States", importance = Importance.INFO)
 	public SwerveModuleState[] getModuleStates() {
 		return this.getState().ModuleStates;
 	}
 
 	/** Module setpoints. */
-	@Logged(key = "Module Setpoints", importance = Importance.DEBUG)
+	@Logged(name = "Module Setpoints", importance = Importance.DEBUG)
 	public SwerveModuleState[] getModuleSetpoints() {
 		return this.getState().ModuleTargets;
 	}
@@ -233,13 +208,13 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	/** Robot-relative chassis speeds (from kinematics). */
-	@Logged(key = "Chassis Speeds", importance = Importance.INFO)
+	@Logged(name = "Chassis Speeds", importance = Importance.INFO)
 	public ChassisSpeeds getChassisSpeeds() {
 		return this.getState().Speeds;
 	}
 
 	/** Cached setpoint speeds we most recently commanded. */
-	@Logged(key = "Setpoint Speeds", importance = Importance.DEBUG)
+	@Logged(name = "Setpoint Speeds", importance = Importance.DEBUG)
 	public ChassisSpeeds getSetpointSpeeds() {
 		return setpointSpeeds;
 	}
@@ -249,12 +224,12 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		this.samplePose = pose;
 	}
 
-	@Logged(key = "Sample Pose", importance = Importance.DEBUG)
+	// @Logged(name = "Sample Pose", importance = Importance.DEBUG)
 	public Pose2d getSample() {
 		return samplePose;
 	}
 
-	@Logged(key = "Pose Estimates", importance = Importance.DEBUG)
+	// @Logged(name = "Pose Estimates", importance = Importance.DEBUG)
 	public Pose2d[] getEstimatedPosesFromCameras() {
 		return estimatedPosesFromCameras;
 	}
@@ -265,28 +240,18 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	public void zeroGyro() {
 		final double yawDeg =
 				DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? 0 : 180;
-		m_Pigeon2.setYaw(yawDeg);
+		gyro.setYaw(yawDeg);
 	}
 
 	/** Zero yaw to custom angle. */
 	public void zeroGyro(Rotation2d start) {
-		m_Pigeon2.setYaw(start.getDegrees());
+		gyro.setYaw(start.getDegrees());
 	}
 
 	/** Field heading from gyro (deg → Rotation2d). */
-	@Logged(key = "Heading", importance = Importance.CRITICAL)
+	@Logged(name = "Heading", importance = Importance.CRITICAL)
 	public Rotation2d getHeading() {
-		return Rotation2d.fromDegrees(m_Pigeon2.getYaw(true).getValue().in(Degrees));
-	}
-
-	@Logged(key = "Yolo Output", importance = Importance.CRITICAL)
-	public double yoloOutput() {
-		return m_YoloController.getCommand();
-	}
-
-	@Logged(key = "Algae Level", importance = Importance.DEBUG)
-	public String algaeLevel() {
-		return PeddieBounds.getAlgaeLevel(getPose()).toString();
+		return Rotation2d.fromDegrees(gyro.getYaw(true).getValue().in(Degrees));
 	}
 
 	// ── Vision ───────────────────────────────────────────────────────────────────
@@ -299,76 +264,9 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
 	// ── Command triggers ─────────────────────────────────────────────────────────
 
-	public Command teleopSwerveCommand() {
-		return new InstantCommand(
-						() -> {
-							double[] output =
-									oneDriver
-											? RobotContainer.getOperator().processedJoystickValues()
-											: RobotContainer.getDriver().processedJoystickValues();
-							drive(new Translation2d(output[0], output[1]), output[2]);
-						},
-						this)
-				.repeatedly();
-	}
-
-	public Command resetHeadingCommand() {
-		double targetAngle = DriverStation.getAlliance().get() == Alliance.Blue ? 0 : 180;
-		return new InstantCommand(
-						() -> {
-							zeroGyro(Rotation2d.fromDegrees(targetAngle));
-							setPose(
-									new Pose2d(
-											getPose().getX(), getPose().getY(), Rotation2d.fromDegrees(targetAngle)));
-						})
-				.repeatedly()
-				.until(() -> getPose().getRotation().getDegrees() == targetAngle)
-				.finallyDo(() -> System.out.println("Gyro reset"));
-	}
-
-	public Command xStanceCommand() {
-		return new InstantCommand(() -> xStance(), this).repeatedly().finallyDo(() -> stopModules());
-	}
-
-	public Command reefAlignCommand(Offset offset) {
-		return new InstantCommand(() -> ReefAlign.initialize(offset), this)
-				.andThen(
-						new InstantCommand(() -> setRobotRelative(ReefAlign.execute()), this)
-								.repeatedly()
-								.until(() -> ReefAlign.isFinished()))
-				.finallyDo(() -> ReefAlign.end());
-	}
-
-	public Command hpAlignCommand(Offset offset) {
-		return new InstantCommand(() -> HPAlign.initialize(offset), this)
-				.andThen(
-						new InstantCommand(() -> setRobotRelative(HPAlign.execute()), this)
-								.repeatedly()
-								.until(() -> HPAlign.isFinished()))
-				.finallyDo(() -> HPAlign.end());
-	}
-
-	public Command similarFaceRotateCommand() {
-		return new InstantCommand(() -> RotateSimilarFace.initialize(), this)
-				.andThen(
-						new InstantCommand(() -> setRobotRelative(RotateSimilarFace.execute()), this)
-								.repeatedly()
-								.until(() -> RotateSimilarFace.isFinished()))
-				.finallyDo(() -> RotateSimilarFace.end());
-	}
-
-	public Command hpRotateCommand() {
-		return new InstantCommand(() -> RotateHPStation.initialize(), this)
-				.andThen(
-						new InstantCommand(
-										() -> {
-											double[] output = RobotContainer.getDriver().processedJoystickValues();
-											drive(new Translation2d(output[0], output[1]), RotateHPStation.execute());
-										},
-										this)
-								.repeatedly()
-								.until(() -> RotateHPStation.isFinished()))
-				.finallyDo(() -> RotateHPStation.end());
+	public void bindCommands() {
+		Driver driver = RobotContainer.getDriver();
+		this.setDefaultCommand(new TeleopSwerve(this, driver.leftY(), driver.leftX(), driver.rightX()));
 	}
 
 	// ── WPILib lifecycle ─────────────────────────────────────────────────────────
@@ -386,20 +284,18 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 							});
 		}
 
-		if (!Utils.isSimulation()) {
-			AprilTagCamera[] cameras = RobotContainer.getAprilTagCameras();
-			if (estimatedPosesFromCameras == null || cameras.length != estimatedPosesFromCameras.length) {
-				estimatedPosesFromCameras = new Pose2d[cameras.length];
-			}
-			for (int i = 0; i < cameras.length; i++) {
-				cameras[i].updateHeading(getHeading());
-				cameras[i].updatePoseEstimator(getPose());
-				if (cameras[i].getEstimatedPose() != null) {
-					addVisionMeasurement(
-							cameras[i].getEstimatedPose().estimatedPose.toPose2d(),
-							cameras[i].getEstimatedPose().timestampSeconds);
-					estimatedPosesFromCameras[i] = cameras[i].getEstimatedPose().estimatedPose.toPose2d();
-				}
+		AprilTagCamera[] cameras = RobotContainer.getAprilTagCameras();
+		if (estimatedPosesFromCameras == null || cameras.length != estimatedPosesFromCameras.length) {
+			estimatedPosesFromCameras = new Pose2d[cameras.length];
+		}
+		for (int i = 0; i < cameras.length; i++) {
+			cameras[i].updateHeading(getHeading());
+			cameras[i].updatePoseEstimator(getPose());
+			if (cameras[i].getEstimatedPose() != null) {
+				addVisionMeasurement(
+						cameras[i].getEstimatedPose().estimatedPose.toPose2d(),
+						cameras[i].getEstimatedPose().timestampSeconds);
+				estimatedPosesFromCameras[i] = cameras[i].getEstimatedPose().estimatedPose.toPose2d();
 			}
 		}
 	}
