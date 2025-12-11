@@ -5,9 +5,6 @@
 package frc.robot;
 
 import static frc.robot.Constants.IOConstants.*;
-import static frc.robot.Constants.VisionConstants.HPCameraPose;
-import static frc.robot.Constants.VisionConstants.LeftFacingCameraPose;
-import static frc.robot.Constants.VisionConstants.RightFacingCameraPose;
 import static frc.robot.Constants.VisionConstants.moduleMatrix;
 import static frc.robot.Constants.VisionConstants.visionMatrix;
 
@@ -21,25 +18,13 @@ import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.state.Bindings;
 import frc.robot.state.Driver;
 import frc.robot.state.Operator;
-import frc.robot.subsystems.Climber;
+//import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.EndEffector.AlgaeIntake;
-import frc.robot.subsystems.EndEffector.AlgaePivot;
-import frc.robot.subsystems.EndEffector.CoralIntake;
-import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 
 public class RobotContainer {
 
-	// Initialize cameras
-	private static final AprilTagCamera m_LeftFacingCamera =
-			new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
-
-	private static final AprilTagCamera m_RightFacingCamera =
-			new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
-
-	private static final AprilTagCamera m_HPCamera = new AprilTagCamera("HP_Cam", HPCameraPose);
 
 	private static final ObjectDetetectorCamera m_BranchCamera =
 			new ObjectDetetectorCamera("Branch_Cam");
@@ -56,15 +41,6 @@ public class RobotContainer {
 					DrivetrainConstants.BackLeft,
 					DrivetrainConstants.BackRight);
 
-	private static final Elevator m_Elevator = new Elevator();
-
-	private static final CoralIntake m_CoralIntake = new CoralIntake();
-
-	private static final Climber m_Climber = new Climber();
-
-	private static final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
-
-	private static final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
 	// Define IO controls
 	private static final Driver m_Driver =
@@ -86,7 +62,7 @@ public class RobotContainer {
 	// Register any subsystems to be logged
 	private void configureLogging() {
 		RaiderLog.register("Swerve", m_Swerve);
-		RaiderLog.register("Elevator", m_Elevator);
+		// RaiderLog.register("Elevator", m_Elevator);
 		// RaiderLog.register("Coral Intake", m_CoralIntake);
 		// RaiderLog.register("Algae Intake", m_AlgaeIntake);
 		// RaiderLog.register("Algae Pivot", m_AlgaePivot);
@@ -117,30 +93,6 @@ public class RobotContainer {
 
 	public static Swerve getSwerve() {
 		return m_Swerve;
-	}
-
-	public static Elevator getElevator() {
-		return m_Elevator;
-	}
-
-	public static CoralIntake getCoralIntake() {
-		return m_CoralIntake;
-	}
-
-	public static Climber getClimber() {
-		return m_Climber;
-	}
-
-	public static AlgaeIntake getAlgaeIntake() {
-		return m_AlgaeIntake;
-	}
-
-	public static AlgaePivot getAlgaePivot() {
-		return m_AlgaePivot;
-	}
-
-	public static AprilTagCamera[] getAprilTagCameras() {
-		return new AprilTagCamera[] {m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera};
 	}
 
 	public static ObjectDetetectorCamera getBranchCamera() {

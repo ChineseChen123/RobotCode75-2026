@@ -284,10 +284,10 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		return m_YoloController.getCommand();
 	}
 
-	@Logged(key = "Algae Level", importance = Importance.DEBUG)
-	public String algaeLevel() {
-		return PeddieBounds.getAlgaeLevel(getPose()).toString();
-	}
+	// @Logged(key = "Algae Level", importance = Importance.DEBUG)
+	// public String algaeLevel() {
+	// 	return PeddieBounds.getAlgaeLevel(getPose()).toString();
+	// }
 
 	// ── Vision ───────────────────────────────────────────────────────────────────
 
@@ -386,22 +386,22 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 							});
 		}
 
-		if (!Utils.isSimulation()) {
-			AprilTagCamera[] cameras = RobotContainer.getAprilTagCameras();
-			if (estimatedPosesFromCameras == null || cameras.length != estimatedPosesFromCameras.length) {
-				estimatedPosesFromCameras = new Pose2d[cameras.length];
-			}
-			for (int i = 0; i < cameras.length; i++) {
-				cameras[i].updateHeading(getHeading());
-				cameras[i].updatePoseEstimator(getPose());
-				if (cameras[i].getEstimatedPose() != null) {
-					addVisionMeasurement(
-							cameras[i].getEstimatedPose().estimatedPose.toPose2d(),
-							cameras[i].getEstimatedPose().timestampSeconds);
-					estimatedPosesFromCameras[i] = cameras[i].getEstimatedPose().estimatedPose.toPose2d();
-				}
-			}
-		}
+		// if (!Utils.isSimulation()) {
+		// 	AprilTagCamera[] cameras = RobotContainer.getAprilTagCameras();
+		// 	if (estimatedPosesFromCameras == null || cameras.length != estimatedPosesFromCameras.length) {
+		// 		estimatedPosesFromCameras = new Pose2d[cameras.length];
+		// 	}
+		// 	for (int i = 0; i < cameras.length; i++) {
+		// 		cameras[i].updateHeading(getHeading());
+		// 		cameras[i].updatePoseEstimator(getPose());
+		// 		if (cameras[i].getEstimatedPose() != null) {
+		// 			addVisionMeasurement(
+		// 					cameras[i].getEstimatedPose().estimatedPose.toPose2d(),
+		// 					cameras[i].getEstimatedPose().timestampSeconds);
+		// 			estimatedPosesFromCameras[i] = cameras[i].getEstimatedPose().estimatedPose.toPose2d();
+		// 		}
+		// 	}
+		// }
 	}
 
 	// ── Internals ────────────────────────────────────────────────────────────────

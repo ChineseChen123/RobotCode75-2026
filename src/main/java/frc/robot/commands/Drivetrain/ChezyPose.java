@@ -49,7 +49,7 @@ public class ChezyPose extends Command {
 			// FieldPose nearestPose =
 			//     new FieldPose(
 			//         Alliance.Blue, PeddieBounds.nearestElement(m_Swerve.getPose()), Offset.LEFT);
-			targetPose2d = PeddieBounds.fieldElementToPose2d(targetPose);
+			//targetPose2d = PeddieBounds.fieldElementToPose2d(targetPose);
 		}
 		m_ChezyController.reset(targetPose2d);
 	}

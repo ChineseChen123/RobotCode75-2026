@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Inches;
-import static frc.robot.Constants.EndEffectorConstants.algaeLidarSensorPort;
+//import static frc.robot.Constants.EndEffectorConstants.algaeLidarSensorPort;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
@@ -13,10 +13,10 @@ public class LidarDistanceSensor {
 	private double threshold = 0;
 	DutyCycle sensorCycle;
 
-	public LidarDistanceSensor(Distance threshold) {
-		sensorCycle = new DutyCycle(new DigitalInput(algaeLidarSensorPort));
-		this.threshold = threshold.in(Inches);
-	}
+	// public LidarDistanceSensor(Distance threshold) {
+	// 	sensorCycle = new DutyCycle(new DigitalInput(algaeLidarSensorPort));
+	// 	this.threshold = threshold.in(Inches);
+	// }
 
 	private double getTimeNanoSeconds() {
 		return sensorCycle.getHighTimeNanoseconds();

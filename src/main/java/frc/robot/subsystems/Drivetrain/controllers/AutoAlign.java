@@ -52,14 +52,6 @@ public class AutoAlign {
 			m_Offset = offset;
 
 			// set our goal to the reef face closest to our current pose
-			FieldElement fieldElement = PeddieBounds.getReefElement(m_Swerve.getPose());
-			if (fieldElement != null) {
-				targetPose =
-						PeddieBounds.fieldElementToPose2d(
-								new FieldPose(DriverStation.getAlliance().get(), fieldElement, m_Offset));
-				m_ChezyController.reset(targetPose);
-				lastTarget = fieldElement;
-			}
 			m_YoloController.reset(true);
 			reefAlignReady = true;
 			isInit = true;
@@ -133,21 +125,21 @@ public class AutoAlign {
 
 		/** reset target before every use */
 		public static void initialize(Offset offset) {
-			m_Swerve = RobotContainer.getSwerve();
-			m_ChezyController = m_Swerve.getChezyController();
-			m_Offset = offset;
-			Alliance alliance = DriverStation.getAlliance().get(); // default to blue if not set
-			targetPose = m_Swerve.getPose();
+			// m_Swerve = RobotContainer.getSwerve();
+			// m_ChezyController = m_Swerve.getChezyController();
+			// m_Offset = offset;
+			// Alliance alliance = DriverStation.getAlliance().get(); // default to blue if not set
+			// targetPose = m_Swerve.getPose();
 
-			targetPose =
-					PeddieBounds.fieldElementToPose2d(
-							new FieldPose(alliance, PeddieBounds.getHPElement(m_Swerve), m_Offset));
-			lastTarget = PeddieBounds.getHPElement(m_Swerve);
-			m_Swerve.setSample(targetPose);
+			// targetPose =
+			// 		PeddieBounds.fieldElementToPose2d(
+			// 				new FieldPose(alliance, PeddieBounds.getHPElement(m_Swerve), m_Offset));
+			// lastTarget = PeddieBounds.getHPElement(m_Swerve);
+			// m_Swerve.setSample(targetPose);
 
-			m_ChezyController.reset(targetPose);
-			hpAlignReady = true;
-			isInit = true;
+			// m_ChezyController.reset(targetPose);
+			// hpAlignReady = true;
+			// isInit = true;
 		}
 
 		/** returns robot-relative speeds */

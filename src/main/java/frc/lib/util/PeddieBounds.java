@@ -2,7 +2,6 @@ package frc.lib.util;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.FieldConstants.*;
-import static frc.robot.Constants.VisionConstants.tagIDToFieldElement;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -18,7 +17,6 @@ import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,7 +49,7 @@ public class PeddieBounds {
 			if (tag.pose.toPose2d().getTranslation().getDistance(pose.getTranslation())
 					< nearestDistance) {
 				nearestDistance = tag.pose.toPose2d().getTranslation().getDistance(pose.getTranslation());
-				nearestElement = tagIDToFieldElement.get(tag.ID);
+				//nearestElement = tagIDToFieldElement.get(tag.ID);
 			}
 		}
 		return nearestElement;
@@ -75,112 +73,112 @@ public class PeddieBounds {
 	}
 
 	/** returns pose of nearest field element */
-	public static Pose2d getNearestFieldPose2d(Pose2d currentPose, FieldPose targetPose) {
-		targetPose.fieldElement = nearestElement(currentPose);
-		return fieldElementToPose2d(targetPose);
-	}
+	// public static Pose2d getNearestFieldPose2d(Pose2d currentPose, FieldPose targetPose) {
+	// 	targetPose.fieldElement = nearestElement(currentPose);
+	// 	return fieldElementToPose2d(targetPose);
+	// }
 
 	/** returns pose of specified field element */
-	public static Pose2d fieldElementToPose2d(FieldPose targetPose) {
-		int targetTag =
-				targetPose.alliance == Alliance.Blue
-						? blueTags.get(targetPose.fieldElement)
-						: redTags.get(targetPose.fieldElement);
-		Pose2d tagPose =
-				AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
-						.getTagPose(targetTag)
-						.get()
-						.toPose2d();
+	//public static Pose2d fieldElementToPose2d(FieldPose targetPose) {
+		// int targetTag =
+		// 		targetPose.alliance == Alliance.Blue
+		// 				? blueTags.get(targetPose.fieldElement)
+		// 				: redTags.get(targetPose.fieldElement);
+		// Pose2d tagPose =
+		// 		AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
+		// 				.getTagPose(targetTag)
+		// 				.get()
+		// 				.toPose2d();
 		// return tagPose;
-		Rotation2d tagHeading = tagPose.getRotation();
-		double bumperSize = 17.5;
-		if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
-			bumperSize = 19;
-		}
-		Pose2d poseToDrive =
-				tagPose.transformBy(
-						new Transform2d(Inches.of(bumperSize).in(Meters), 0, new Rotation2d(0)));
-		// flip the pose
-		if (FieldPose.fieldElementIsReef(targetPose.fieldElement) && targetPose.offset == Offset.LEFT) {
-			tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
-			poseToDrive =
-					poseToDrive.transformBy(
-							new Transform2d(0, reefLeftPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
-		}
-		if (FieldPose.fieldElementIsReef(targetPose.fieldElement)
-				&& targetPose.offset == Offset.RIGHT) {
-			tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
-			poseToDrive =
-					poseToDrive.transformBy(
-							new Transform2d(0, reefRightPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
-		}
-		if (FieldPose.fieldElementIsReef(targetPose.fieldElement) && targetPose.offset == Offset.MID) {
-			tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
-			poseToDrive =
-					poseToDrive.transformBy(
-							new Transform2d(0, reefAlgaePoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
-		}
-		if (FieldPose.fieldElementIsReef(targetPose.fieldElement)) {
-			return new Pose2d(
-					poseToDrive.getX(),
-					poseToDrive.getY(),
-					Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 180));
-		} else if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
-			if (targetPose.offset == Offset.LEFT) {
-				poseToDrive =
-						poseToDrive.transformBy(
-								new Transform2d(0, hpLeftPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
-			}
-			if (targetPose.offset == Offset.RIGHT) {
-				poseToDrive =
-						poseToDrive.transformBy(
-								new Transform2d(0, hpRightPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
-			}
-			poseToDrive = poseToDrive.transformBy(new Transform2d(-0.3, 0, Rotation2d.fromDegrees(0)));
-			return new Pose2d(
-					poseToDrive.getX(),
-					poseToDrive.getY(),
-					Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees()));
-		}
-		return poseToDrive;
-	}
+	// 	Rotation2d tagHeading = tagPose.getRotation();
+	// 	double bumperSize = 17.5;
+	// 	if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
+	// 		bumperSize = 19;
+	// 	}
+	// 	Pose2d poseToDrive =
+	// 			tagPose.transformBy(
+	// 					new Transform2d(Inches.of(bumperSize).in(Meters), 0, new Rotation2d(0)));
+	// 	// flip the pose
+	// 	if (FieldPose.fieldElementIsReef(targetPose.fieldElement) && targetPose.offset == Offset.LEFT) {
+	// 		tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
+	// 		poseToDrive =
+	// 				poseToDrive.transformBy(
+	// 						new Transform2d(0, reefLeftPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
+	// 	}
+	// 	if (FieldPose.fieldElementIsReef(targetPose.fieldElement)
+	// 			&& targetPose.offset == Offset.RIGHT) {
+	// 		tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
+	// 		poseToDrive =
+	// 				poseToDrive.transformBy(
+	// 						new Transform2d(0, reefRightPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
+	// 	}
+	// 	if (FieldPose.fieldElementIsReef(targetPose.fieldElement) && targetPose.offset == Offset.MID) {
+	// 		tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
+	// 		poseToDrive =
+	// 				poseToDrive.transformBy(
+	// 						new Transform2d(0, reefAlgaePoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
+	// 	}
+	// 	if (FieldPose.fieldElementIsReef(targetPose.fieldElement)) {
+	// 		return new Pose2d(
+	// 				poseToDrive.getX(),
+	// 				poseToDrive.getY(),
+	// 				Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 180));
+	// 	} else if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
+	// 		if (targetPose.offset == Offset.LEFT) {
+	// 			poseToDrive =
+	// 					poseToDrive.transformBy(
+	// 							new Transform2d(0, hpLeftPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
+	// 		}
+	// 		if (targetPose.offset == Offset.RIGHT) {
+	// 			poseToDrive =
+	// 					poseToDrive.transformBy(
+	// 							new Transform2d(0, hpRightPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
+	// 		}
+	// 		poseToDrive = poseToDrive.transformBy(new Transform2d(-0.3, 0, Rotation2d.fromDegrees(0)));
+	// 		return new Pose2d(
+	// 				poseToDrive.getX(),
+	// 				poseToDrive.getY(),
+	// 				Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees()));
+	// 	}
+	// 	return poseToDrive;
+	 //}
 
 	/** returns algae level of nearest reef face */
-	public static ElevatorPositions getAlgaeLevel(Pose2d currentPose) {
-		return algaeHeights.get(getReefElement(currentPose).toString());
-	}
+	// public static ElevatorPositions getAlgaeLevel(Pose2d currentPose) {
+	// 	return algaeHeights.get(getReefElement(currentPose).toString());
+	// }
 
 	/** returns nearest reef field element */
-	public static FieldElement getReefElement(Pose2d currentPose) {
-		// calculate current odometry pose
-		Translation2d odometryPose = currentPose.getTranslation();
-		List<IDVectorPair> robotToTag = new ArrayList<>();
-		AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+	// public static FieldElement getReefElement(Pose2d currentPose) {
+	// 	// calculate current odometry pose
+	// 	Translation2d odometryPose = currentPose.getTranslation();
+	// 	List<IDVectorPair> robotToTag = new ArrayList<>();
+	// 	AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
-		if (DriverStation.getAlliance().isEmpty()
-				|| DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
-			// BLUE:
-			for (int i = 17; i <= 22; i++) {
-				Translation2d tagPose = field.getTagPose(i).get().toPose2d().getTranslation();
-				robotToTag.add(new IDVectorPair(i, tagPose.minus(odometryPose)));
-			}
-		} else {
-			// RED:
-			for (int i = 6; i <= 11; i++) {
-				Translation2d tagPose = field.getTagPose(i).get().toPose2d().getTranslation();
-				robotToTag.add(new IDVectorPair(i, tagPose.minus(odometryPose)));
-			}
-		}
+	// 	if (DriverStation.getAlliance().isEmpty()
+	// 			|| DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+	// 		// BLUE:
+	// 		for (int i = 17; i <= 22; i++) {
+	// 			Translation2d tagPose = field.getTagPose(i).get().toPose2d().getTranslation();
+	// 			robotToTag.add(new IDVectorPair(i, tagPose.minus(odometryPose)));
+	// 		}
+	// 	} else {
+	// 		// RED:
+	// 		for (int i = 6; i <= 11; i++) {
+	// 			Translation2d tagPose = field.getTagPose(i).get().toPose2d().getTranslation();
+	// 			robotToTag.add(new IDVectorPair(i, tagPose.minus(odometryPose)));
+	// 		}
+	// 	}
 
-		// sort list in ascending order of vector magnitude / robot distance to tag
-		Collections.sort(
-				robotToTag, (o1, o2) -> (((Double) o1.vector.getNorm()).compareTo(o2.vector.getNorm())));
+	// 	// sort list in ascending order of vector magnitude / robot distance to tag
+	// 	Collections.sort(
+	// 			robotToTag, (o1, o2) -> (((Double) o1.vector.getNorm()).compareTo(o2.vector.getNorm())));
 
-		// closest tag ID
-		int tag0id = robotToTag.get(0).id;
+	// 	// closest tag ID
+	// 	int tag0id = robotToTag.get(0).id;
 
-		return VisionConstants.tagIDToFieldElement.get(tag0id);
-	}
+	// 	return VisionConstants.tagIDToFieldElement.get(tag0id);
+	// }
 
 	private static final double hpThreshold =
 			0.5; // section in the middle where bound is determined by vel
