@@ -5,18 +5,19 @@
 package frc.robot;
 
 import edu.wpi.first.net.PortForwarder;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.lib.util.RaiderLog.Logged.Importance;
+import frc.lib.util.RaiderLog.RaiderLog.Importance;
+import frc.lib.util.RaiderLog.RaiderLog.LogMode;
 import frc.lib.util.RaiderLog.RaiderLog;
+import org.littletonrobotics.junction.LoggedRobot;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
  * the TimedRobot documentation. If you change the name of this class or the package after creating
  * this project, you must also update the Main.java file in the project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
 	private Command m_autonomousCommand;
 
 	private final RobotContainer m_robotContainer;
@@ -29,8 +30,12 @@ public class Robot extends TimedRobot {
 
 		m_robotContainer = new RobotContainer();
 
-		// DogLog.setOptions(new DogLogOptions()); if we need to edit something
-		RaiderLog.setMinImportance(Importance.DEBUG);
+		Importance minImportance = Importance.DEBUG;
+		LogMode logMode = LogMode.BASIC;
+		RaiderLog.init(minImportance, logMode);
+		if (logMode == LogMode.REPLAY) {
+			setUseTiming(false); // Allows simulation to run as fast as possible
+		}
 
 		PortForwarder.add(5800, "photon-frontcams.local", 5801);
 		PortForwarder.add(5800, "photon-rearcams.local", 5802);

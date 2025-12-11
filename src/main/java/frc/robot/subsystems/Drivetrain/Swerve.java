@@ -1,7 +1,6 @@
 package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static frc.robot.Constants.DrivetrainConstants.*;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.Utils;
@@ -30,7 +29,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.lib.util.RaiderLog.Logged;
-import frc.lib.util.RaiderLog.Logged.Importance;
+import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.lib.util.RaiderLog.RaiderLog;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
@@ -111,8 +110,6 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		estimatedPosesFromCameras = null;
 
 		if (Utils.isSimulation()) startSimThread();
-
-		RaiderLog.register("Swerve", this);
 	}
 
 	// ── Driving API ───────────────────────────────────────────────────────────────
@@ -180,7 +177,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	// ── Pose / state ─────────────────────────────────────────────────────────────
 
 	/** Current odometry pose. */
-	@Logged(name = "Pose", importance = Importance.CRITICAL)
+	@Logged(key = "Pose", importance = Importance.CRITICAL)
 	public Pose2d getPose() {
 		return this.getState().Pose;
 	}
@@ -191,13 +188,13 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	/** Processed module states (velocity + angle). */
-	@Logged(name = "Module States", importance = Importance.INFO)
+	@Logged(key = "Module States", importance = Importance.INFO)
 	public SwerveModuleState[] getModuleStates() {
 		return this.getState().ModuleStates;
 	}
 
 	/** Module setpoints. */
-	@Logged(name = "Module Setpoints", importance = Importance.DEBUG)
+	@Logged(key = "Module Setpoints", importance = Importance.DEBUG)
 	public SwerveModuleState[] getModuleSetpoints() {
 		return this.getState().ModuleTargets;
 	}
@@ -208,13 +205,13 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	/** Robot-relative chassis speeds (from kinematics). */
-	@Logged(name = "Chassis Speeds", importance = Importance.INFO)
+	@Logged(key = "Chassis Speeds", importance = Importance.INFO)
 	public ChassisSpeeds getChassisSpeeds() {
 		return this.getState().Speeds;
 	}
 
 	/** Cached setpoint speeds we most recently commanded. */
-	@Logged(name = "Setpoint Speeds", importance = Importance.DEBUG)
+	@Logged(key = "Setpoint Speeds", importance = Importance.DEBUG)
 	public ChassisSpeeds getSetpointSpeeds() {
 		return setpointSpeeds;
 	}
@@ -224,12 +221,12 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		this.samplePose = pose;
 	}
 
-	// @Logged(name = "Sample Pose", importance = Importance.DEBUG)
+	// @Logged(key = "Sample Pose", importance = Importance.DEBUG)
 	public Pose2d getSample() {
 		return samplePose;
 	}
 
-	// @Logged(name = "Pose Estimates", importance = Importance.DEBUG)
+	// @Logged(key = "Pose Estimates", importance = Importance.DEBUG)
 	public Pose2d[] getEstimatedPosesFromCameras() {
 		return estimatedPosesFromCameras;
 	}
@@ -249,7 +246,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	/** Field heading from gyro (deg → Rotation2d). */
-	@Logged(name = "Heading", importance = Importance.CRITICAL)
+	@Logged(key = "Heading", importance = Importance.CRITICAL)
 	public Rotation2d getHeading() {
 		return Rotation2d.fromDegrees(gyro.getYaw(true).getValue().in(Degrees));
 	}
