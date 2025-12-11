@@ -127,7 +127,6 @@ public class Climber extends SubsystemBase {
 		}
 		SmartDashboard.putBoolean("Climber Limit", getLimitSwitch());
 
-		
 		// if (climberKp.getNumber() != PIDConfig.kP
 		//     || climberKd.getNumber() != PIDConfig.kD
 		//     || climberKs.getNumber() != PIDConfig.kS

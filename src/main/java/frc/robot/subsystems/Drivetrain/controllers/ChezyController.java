@@ -61,7 +61,8 @@ public class ChezyController {
 		}
 		Pose2d currentPose = m_swerve.getPose();
 
-		// resets drive controller with our current distance to target and our current velocity in the axis to the target
+		// resets drive controller with our current distance to target and our current velocity in the
+		// axis to the target
 		driveController.reset(
 				currentPose.getTranslation().getDistance(targetPose.getTranslation()),
 				Math.min(
@@ -69,14 +70,15 @@ public class ChezyController {
 						-new Translation2d( // x and y components of velocity
 										m_swerve.getChassisSpeeds().vxMetersPerSecond,
 										m_swerve.getChassisSpeeds().vyMetersPerSecond)
-								.rotateBy( // rotate by angle difference so that x is directly toward target and y is left/right
+								.rotateBy( // rotate by angle difference so that x is directly toward target and y
+										// is left/right
 										targetPose
 												.getTranslation()
 												.minus(currentPose.getTranslation())
 												.getAngle()
 												.unaryMinus())
 								.getX())); // get forward component only
-		
+
 		// resets rotation controller current angle and current angular velocity
 		thetaController.reset(
 				currentPose.getRotation().getRadians(), m_swerve.getChassisSpeeds().omegaRadiansPerSecond);

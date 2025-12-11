@@ -100,7 +100,8 @@ public class AlgaePivot extends SubsystemBase {
 	/** return whether motor encoder is at postion */
 	public boolean isAtPosition(PivotStates state) {
 		return Math.abs(
-						state.Rotations.in(Rotations) - m_AlgaePivotMotor.getPosition().getValue().in(Rotations))
+						state.Rotations.in(Rotations)
+								- m_AlgaePivotMotor.getPosition().getValue().in(Rotations))
 				< algaePivotTolerance;
 	}
 

@@ -25,7 +25,8 @@ public class AutoScoreProcessor extends SequentialCommandGroup {
 		addRequirements(swerve, intake, pivot);
 		Pose2d poseToDrive =
 				PeddieBounds.getNearestFieldPose2d(
-						swerve.getPose(), new FieldPose(DriverStation.getAlliance().get(), FieldElement.P, Offset.MID));
+						swerve.getPose(),
+						new FieldPose(DriverStation.getAlliance().get(), FieldElement.P, Offset.MID));
 		addCommands(
 				new ChezyPose(poseToDrive, false),
 				new InstantCommand(

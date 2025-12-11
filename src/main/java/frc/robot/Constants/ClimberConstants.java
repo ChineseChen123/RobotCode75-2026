@@ -19,7 +19,7 @@ public final class ClimberConstants {
 	// motor encoder setpoint when fully deployed
 	public static final Angle climbExtendPosition = Rotations.of(130);
 	public static final double climbPositionTolerance = 0.5;
-	
+
 	public static final int limitPort = 8;
 	public static final int climberMotor2CANID = 47;
 	public static final int climberMotor1CANID = 46;

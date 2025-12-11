@@ -112,8 +112,7 @@ public class YoloController {
 			}
 		} else {
 			if (!m_BranchDetectorCamera.hasTargets()) {
-				desiredSpeeds = 
-						new ChassisSpeeds(0, 0.0, 0); // scoot toward direction of last seen target
+				desiredSpeeds = new ChassisSpeeds(0, 0.0, 0); // scoot toward direction of last seen target
 			} else {
 				double targetYaw = m_BranchDetectorCamera.getTargetYaw(0).getAsDouble();
 

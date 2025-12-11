@@ -2,7 +2,6 @@ package frc.robot.state;
 
 import static frc.robot.Constants.ClimberConstants.climbExtendPosition;
 import static frc.robot.Constants.ClimberConstants.climbPosition;
-import static frc.robot.Constants.EndEffectorConstants.pivotDeAlgaefyDelay;
 import static frc.robot.Constants.IOConstants.oneDriver;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -121,7 +120,8 @@ public class Bindings {
 		// // Algae Pivot bindings
 		// algaePivot.setDefaultCommand(algaePivot.setStateCommand(PivotStates.RETRACTED));
 		// if (!oneDriver) {
-		// 	RobotStates.actionProcessorPivot.whileTrue(algaePivot.setStateCommand(PivotStates.PROCESSOR));
+		//
+		//	RobotStates.actionProcessorPivot.whileTrue(algaePivot.setStateCommand(PivotStates.PROCESSOR));
 		// }
 		// // Keep pivot down until elevator raises
 		// RobotStates.actionGroundAlgae.whileTrue(
@@ -189,15 +189,10 @@ public class Bindings {
 
 		// LT/RT auto align based on coral state
 		RobotStates.actionLeftAlign =
-				operator
-						.leftTriggerGreater(0.15)
-						.and(operator.rightTriggerGreater(0.15).negate());
+				operator.leftTriggerGreater(0.15).and(operator.rightTriggerGreater(0.15).negate());
 		RobotStates.actionRightAlign =
-				operator
-						.rightTriggerGreater(0.15)
-						.and(operator.leftTriggerGreater(0.15).negate());
-		RobotStates.actionHPAlign =
-				operator.leftBumper.and(operator.rightBumper);
+				operator.rightTriggerGreater(0.15).and(operator.leftTriggerGreater(0.15).negate());
+		RobotStates.actionHPAlign = operator.leftBumper.and(operator.rightBumper);
 
 		// Dealgaefy chain
 		RobotStates.actionAlgaeAlign =
@@ -219,8 +214,7 @@ public class Bindings {
 
 		// Intake based on last auto align
 		RobotStates.actionIntakeCoral =
-				operator.leftDpad.and(RobotStates.hasCoral.negate())
-						.or(RobotStates.isHPAligned);
+				operator.leftDpad.and(RobotStates.hasCoral.negate()).or(RobotStates.isHPAligned);
 		RobotStates.actionIntakeCoralWhileTrue = RobotStates.actionHPAlign;
 		RobotStates.actionGroundAlgae = operator.leftBumper.and(operator.rightBumper.negate());
 		RobotStates.actionReverseCoral = operator.leftDpad.and(RobotStates.hasCoral);
@@ -264,7 +258,8 @@ public class Bindings {
 										.until(RobotStates.hasAlgae.negate()),
 								new WaitCommand(0.75)
 										.alongWith(
-											new InstantCommand(() -> swerve.xStance(), elevator, swerve).repeatedly())));
+												new InstantCommand(() -> swerve.xStance(), elevator, swerve)
+														.repeatedly())));
 		RobotStates.actionScoreAlgae
 				.and(() -> (PeddieBounds.nearestElement(swerve.getPose()) == FieldElement.P))
 				.whileTrue(

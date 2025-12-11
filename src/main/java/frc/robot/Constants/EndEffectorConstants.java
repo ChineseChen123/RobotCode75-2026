@@ -75,7 +75,7 @@ public class EndEffectorConstants {
 		public static final TalonFXSConfiguration m_CoralMotorConfig = new TalonFXSConfiguration();
 		public static final TalonFXConfiguration m_AlgaeMotorConfig = new TalonFXConfiguration();
 		public static final TalonFXConfiguration m_PivotConfig = new TalonFXConfiguration();
-		
+
 		// Neutral modes and inverts
 		public static final InvertedValue coralMotorInvert = InvertedValue.CounterClockwise_Positive;
 		public static final InvertedValue algaeMotorInvert = InvertedValue.CounterClockwise_Positive;
@@ -168,7 +168,7 @@ public class EndEffectorConstants {
 			m_CoralMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 			m_CoralMotorConfig.CurrentLimits.StatorCurrentLimit = coralStatorCurrentLimit.in(Amps);
 
-			// PID Config 
+			// PID Config
 			m_CoralMotorConfig.Slot0.kP = coralVelocityKP;
 			m_CoralMotorConfig.Slot0.kI = coralVelocityKI;
 			m_CoralMotorConfig.Slot0.kD = coralVelocityKD;
@@ -195,7 +195,7 @@ public class EndEffectorConstants {
 			m_AlgaeMotorConfig.MotorOutput.Inverted = algaeMotorInvert;
 			m_AlgaeMotorConfig.MotorOutput.NeutralMode = algaeMotorNuetralMode;
 
-			// Current Limiting 
+			// Current Limiting
 			m_AlgaeMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 			m_AlgaeMotorConfig.CurrentLimits.SupplyCurrentLimit = algaeSupplyCurrentLimit.in(Amps);
 			m_AlgaeMotorConfig.CurrentLimits.SupplyCurrentLowerTime =

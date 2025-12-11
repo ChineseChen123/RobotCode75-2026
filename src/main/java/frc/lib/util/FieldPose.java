@@ -78,6 +78,7 @@ public class FieldPose {
 
 	/** 3 required components of a FieldPose */
 	public Alliance alliance;
+
 	public FieldElement fieldElement;
 	public Offset offset;
 

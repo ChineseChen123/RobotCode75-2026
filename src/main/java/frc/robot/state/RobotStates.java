@@ -30,6 +30,7 @@ public class RobotStates {
 
 	/** Game time triggers */
 	public static final Trigger sim = new Trigger(Robot::isSimulation);
+
 	public static final Trigger teleop = RobotModeTriggers.teleop();
 	public static final Trigger auto = RobotModeTriggers.autonomous();
 	public static final Trigger disabled = RobotModeTriggers.disabled();
@@ -44,6 +45,7 @@ public class RobotStates {
 	/** Elevator states */
 	public static final Trigger elevatorAtHome =
 			new Trigger(() -> m_Elevator.isAtPosition(ElevatorPositions.HOME, false));
+
 	public static final Trigger elevatorAtL1 =
 			new Trigger(() -> m_Elevator.isAtPosition(ElevatorPositions.L1, false));
 	public static final Trigger elevatorAtL2 =
@@ -65,6 +67,7 @@ public class RobotStates {
 
 	/** Coral Intake states */
 	public static final Trigger hasCoral = new Trigger(RobotContainer.getCoralIntake()::hasCoral);
+
 	public static final Trigger isCoralPositioned =
 			new Trigger(RobotContainer.getCoralIntake()::atPosition);
 	public static final Trigger isCoralIntaking =
@@ -72,12 +75,14 @@ public class RobotStates {
 
 	/** Algae Intake states */
 	public static final Trigger hasAlgae = new Trigger(RobotContainer.getAlgaeIntake()::hasAlgae);
+
 	public static final Trigger isAlgaeIntaking =
 			new Trigger(() -> RobotContainer.getAlgaeIntake().getState() == AlgaeStates.INTAKING);
 
 	/** Alge Pivot states */
 	public static final Trigger pivotAtHome =
 			new Trigger(() -> m_Pivot.isAtPosition(PivotStates.RETRACTED));
+
 	public static final Trigger pivotAtDealgaefy =
 			new Trigger(() -> m_Pivot.isAtPosition(PivotStates.DEALGAEFY));
 	public static final Trigger pivotAtGround =
@@ -88,16 +93,31 @@ public class RobotStates {
 	/** Climber states */
 	public static final Trigger isClimberReset =
 			new Trigger(() -> (m_Climber.isReset() && m_Climber.getPositionRotations() > 5));
+
 	public static final Trigger climberLimit = new Trigger(m_Climber::getLimitSwitch);
 
 	/** Auto align states */
 	public static final Trigger isLeftAligned =
-			new Trigger(() -> (AutoAlign.isInitialized() && ReefAlign.isFinished() && ReefAlign.getOffset() == Offset.LEFT));
+			new Trigger(
+					() ->
+							(AutoAlign.isInitialized()
+									&& ReefAlign.isFinished()
+									&& ReefAlign.getOffset() == Offset.LEFT));
+
 	public static final Trigger isRightAligned =
-			new Trigger(() -> (AutoAlign.isInitialized() && ReefAlign.isFinished() && ReefAlign.getOffset() == Offset.RIGHT));
+			new Trigger(
+					() ->
+							(AutoAlign.isInitialized()
+									&& ReefAlign.isFinished()
+									&& ReefAlign.getOffset() == Offset.RIGHT));
 	public static final Trigger isAlgaeAligned =
-			new Trigger(() -> (AutoAlign.isInitialized() && ReefAlign.isFinished() && ReefAlign.getOffset() == Offset.MID));
-	public static final Trigger isHPAligned = new Trigger(() -> (AutoAlign.isInitialized() && HPAlign.isFinished()));
+			new Trigger(
+					() ->
+							(AutoAlign.isInitialized()
+									&& ReefAlign.isFinished()
+									&& ReefAlign.getOffset() == Offset.MID));
+	public static final Trigger isHPAligned =
+			new Trigger(() -> (AutoAlign.isInitialized() && HPAlign.isFinished()));
 	public static final Trigger isAlgaeL3 =
 			new Trigger(() -> (RobotContainer.getSwerve().algaeLevel() == "L3"));
 	public static final Trigger isLastTargetReef =
@@ -109,22 +129,25 @@ public class RobotStates {
 
 	/** Elevator actions */
 	public static Trigger actionElevatorL1 = m_Operator.A.and(teleop);
+
 	public static Trigger actionElevatorL2 =
 			m_Operator.X.and(m_Operator.leftTriggerGreater(0.15).negate()).and(teleop);
 	public static Trigger actionElevatorL3 =
 			m_Operator.Y.and(m_Operator.leftTriggerGreater(0.15).negate()).and(teleop);
 	public static Trigger actionElevatorL4 =
 			m_Operator.B.and(m_Operator.leftTriggerGreater(0.15).negate()).and(teleop).or(() -> autoL4);
-	
+
 	/** Coral actions */
 	public static Trigger actionScoreCoral =
 			m_Operator.rightTriggerGreater(0.15).and(teleop).or(() -> autoScore);
+
 	public static Trigger actionIntakeCoral = m_Operator.upDpad.and(teleop).or(() -> autoIntake);
 	public static Trigger actionIntakeCoralWhileTrue = null;
 	public static Trigger actionReverseCoral = m_Operator.leftDpad.and(teleop);
 
 	/** Algae actions */
 	public static Trigger actionScoreAlgae = m_Operator.rightBumper.and(teleop);
+
 	public static Trigger actionGroundAlgae = m_Operator.leftBumper.and(teleop);
 	public static Trigger actionProcessorPivot = m_Operator.rightDpad.and(teleop);
 	public static Trigger actionDeAlgaefyL2 =
@@ -137,6 +160,7 @@ public class RobotStates {
 	/** Climber actions */
 	public static Trigger actionClimberIn =
 			new Trigger(() -> m_Operator.leftStickY().getAsDouble() < -0.15);
+
 	public static Trigger actionClimberOut =
 			new Trigger(() -> m_Operator.leftStickY().getAsDouble() > 0.15);
 	public static Trigger actionClimberInSetpoint =
@@ -147,6 +171,7 @@ public class RobotStates {
 
 	/** Swerve actions */
 	public static Trigger actionLeftAlign = m_Driver.getLeftButton(autoAlignButton).and(teleop);
+
 	public static Trigger actionRightAlign = m_Driver.getRightButton(autoAlignButton).and(teleop);
 	public static Trigger actionAlgaeAlign = m_Driver.getLeftButton(algaeAlignButton).and(teleop);
 	public static Trigger actionRotateSimilarFace =

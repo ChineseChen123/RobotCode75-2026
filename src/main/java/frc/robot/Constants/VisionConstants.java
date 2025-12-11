@@ -131,7 +131,7 @@ public class VisionConstants {
 							Units.inchesToMeters(34.334)),
 					new Rotation3d(
 							Units.degreesToRadians(0), Units.degreesToRadians(160), Units.degreesToRadians(160)));
-	
+
 	// Left/right reef align setpoints
 	public static final double finalYawSetpointLeft = 13.8;
 	public static final double finalPitchSetpointLeft = -3.37;

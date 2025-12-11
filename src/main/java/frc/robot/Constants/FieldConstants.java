@@ -3,13 +3,8 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.*;
 import static java.util.Map.entry;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
-import frc.lib.util.FieldPose.Offset;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import java.util.Map;
 
