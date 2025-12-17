@@ -41,9 +41,6 @@ public class AprilTagCamera extends SubsystemBase {
 	private EstimatedRobotPose m_pose;
 	private Transform3d cameraToRobotPose;
 
-	private final double ambiguityThreshold;
-	private final double distanceThreshold;
-	private final double reprojectionErrorThreshold;
 	private double ambiguity = 0;
 	private double reprojError = 0;
 	private double tagDist = 0;
@@ -57,9 +54,6 @@ public class AprilTagCamera extends SubsystemBase {
 		m_poseEstimator =
 				new PhotonPoseEstimator(m_tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameraPose);
 		m_poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-		ambiguityThreshold = cameraName == "HP_Cam" ? 0.07 : 0.15;
-		distanceThreshold = maxTagDistanceThreshold;
-		reprojectionErrorThreshold = 0.5;
 	}
 
 	public boolean hasTarget() {
@@ -314,7 +308,7 @@ public class AprilTagCamera extends SubsystemBase {
 					}
 				}
 				if (maxTagDist(currentPose).isPresent()
-						&& maxTagDist(currentPose).getAsDouble() > distanceThreshold) {
+						&& maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
 					m_pose = null;
 					return;
 				}

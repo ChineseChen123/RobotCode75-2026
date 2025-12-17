@@ -31,10 +31,12 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.lib.util.RaiderLog.RaiderLog;
+import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.state.Driver;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+import frc.robot.subsystems.Vision.Limelight;
 
 public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> implements Subsystem {
 
@@ -283,7 +285,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
 		AprilTagCamera[] cameras = RobotContainer.getAprilTagCameras();
 		if (estimatedPosesFromCameras == null || cameras.length != estimatedPosesFromCameras.length) {
-			estimatedPosesFromCameras = new Pose2d[cameras.length];
+			estimatedPosesFromCameras = new Pose2d[cameras.length + (RobotContainer.getLimelight() != null ? 1 : 0)];
 		}
 		for (int i = 0; i < cameras.length; i++) {
 			cameras[i].updateHeading(getHeading());
@@ -294,6 +296,13 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 						cameras[i].getEstimatedPose().timestampSeconds);
 				estimatedPosesFromCameras[i] = cameras[i].getEstimatedPose().estimatedPose.toPose2d();
 			}
+		}
+
+		LimelightHelpers.PoseEstimate llEstimate = RobotContainer.getLimelight().getEstimatedPose();
+		if (llEstimate != null) {
+			addVisionMeasurement(
+					llEstimate.pose, llEstimate.timestampSeconds);
+			estimatedPosesFromCameras[estimatedPosesFromCameras.length - 1] = llEstimate.pose;
 		}
 	}
 

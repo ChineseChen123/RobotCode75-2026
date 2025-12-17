@@ -25,6 +25,7 @@ import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.controllers.ChezyController;
 import frc.robot.subsystems.Drivetrain.controllers.RotationController;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+import frc.robot.subsystems.Vision.Limelight;
 
 public class RobotContainer {
 
@@ -35,6 +36,8 @@ public class RobotContainer {
 	// 		new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
 	// private static final AprilTagCamera m_HPCamera = new AprilTagCamera("HP_Cam", HPCameraPose);
+
+	private static final Limelight m_Limelight = new Limelight();
 
 	private static final Swerve m_Swerve =
 			new Swerve(
@@ -113,6 +116,10 @@ public class RobotContainer {
 	public static AprilTagCamera[] getAprilTagCameras() {
 		// return new AprilTagCamera[] {m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera};
 		return new AprilTagCamera[] {};
+	}
+
+	public static Limelight getLimelight() {
+		return m_Limelight;
 	}
 
 	public static Driver getDriver() {

@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
 
 /** resets the heading of the robot (should not be used often) */
@@ -45,7 +46,8 @@ public class ResetHeading extends Command {
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted) {
-		System.out.println("Gyro reset");
+		System.out.println("Pigeon reset");
+		RobotContainer.getLimelight().resetInternalIMU();
 	}
 
 	// Returns true when the command should end.
