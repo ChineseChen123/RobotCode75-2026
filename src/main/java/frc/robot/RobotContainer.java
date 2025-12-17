@@ -18,13 +18,11 @@ import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.state.Bindings;
 import frc.robot.state.Driver;
 import frc.robot.state.Operator;
-//import frc.robot.subsystems.Climber;
+// import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Vision.AprilTagCamera;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 
 public class RobotContainer {
-
 
 	private static final ObjectDetetectorCamera m_BranchCamera =
 			new ObjectDetetectorCamera("Branch_Cam");
@@ -40,7 +38,6 @@ public class RobotContainer {
 					DrivetrainConstants.FrontRight,
 					DrivetrainConstants.BackLeft,
 					DrivetrainConstants.BackRight);
-
 
 	// Define IO controls
 	private static final Driver m_Driver =
@@ -62,11 +59,6 @@ public class RobotContainer {
 	// Register any subsystems to be logged
 	private void configureLogging() {
 		RaiderLog.register("Swerve", m_Swerve);
-		// RaiderLog.register("Elevator", m_Elevator);
-		// RaiderLog.register("Coral Intake", m_CoralIntake);
-		// RaiderLog.register("Algae Intake", m_AlgaeIntake);
-		// RaiderLog.register("Algae Pivot", m_AlgaePivot);
-		// RaiderLog.register("Climber", m_Climber);
 	}
 
 	// Configure button bindings based on driving mode

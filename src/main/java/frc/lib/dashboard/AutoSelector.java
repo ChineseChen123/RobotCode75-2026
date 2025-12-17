@@ -50,22 +50,11 @@ import java.util.Map;
  */
 
 /* ACTIONS
- * 1 for elevator movement & score L1
- * 2 for align + elevator movement & dealgify (decide level by last point or apriltag)
- * 3 for elevator movement & score L4
- * 4 for align + score processor
- * 5 for intake coral + wait set time
- * 6 for in-place YOLO align
- * 7 for preraise elevator while driving
- * 8 for simultaneous in-place YOLO align and score L4
- * 9 for simultaneous in-place YOLO align and score L4 that ends early if no coral
+ *
  */
 
 /* POINTS
- * ST, SM, SB - top/middle/bottom starting positions
- * P - processor
- * A, B, C, D, E, F - reef points, followed by L/M/R for offset (M for algae)
- * HT, HB - human player stations
+ *
  */
 
 public class AutoSelector {
@@ -98,11 +87,6 @@ public class AutoSelector {
 		// initialize presets
 		presetChooser = new SendableChooser<>();
 		presetChooser.setDefaultOption("Custom", "");
-		presetChooser.addOption("Left Side Two Piece", Presets.LeftSideTwoPiece);
-		presetChooser.addOption("Right Side Two Piece", Presets.RightSideTwoPiece);
-		presetChooser.addOption("Middle One Piece", Presets.MiddleOnePiece);
-		presetChooser.addOption("Left Side Three Piece", Presets.LeftSideThreePiece);
-		presetChooser.addOption("Right Side Three Piece", Presets.RightSideThreePiece);
 
 		// define auto factory for autos
 		factory =
@@ -263,11 +247,6 @@ public class AutoSelector {
 					// m_trajectories.add(
 					//     new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "-" + point).get()));
 
-					// paths starting at reef do not need L or R
-					if (lastPose.charAt(0) >= 'a' && lastPose.charAt(0) <= 'f') {
-						lastPose = lastPose.substring(0, 1);
-					}
-
 					// reset pose and gyro if not done yet
 					if (!isOdometryReset) {
 						// TODO: Use start pose to set gyro
@@ -323,7 +302,7 @@ public class AutoSelector {
 		return m_autoCommand;
 	}
 
-	// public Pose2d getStartPose() {
-	// 	return m_startPose;
-	// }
+	public Pose2d getStartPose() {
+		return m_startPose;
+	}
 }

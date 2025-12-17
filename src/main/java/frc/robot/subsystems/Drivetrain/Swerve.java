@@ -32,19 +32,11 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.lib.util.FieldPose.Offset;
-import frc.lib.util.PeddieBounds;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.Drivetrain.controllers.AutoAlign.HPAlign;
-import frc.robot.subsystems.Drivetrain.controllers.AutoAlign.ReefAlign;
-import frc.robot.subsystems.Drivetrain.controllers.AutoAlign.RotateHPStation;
-import frc.robot.subsystems.Drivetrain.controllers.AutoAlign.RotateSimilarFace;
 import frc.robot.subsystems.Drivetrain.controllers.ChezyController;
 import frc.robot.subsystems.Drivetrain.controllers.RotationController;
-import frc.robot.subsystems.Drivetrain.controllers.YoloController;
-import frc.robot.subsystems.Vision.AprilTagCamera;
 
 public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> implements Subsystem {
 
@@ -89,7 +81,6 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	private final PIDController rController = new PIDController(3.05, 0, 0);
 
 	private static final ChezyController m_ChezyController = new ChezyController();
-	private static final YoloController m_YoloController = new YoloController();
 	private static final RotationController m_RotationController = new RotationController();
 
 	// ── Cameras ───────────────────────────────────────────────────────────────────
@@ -136,10 +127,6 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
 	public ChezyController getChezyController() {
 		return m_ChezyController;
-	}
-
-	public YoloController getYoloController() {
-		return m_YoloController;
 	}
 
 	public RotationController getRotationController() {
@@ -279,16 +266,6 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		return Rotation2d.fromDegrees(m_Pigeon2.getYaw(true).getValue().in(Degrees));
 	}
 
-	@Logged(key = "Yolo Output", importance = Importance.CRITICAL)
-	public double yoloOutput() {
-		return m_YoloController.getCommand();
-	}
-
-	// @Logged(key = "Algae Level", importance = Importance.DEBUG)
-	// public String algaeLevel() {
-	// 	return PeddieBounds.getAlgaeLevel(getPose()).toString();
-	// }
-
 	// ── Vision ───────────────────────────────────────────────────────────────────
 
 	/** Timestamp is FPGA time in seconds. */
@@ -330,47 +307,6 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		return new InstantCommand(() -> xStance(), this).repeatedly().finallyDo(() -> stopModules());
 	}
 
-	public Command reefAlignCommand(Offset offset) {
-		return new InstantCommand(() -> ReefAlign.initialize(offset), this)
-				.andThen(
-						new InstantCommand(() -> setRobotRelative(ReefAlign.execute()), this)
-								.repeatedly()
-								.until(() -> ReefAlign.isFinished()))
-				.finallyDo(() -> ReefAlign.end());
-	}
-
-	public Command hpAlignCommand(Offset offset) {
-		return new InstantCommand(() -> HPAlign.initialize(offset), this)
-				.andThen(
-						new InstantCommand(() -> setRobotRelative(HPAlign.execute()), this)
-								.repeatedly()
-								.until(() -> HPAlign.isFinished()))
-				.finallyDo(() -> HPAlign.end());
-	}
-
-	public Command similarFaceRotateCommand() {
-		return new InstantCommand(() -> RotateSimilarFace.initialize(), this)
-				.andThen(
-						new InstantCommand(() -> setRobotRelative(RotateSimilarFace.execute()), this)
-								.repeatedly()
-								.until(() -> RotateSimilarFace.isFinished()))
-				.finallyDo(() -> RotateSimilarFace.end());
-	}
-
-	public Command hpRotateCommand() {
-		return new InstantCommand(() -> RotateHPStation.initialize(), this)
-				.andThen(
-						new InstantCommand(
-										() -> {
-											double[] output = RobotContainer.getDriver().processedJoystickValues();
-											drive(new Translation2d(output[0], output[1]), RotateHPStation.execute());
-										},
-										this)
-								.repeatedly()
-								.until(() -> RotateHPStation.isFinished()))
-				.finallyDo(() -> RotateHPStation.end());
-	}
-
 	// ── WPILib lifecycle ─────────────────────────────────────────────────────────
 
 	@Override
@@ -388,7 +324,8 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
 		// if (!Utils.isSimulation()) {
 		// 	AprilTagCamera[] cameras = RobotContainer.getAprilTagCameras();
-		// 	if (estimatedPosesFromCameras == null || cameras.length != estimatedPosesFromCameras.length) {
+		// 	if (estimatedPosesFromCameras == null || cameras.length != estimatedPosesFromCameras.length)
+		// {
 		// 		estimatedPosesFromCameras = new Pose2d[cameras.length];
 		// 	}
 		// 	for (int i = 0; i < cameras.length; i++) {

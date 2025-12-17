@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.util.FieldPose;
-import frc.lib.util.PeddieBounds;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.controllers.ChezyController;
@@ -49,7 +48,7 @@ public class ChezyPose extends Command {
 			// FieldPose nearestPose =
 			//     new FieldPose(
 			//         Alliance.Blue, PeddieBounds.nearestElement(m_Swerve.getPose()), Offset.LEFT);
-			//targetPose2d = PeddieBounds.fieldElementToPose2d(targetPose);
+			// targetPose2d = PeddieBounds.fieldElementToPose2d(targetPose);
 		}
 		m_ChezyController.reset(targetPose2d);
 	}

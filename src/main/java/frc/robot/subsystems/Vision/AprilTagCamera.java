@@ -31,7 +31,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class AprilTagCamera extends SubsystemBase {
-	//private final String cameraName;
+	private final String cameraName;
 	private PhotonCamera m_camera;
 	private PhotonPipelineResult m_result;
 	private AprilTagFieldLayout m_tagLayout =
@@ -44,32 +44,32 @@ public class AprilTagCamera extends SubsystemBase {
 	// Tunable thresholds to discard bad estimates
 	// Reprojection error measures how reliable a multi-tag estimate is (lower = better)
 	// Ambiguity measures how reliable a single-tag estimate is (lower = better)
-	// private final double ambiguityThreshold;
-	// private final double distanceThreshold;
-	// private final double reprojectionErrorThreshold;
+	private final double ambiguityThreshold;
+	private final double distanceThreshold;
+	private final double reprojectionErrorThreshold;
 	private double ambiguity = 0;
 	private double reprojError = 0;
 	private double tagDist = 0;
 
 	/** cameraPose - includes angle and translation from robot center (based on CAD) */
-	// public AprilTagCamera(String name, Transform3d cameraPose) {
-	// 	cameraName = name;
+	public AprilTagCamera(String name, Transform3d cameraPose) {
+		cameraName = name;
 
-	// 	cameraToRobotPose = cameraPose;
-	// 	m_camera = new PhotonCamera(NetworkTableInstance.getDefault(), name);
+		cameraToRobotPose = cameraPose;
+		m_camera = new PhotonCamera(NetworkTableInstance.getDefault(), name);
 
-	// 	// Set pose estimator strategies
-	// 	// Multi-tag PnP on coprocessor - used when one camera sees multiple tags
-	// 	// Lowest ambiguity - one-tag strategy, selects pose estimate with lowest ambiguity
-	// 	m_poseEstimator =
-	// 			new PhotonPoseEstimator(m_tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameraPose);
-	// 	m_poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+		// Set pose estimator strategies
+		// Multi-tag PnP on coprocessor - used when one camera sees multiple tags
+		// Lowest ambiguity - one-tag strategy, selects pose estimate with lowest ambiguity
+		m_poseEstimator =
+				new PhotonPoseEstimator(m_tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameraPose);
+		m_poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
-	// 	// Set threshold constants
-	// 	ambiguityThreshold = cameraName == "HP_Cam" ? 0.07 : 0.15;
-	// 	distanceThreshold = maxTagDistanceThreshold;
-	// 	reprojectionErrorThreshold = 0.5;
-	// }
+		// Set threshold constants
+		ambiguityThreshold = cameraName == "HP_Cam" ? 0.07 : 0.15;
+		distanceThreshold = maxTagDistanceThreshold;
+		reprojectionErrorThreshold = 0.5;
+	}
 
 	/** if the camera has any number of targets */
 	public boolean hasTarget() {
@@ -341,26 +341,26 @@ public class AprilTagCamera extends SubsystemBase {
 				}
 
 				// discard estimate if tag(s) are too far away
-				// if (maxTagDist(currentPose).isPresent()
-				// 		&& maxTagDist(currentPose).getAsDouble() > distanceThreshold) {
-				// 	m_pose = null;
-				// 	return;
-				// }
+				if (maxTagDist(currentPose).isPresent()
+						&& maxTagDist(currentPose).getAsDouble() > distanceThreshold) {
+					m_pose = null;
+					return;
+				}
 
-				// // discard multi-tag estimate if reprojection error is too high
-				// if (m_result.getMultiTagResult().isPresent()
-				// 		&& m_result.getMultiTagResult().get().estimatedPose.bestReprojErr
-				// 				> reprojectionErrorThreshold) {
-				// 	m_pose = null;
-				// 	return;
-				// }
+				// discard multi-tag estimate if reprojection error is too high
+				if (m_result.getMultiTagResult().isPresent()
+						&& m_result.getMultiTagResult().get().estimatedPose.bestReprojErr
+								> reprojectionErrorThreshold) {
+					m_pose = null;
+					return;
+				}
 
-				// // discard single-tag estimate if ambiguity is too high
-				// if (getBestTarget().isPresent()
-				// 		&& getBestTarget().get().poseAmbiguity > ambiguityThreshold) {
-				// 	m_pose = null;
-				// 	return;
-				// }
+				// discard single-tag estimate if ambiguity is too high
+				if (getBestTarget().isPresent()
+						&& getBestTarget().get().poseAmbiguity > ambiguityThreshold) {
+					m_pose = null;
+					return;
+				}
 
 				pose = m_poseEstimator.update(m_result);
 			} else { // Latest result is a duplicate
