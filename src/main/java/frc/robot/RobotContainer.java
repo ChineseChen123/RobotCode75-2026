@@ -72,6 +72,7 @@ public class RobotContainer {
 
 	private void configureLogging() {
 		RaiderLog.register("Swerve", m_Swerve);
+		RaiderLog.register("Limelight", m_Limelight);
 	}
 
 	private void configureDefaultCommands() {

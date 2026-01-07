@@ -17,13 +17,13 @@ public class VisionConstants {
 	public static final Transform3d LimelightPose =
 			new Transform3d(
 					new Translation3d(
-							Units.inchesToMeters(3),
+							Units.inchesToMeters(-3),
 							Units.inchesToMeters(-0.25), // quarter inch left
 							Units.inchesToMeters(8.25)), // height from ground
 					new Rotation3d(
 							Units.degreesToRadians(0),
 							Units.degreesToRadians(15), // positive up
-							Units.degreesToRadians(0)));
+							Units.degreesToRadians(180)));
 
 	public static final String llName = "limelight";
 	public static final int[] validMT2Tags = {1, 6, 7, 8, 9, 10, 11};

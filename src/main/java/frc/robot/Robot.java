@@ -28,8 +28,6 @@ public class Robot extends LoggedRobot {
 	 */
 	public Robot() {
 
-		m_robotContainer = new RobotContainer();
-
 		Importance minImportance = Importance.DEBUG;
 		LogMode logMode = LogMode.BASIC;
 		RaiderLog.init(minImportance, logMode);
@@ -37,8 +35,10 @@ public class Robot extends LoggedRobot {
 			setUseTiming(false); // Allows simulation to run as fast as possible
 		}
 
-		PortForwarder.add(5800, "photon-frontcams.local", 5801);
-		PortForwarder.add(5800, "photon-rearcams.local", 5802);
+		m_robotContainer = new RobotContainer();
+
+		// PortForwarder.add(5800, "photon-frontcams.local", 5801);
+		// PortForwarder.add(5800, "photon-rearcams.local", 5802);
 	}
 
 	@Override

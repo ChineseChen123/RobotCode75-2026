@@ -9,7 +9,10 @@ import static frc.robot.Constants.VisionConstants.*;
 import java.util.Optional;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.RaiderLog.Logged;
+import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
 
@@ -29,7 +32,7 @@ public class Limelight extends SubsystemBase {
 
 	public void resetInternalIMU() {
 		LimelightHelpers.SetIMUMode(llName, 1);
-		LimelightHelpers.SetRobotOrientation(llName, RobotContainer.getSwerve().getHeading().getDegrees(), 0, 0, 0, 0, 0);
+		LimelightHelpers.SetRobotOrientation(llName, RobotContainer.getSwerve().getHeading().getDegrees() + 180, 0, 0, 0, 0, 0);
 		LimelightHelpers.SetIMUMode(llName, 2);
 		System.out.println("Limelight IMU reset");
 		isIMUReset = true;
@@ -46,18 +49,27 @@ public class Limelight extends SubsystemBase {
 		LimelightHelpers.RawFiducial[] detectedTags = mt2Estimate.rawFiducials;
 		for (LimelightHelpers.RawFiducial tag : detectedTags) {
 			// discard result if tag is too far or too small
-			if (tag.distToRobot > maxTagDistanceThreshold || tag.ta < minTagAreaThreshold) {
-				return null;
-			}
-			// discard result if too ambiguous
-			if (mt2Estimate.tagCount == 1 && tag.ambiguity > ambiguityThreshold) {
-				return null;
-			}
-			if (mt2Estimate.tagCount > 1 && tag.ambiguity > multiTagAmbiguityThreshold) {
-				return null;
-			}
+			// if (tag.distToRobot > maxTagDistanceThreshold || tag.ta < minTagAreaThreshold) {
+			// 	return null;
+			// }
+			// // discard result if too ambiguous
+			// if (mt2Estimate.tagCount == 1 && tag.ambiguity > ambiguityThreshold) {
+			// 	return null;
+			// }
+			// if (mt2Estimate.tagCount > 1 && tag.ambiguity > multiTagAmbiguityThreshold) {
+			// 	return null;
+			// }
 		}
 		return mt2Estimate;
+	}
+
+	@Logged(key = "Estimated Pose", importance = Importance.CRITICAL)
+	public Pose2d logPose() {
+		LimelightHelpers.PoseEstimate pose = getEstimatedPose();
+		if (pose != null) {
+			return pose.pose.rotateAround(pose.pose.getTranslation(), Rotation2d.k180deg);
+		}
+		return new Pose2d();
 	}
 
 	@Override
