@@ -205,9 +205,9 @@ public class RaiderLog extends DogLog {
 			DogLog.log(key, (String) value);
 		} else if (value instanceof Boolean) {
 			DogLog.log(key, (Boolean) value);
-		} else if (value instanceof Enum<?>) {
+		} /*else if (value instanceof Enum<?>) {
 			DogLog.log(key, (Enum<?>) value);
-		} else if (value instanceof StructSerializable) {
+		}*/ else if (value instanceof StructSerializable) {
 			DogLog.log(key, (StructSerializable) value);
 		} else if (value instanceof double[]) {
 			DogLog.log(key, (double[]) value);
