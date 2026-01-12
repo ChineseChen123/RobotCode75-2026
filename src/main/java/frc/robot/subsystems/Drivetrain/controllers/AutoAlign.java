@@ -2,14 +2,12 @@ package frc.robot.subsystems.Drivetrain.controllers;
 
 import frc.lib.util.FieldPose.FieldElement;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 
 public class AutoAlign {
 
 	private static Swerve m_Swerve;
 	private static ChezyController m_ChezyController;
 	private static RotationController m_RotationController;
-	private static ObjectDetetectorCamera m_BranchCamera;
 	private static FieldElement lastTarget = null;
 	private static boolean isInit = false;
 

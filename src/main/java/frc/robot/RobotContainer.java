@@ -24,9 +24,6 @@ import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 
 public class RobotContainer {
 
-	private static final ObjectDetetectorCamera m_BranchCamera =
-			new ObjectDetetectorCamera("Branch_Cam");
-
 	// Initialize Phoenix swerve
 	private static final Swerve m_Swerve =
 			new Swerve(
@@ -85,10 +82,6 @@ public class RobotContainer {
 
 	public static Swerve getSwerve() {
 		return m_Swerve;
-	}
-
-	public static ObjectDetetectorCamera getBranchCamera() {
-		return m_BranchCamera;
 	}
 
 	public static Driver getDriver() {
