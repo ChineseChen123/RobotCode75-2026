@@ -2,10 +2,12 @@ package frc.robot.state;
 
 import static frc.robot.Constants.IOConstants.*;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import java.util.function.Supplier;
 
 public class RobotStates {
 
@@ -19,6 +21,8 @@ public class RobotStates {
 	public static final Trigger auto = RobotModeTriggers.autonomous();
 	public static final Trigger disabled = RobotModeTriggers.disabled();
 	public static final Trigger endgame = null;
+
+	public static final Supplier<Pose2d> robotPose = RobotContainer.getSwerve()::getPose;
 
 	// ── Actions ──────────────────────────────────────────────────────────────────
 
