@@ -20,8 +20,7 @@ import frc.robot.state.Driver;
 import frc.robot.state.Operator;
 // import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
-import frc.robot.subsystems.EndEffectors.Intake;
+import frc.robot.subsystems.EndEffector.Intake;
 
 public class RobotContainer {
 
@@ -36,7 +35,6 @@ public class RobotContainer {
 					DrivetrainConstants.FrontRight,
 					DrivetrainConstants.BackLeft,
 					DrivetrainConstants.BackRight);
-
 
 	private static final Intake m_Intake = new Intake();
 	// Define IO controls
