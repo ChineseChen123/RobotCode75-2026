@@ -21,6 +21,7 @@ import frc.robot.state.Operator;
 // import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
+import frc.robot.subsystems.EndEffectors.Intake;
 
 public class RobotContainer {
 
@@ -36,6 +37,8 @@ public class RobotContainer {
 					DrivetrainConstants.BackLeft,
 					DrivetrainConstants.BackRight);
 
+
+	private static final Intake m_Intake = new Intake();
 	// Define IO controls
 	private static final Driver m_Driver =
 			new Driver(new Joystick(leftStickPort), new Joystick(rightStickPort));
@@ -79,6 +82,10 @@ public class RobotContainer {
 	}
 
 	// Methods to return instances of static subsystems
+
+	public static Intake getIntake() {
+		return m_Intake;
+	}
 
 	public static Swerve getSwerve() {
 		return m_Swerve;

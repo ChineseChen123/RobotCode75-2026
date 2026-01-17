@@ -20,6 +20,13 @@ public class RobotStates {
 	public static final Trigger disabled = RobotModeTriggers.disabled();
 	public static final Trigger endgame = null;
 
+	// ── States ──────────────────────────────────────────────────────────────────
+
+	/** Intake & Pivot states */
+	
+	/** */
+
+
 	// ── Actions ──────────────────────────────────────────────────────────────────
 
 	/** Swerve actions */
