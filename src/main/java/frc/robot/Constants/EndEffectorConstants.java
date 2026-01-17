@@ -5,4 +5,7 @@
 package frc.robot.Constants;
 
 /** Add your docs here. */
-public class EndEffectorConstants {}
+public class EndEffectorConstants {
+    public static final int innerMotorCANID = 6;
+    public static final int outerMotorCANID = 7;
+}
