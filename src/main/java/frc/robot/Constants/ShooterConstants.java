@@ -170,6 +170,8 @@ public class ShooterConstants {
 		public static final Angle encoder2Offset = Rotations.of(0);
 		// discrepancy threshold between encoders to accept solution
 		public static final Angle matchTolerance = Rotations.of(0.005);
+		// minimum difference between two possible solutions to avoid ambiguity
+		public static final Angle ambiguityTolerance = Rotations.of(0.001);
 
 		// abs for both
 		public static final Angle turretRingGearRange = Degrees.of(270);

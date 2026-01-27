@@ -39,7 +39,7 @@ public class Turret extends SubsystemBase {
 		Angle encoder2Position = Rotations.of(m_TurretEncoder2.get());
 
 		Angle possibleMechRot =
-				Degrees.of(encoder1Position.in(Degrees) * encoderPinion1Teeth / ringGearTeeth);
+				Rotations.of(encoder1Position.in(Rotations) * encoderPinion1Teeth / ringGearTeeth);
 
 		// calculate minimum possible solution for encoder 1 (closest to CW limit)
 		possibleMechRot =
@@ -48,19 +48,43 @@ public class Turret extends SubsystemBase {
 								possibleMechRot.in(Rotations), 0, encoderPinion1Teeth / ringGearTeeth));
 
 		// iterate through possible encoder 2 solutions
+		Angle bestErr = Rotations.of(Double.MAX_VALUE);
+		Angle secondErr = Rotations.of(Double.MAX_VALUE);
+		Angle bestRot = Rotations.of(0);
 		while (possibleMechRot.lte(turretRingGearRange)) {
 			Angle encoder2Solution =
 					Rotations.of((possibleMechRot.in(Rotations) * ringGearTeeth / encoderPinion2Teeth) % 1.0);
 
-			if (encoder2Position.minus(encoder2Solution).abs(Degrees) < matchTolerance.in(Degrees)) {
-				return Optional.of(possibleMechRot);
+			Angle err = Rotations.of(encoder2Position.minus(encoder2Solution).abs(Rotations));
+			if (err.gt(Rotations.of(0.5))) {
+				err = Rotations.of(1.0).minus(err);
+			}
+			if (err.lt(bestErr)) {
+				secondErr = bestErr;
+				bestErr = err;
+				bestRot = possibleMechRot;
+			} else if (err.lt(secondErr)) {
+				secondErr = err;
 			}
 
 			possibleMechRot = possibleMechRot.plus(Rotations.of(encoderPinion1Teeth / ringGearTeeth));
 		}
 
-		return Optional.empty();
+		// no solution found
+		if (bestErr.in(Rotations) == Double.MAX_VALUE || bestErr.gt(matchTolerance)) {
+			return Optional.empty();
+		}
+
+		// ambiguous solutions
+		if (secondErr.lt(matchTolerance)
+				&& Math.abs(secondErr.in(Rotations) - bestErr.in(Rotations)) < ambiguityTolerance.in(Rotations)) {
+			return Optional.empty();
+		}
+
+		return Optional.of(bestRot);
 	}
+
+	
 
 	@Override
 	public void periodic() {
