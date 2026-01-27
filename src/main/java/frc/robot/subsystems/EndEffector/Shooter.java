@@ -5,7 +5,7 @@
 package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.Constants.EndEffectorConstants.Shooter.*;
+import static frc.robot.Constants.ShooterConstants.Shooter.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
@@ -18,40 +18,39 @@ import frc.robot.state.RobotStates;
 public class Shooter extends SubsystemBase {
 	/** Creates a new Shooter. */
 	public enum ShooterStates {
-		DEFAULT(defaultFlywheelSpeed, defaultRollerSpeed),
-		SHOOTING(null, null),
-		REVERSING(reverseFlywheelSpeed, reverseRollerSpeed);
+		DEFAULT(defaultShooterSpeed),
+		SHOOTING(null),
+		REVERSING(reverseShooterSpeed);
 
-		AngularVelocity flywheelSpeed;
-		AngularVelocity rollerSpeed;
+		AngularVelocity shooterSpeed;
 
-		private ShooterStates(AngularVelocity flywheel, AngularVelocity roller) {
-			this.flywheelSpeed = flywheel;
-			this.rollerSpeed = roller;
+		private ShooterStates(AngularVelocity shooterSpeed) {
+			this.shooterSpeed = shooterSpeed;
 		}
 	}
 
 	private ShooterStates m_ShooterState;
-	private final TalonFX m_FlywheelMotor;
-	private final TalonFX m_RollerMotor;
+
+	private final TalonFX m_ShooterMotor1;
+	private final TalonFX m_ShooterMotor2;
 	private final VelocityTorqueCurrentFOC m_VelocityRequest = new VelocityTorqueCurrentFOC(0);
 
 	public Shooter() {
-		m_FlywheelMotor = new TalonFX(flywheelCanID, superstructureCANBusName);
-		m_RollerMotor = new TalonFX(rollerCanID, superstructureCANBusName);
+		m_ShooterMotor1 = new TalonFX(shooterMotor1CanID, superstructureCANBusName);
+		m_ShooterMotor2 = new TalonFX(shooterMotor2CanID, superstructureCANBusName);
 
-		m_FlywheelMotor.getConfigurator().apply(MotorConfigs.getFlywheelMotorConfiguration());
-		m_RollerMotor.getConfigurator().apply(MotorConfigs.getRollerMotorConfiguration());
+		m_ShooterMotor1.getConfigurator().apply(MotorConfigs.getShooterMotor1MotorConfiguration());
+		m_ShooterMotor2.getConfigurator().apply(MotorConfigs.getShooterMotor2MotorConfiguration());
 
 		m_ShooterState = ShooterStates.DEFAULT;
 	}
 
 	public double getFlyWheelVelocity() {
-		return m_FlywheelMotor.getVelocity(true).getValue().in(RotationsPerSecond);
+		return m_ShooterMotor1.getVelocity(true).getValue().in(RotationsPerSecond);
 	}
 
 	public double getRollerVelocity() {
-		return m_RollerMotor.getVelocity(true).getValue().in(RotationsPerSecond);
+		return m_ShooterMotor2.getVelocity(true).getValue().in(RotationsPerSecond);
 	}
 
 	public ShooterStates getShooterState() {
@@ -62,9 +61,8 @@ public class Shooter extends SubsystemBase {
 		m_ShooterState = state;
 	}
 
-	public AngularVelocity[] calculateShooterSpeeds(Pose2d robotPose) {
+	public AngularVelocity calculateShooterSpeed(Pose2d robotPose) {
 		// lookup table stuff
-		// 0 > flywheel, 1 > roller
 		return null;
 	}
 
@@ -72,12 +70,12 @@ public class Shooter extends SubsystemBase {
 	public void periodic() {
 		if (m_ShooterState == ShooterStates.SHOOTING) {
 			// variable speeds
-			AngularVelocity[] velocities = calculateShooterSpeeds(RobotStates.robotPose.get());
-			m_FlywheelMotor.setControl(m_VelocityRequest.withVelocity(velocities[0]));
-			m_RollerMotor.setControl(m_VelocityRequest.withVelocity(velocities[1]));
+			AngularVelocity velocity = calculateShooterSpeed(RobotStates.robotPose.get());
+			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(velocity));
+			m_ShooterMotor2.setControl(m_VelocityRequest.withVelocity(velocity));
 		} else {
-			m_FlywheelMotor.setControl(m_VelocityRequest.withVelocity(m_ShooterState.flywheelSpeed));
-			m_RollerMotor.setControl(m_VelocityRequest.withVelocity(m_ShooterState.rollerSpeed));
+			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
+			m_ShooterMotor2.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
 		}
 	}
 }
