@@ -5,8 +5,8 @@
 package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.Constants.ShooterConstants.Shooter.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
+import static frc.robot.Constants.ShooterConstants.Shooter.*;
 
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;

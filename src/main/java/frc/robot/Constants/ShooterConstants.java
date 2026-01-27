@@ -5,9 +5,9 @@
 package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
@@ -17,7 +17,6 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -46,7 +45,8 @@ public class ShooterConstants {
 			public static final TalonFXConfiguration m_shooterMotor2Config = new TalonFXConfiguration();
 
 			// Neutral modes and inverts
-			public static final InvertedValue shooterMotor1Inverted = InvertedValue.CounterClockwise_Positive;
+			public static final InvertedValue shooterMotor1Inverted =
+					InvertedValue.CounterClockwise_Positive;
 			public static final InvertedValue shooterMotor2Inverted = InvertedValue.Clockwise_Positive;
 
 			public static final NeutralModeValue shooterMotor1NeutralMode = NeutralModeValue.Coast;
@@ -86,14 +86,16 @@ public class ShooterConstants {
 
 				// Current Limiting
 				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLimitEnable = true;
-				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLimit = shooterMotor1SupplyCurrentLimit.in(Amps);
+				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLimit =
+						shooterMotor1SupplyCurrentLimit.in(Amps);
 				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLowerTime =
 						shooterMotor1CurrentThresholdTime.in(Seconds);
 				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLowerLimit =
 						shooterMotor1CurrentLowerThreshold.in(Amps);
 
 				m_shooterMotor1Config.CurrentLimits.StatorCurrentLimitEnable = true;
-				m_shooterMotor1Config.CurrentLimits.StatorCurrentLimit = shooterMotor1StatorCurrentLimit.in(Amps);
+				m_shooterMotor1Config.CurrentLimits.StatorCurrentLimit =
+						shooterMotor1StatorCurrentLimit.in(Amps);
 
 				// PID Config
 				m_shooterMotor1Config.Slot0.kP = shooterMotor1VelocityKP;
@@ -121,12 +123,15 @@ public class ShooterConstants {
 
 				// Current Limiting
 				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLimitEnable = true;
-				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLimit = shooterMotor2SupplyCurrentLimit.in(Amps);
+				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLimit =
+						shooterMotor2SupplyCurrentLimit.in(Amps);
 				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLowerTime =
 						shooterMotor2CurrentThresholdTime.in(Seconds);
-				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLowerLimit = shooterMotor2CurrentLowerThreshold.in(Amps);
+				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLowerLimit =
+						shooterMotor2CurrentLowerThreshold.in(Amps);
 				m_shooterMotor2Config.CurrentLimits.StatorCurrentLimitEnable = true;
-				m_shooterMotor2Config.CurrentLimits.StatorCurrentLimit = shooterMotor2StatorCurrentLimit.in(Amps);
+				m_shooterMotor2Config.CurrentLimits.StatorCurrentLimit =
+						shooterMotor2StatorCurrentLimit.in(Amps);
 
 				// PID Config
 				m_shooterMotor2Config.Slot0.kP = shooterMotor2VelocityKP;
@@ -149,14 +154,26 @@ public class ShooterConstants {
 		}
 	}
 
-    public class Turret {
-        
-		public static final int turretMotorCanID = 0;
-		public static final int turretCCWLimitID = 0;
-		public static final int turretCWLimitID = 0;
+	public class Turret {
 
-		public static final double turretGearRatio = 1.0 / 1.0;
-		public static final Angle turretRotationRelativeRange = Rotations.of(100);
+		public static final int turretMotorCanID = 0;
+		public static final int encoder1Port = 0;
+		public static final int encoder2Port = 0;
+
+		public static final int ringGearTeeth = 102;
+		public static final int encoderPinion1Teeth = 18;
+		public static final int encoderPinion2Teeth = 19;
+		public static final double motorToMechanismRatio = 1.0 / 1.0;
+
+		// at CW limit
+		public static final Angle encoder1Offset = Rotations.of(0);
+		public static final Angle encoder2Offset = Rotations.of(0);
+		// discrepancy threshold between encoders to accept solution
+		public static final Angle matchTolerance = Rotations.of(0.005);
+
+		// abs for both
+		public static final Angle turretRingGearRange = Degrees.of(270);
+		public static final Angle turretMotorRange = Rotations.of(100);
 
 		public static class MotorConfigs {
 			public static final Time closedLoopRamp = Seconds.of(0.25);
@@ -198,7 +215,8 @@ public class ShooterConstants {
 
 				m_TurretMotorConfig.CurrentLimits.SupplyCurrentLimit = supplyCurrentLimit.in(Amps);
 				m_TurretMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-				m_TurretMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = supplyCurrentLowerLimit.in(Amps);
+				m_TurretMotorConfig.CurrentLimits.SupplyCurrentLowerLimit =
+						supplyCurrentLowerLimit.in(Amps);
 				m_TurretMotorConfig.CurrentLimits.SupplyCurrentLowerTime =
 						supplyCurrentLowerTime.in(Seconds);
 
@@ -207,7 +225,8 @@ public class ShooterConstants {
 				m_TurretMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
 				m_TurretMotorConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-				m_TurretMotorConfig.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
+				m_TurretMotorConfig.Slot0.StaticFeedforwardSign =
+						StaticFeedforwardSignValue.UseVelocitySign;
 				m_TurretMotorConfig.Slot0.kA = kA; // tune third
 				m_TurretMotorConfig.Slot0.kG = kG; // tune first
 				m_TurretMotorConfig.Slot0.kS = kS; // tune second
@@ -231,6 +250,5 @@ public class ShooterConstants {
 				return m_TurretMotorConfig;
 			}
 		}
-
-    }
+	}
 }
