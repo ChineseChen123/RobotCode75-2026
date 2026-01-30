@@ -17,6 +17,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -163,7 +164,11 @@ public class ShooterConstants {
 		public static final int ringGearTeeth = 102;
 		public static final int encoderPinion1Teeth = 18;
 		public static final int encoderPinion2Teeth = 19;
+
 		public static final double motorToMechanismRatio = 1.0 / 1.0;
+		// translation from robot center to turret center, climber is forward
+		public static final Translation2d turretPositionOffset =
+				new Translation2d(Inches.of(0), Inches.of(0));
 
 		// at CW limit
 		public static final Angle encoder1Offset = Rotations.of(0);
