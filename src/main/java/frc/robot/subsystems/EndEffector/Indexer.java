@@ -35,7 +35,7 @@ public class Indexer extends SubsystemBase {
 
 	private IndexerStates m_IndexerState;
 
-	private DigitalInput m_BeamBreak;
+	private final DigitalInput m_BeamBreak;
 
 	private final TalonFX m_IndexerMotor;
 	private final TalonFX m_HopperMotor;
