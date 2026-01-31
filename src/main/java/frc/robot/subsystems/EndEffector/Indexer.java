@@ -18,14 +18,18 @@ import frc.robot.Constants.EndEffectorConstants.Indexer.MotorConfigs;
 public class Indexer extends SubsystemBase {
 	/** Creates a new Shooter. */
 	public enum IndexerStates {
-		DEFAULT(defaultIndexerSpeed),
-		RUNNING(runningIndexerSpeed),
-		REVERSING(reverseIndexerSpeed);
+		DEFAULT(defaultIndexerSpeed, defaultHopperSpeed),
+		INDEXING(runningIndexerSpeed, runningHopperSpeed),
+		READYTOSHOOT(defaultIndexerSpeed, runningHopperSpeed),
+		SHOOTING(shootingIndexerSpeed, runningHopperSpeed),
+		REVERSING(reverseIndexerSpeed, reverseHopperSpeed);
 
 		AngularVelocity indexerSpeed;
+		AngularVelocity hopperSpeed;
 
-		private IndexerStates(AngularVelocity indexerSpeed) {
+		private IndexerStates(AngularVelocity indexerSpeed, AngularVelocity hopperSpeed) {
 			this.indexerSpeed = indexerSpeed;
+			this.hopperSpeed = hopperSpeed;
 		}
 	}
 
@@ -34,15 +38,18 @@ public class Indexer extends SubsystemBase {
 	private DigitalInput m_BeamBreak;
 
 	private final TalonFX m_IndexerMotor;
+	private final TalonFX m_HopperMotor;
 	private final VelocityTorqueCurrentFOC m_VelocityRequest = new VelocityTorqueCurrentFOC(0);
 
 	public Indexer() {
 		m_IndexerMotor = new TalonFX(indexerMotorCanID, superstructureCANBusName);
+		m_HopperMotor = new TalonFX(hopperMotorCanID, superstructureCANBusName);
 
 		m_IndexerState = IndexerStates.DEFAULT;
 		m_BeamBreak = new DigitalInput(beamBreakPort);
 
 		m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerMotorConfig());
+		m_HopperMotor.getConfigurator().apply(MotorConfigs.getIndexerMotorConfig());
 	}
 
 	public boolean hasFuel() {
@@ -64,5 +71,6 @@ public class Indexer extends SubsystemBase {
 	@Override
 	public void periodic() {
 		m_IndexerMotor.setControl(m_VelocityRequest.withVelocity(m_IndexerState.indexerSpeed));
+		m_HopperMotor.setControl(m_VelocityRequest.withVelocity(m_IndexerState.hopperSpeed));
 	}
 }

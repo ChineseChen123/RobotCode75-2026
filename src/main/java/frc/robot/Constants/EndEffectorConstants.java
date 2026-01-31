@@ -191,12 +191,18 @@ public class EndEffectorConstants {
 
 	public class Indexer {
 		public static final int indexerMotorCanID = 0;
+		public static final int hopperMotorCanID = 1;
 
 		public static final int beamBreakPort = 0;
 
 		public static final AngularVelocity defaultIndexerSpeed = RotationsPerSecond.of(0);
 		public static final AngularVelocity runningIndexerSpeed = RotationsPerSecond.of(3);
+		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(5);
 		public static final AngularVelocity reverseIndexerSpeed = RotationsPerSecond.of(-3);
+
+		public static final AngularVelocity defaultHopperSpeed = RotationsPerSecond.of(0);
+		public static final AngularVelocity runningHopperSpeed = RotationsPerSecond.of(3);
+		public static final AngularVelocity reverseHopperSpeed = RotationsPerSecond.of(-3);
 
 		public class MotorConfigs {
 			public static final TalonFXConfiguration m_IndexerMotorConfig = new TalonFXConfiguration();
