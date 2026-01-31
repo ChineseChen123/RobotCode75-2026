@@ -179,6 +179,7 @@ public class Turret extends SubsystemBase {
 		// This method will be called once per scheduler run
 		if (!isReset) {
 			resetMotorPosition();
+			return;
 		}
 
 		updateTurretTarget();
