@@ -40,7 +40,6 @@ public class Operator extends SubsystemBase {
 	public Trigger rightDpad = kFalse;
 	public Trigger start = kFalse;
 	public Trigger back = kFalse;
-	
 
 	/** Creates a new Driver. */
 	public Operator(CommandXboxController controller) {
