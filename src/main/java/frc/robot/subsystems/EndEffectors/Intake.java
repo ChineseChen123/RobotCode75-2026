@@ -49,6 +49,7 @@ public class Intake extends SubsystemBase {
 
   public void setState(IntakeStates state) {
 		m_IntakeState = state;
+    
 	}
 
   @Override

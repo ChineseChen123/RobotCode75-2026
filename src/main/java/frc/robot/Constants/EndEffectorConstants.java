@@ -5,10 +5,12 @@
 package frc.robot.Constants;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Frequency;
 
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Hertz;
@@ -20,7 +22,6 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.AdvancedHallSupportValue;
 
@@ -31,21 +32,32 @@ public class EndEffectorConstants {
 
     public static final int intakeMotorCanID = 0; // Kraken X44
 	public static final int pivotCanID = 0; // Kraken X60
+	public static final int indexerMotorCanID = 0;
     
 	public static final int intakeEncoderPort = 0;
 	public static final int pivotEncoderPort = 0;
+	public static final int beamBreakPort = 0;
 
     public static final Angle pivotZeroPoint = Rotations.of(0);
 
+	public static final AngularVelocity defaultIndexerSpeed = RotationsPerSecond.of(0);
+	public static final AngularVelocity runningIndexerSpeed = RotationsPerSecond.of(1);
+	public static final AngularVelocity reverseIndexerSpeed = RotationsPerSecond.of(-1);
+
+
     public static final class MotorConfigs {
 
-		public static final TalonFXSConfiguration m_IntakeMotorConfig = new TalonFXSConfiguration();
+		public static final TalonFXConfiguration m_IntakeMotorConfig = new TalonFXConfiguration();
         public static final TalonFXConfiguration m_PivotConfig = new TalonFXConfiguration();
+		public static final TalonFXConfiguration m_IndexerMotorConfig = new TalonFXConfiguration();
+		
         
 		public static final InvertedValue intakeMotorInvert = InvertedValue.CounterClockwise_Positive;
+		public static final InvertedValue indexMotorInvert = InvertedValue.CounterClockwise_Positive;
 		public static final InvertedValue pivotInvert = InvertedValue.CounterClockwise_Positive;
         
 		public static final NeutralModeValue intakeNeutralMode = NeutralModeValue.Brake;
+		public static final NeutralModeValue indexNeutralMode = NeutralModeValue.Brake;
 		public static final NeutralModeValue pivotNeutralMode = NeutralModeValue.Brake;
 
         public static final Frequency timeSyncFreq = Hertz.of(250);
@@ -98,12 +110,10 @@ public class EndEffectorConstants {
 		public static final double pivotMMVel = 50;
 		public static final double pivotMMJerk = 500;
 
-		public static TalonFXSConfiguration getIntakeMotorConfiguration() {
+		public static TalonFXConfiguration getIntakeMotorConfiguration() {
 			m_IntakeMotorConfig.MotorOutput.Inverted = intakeMotorInvert;
 			m_IntakeMotorConfig.MotorOutput.NeutralMode = intakeNeutralMode;
 
-			m_IntakeMotorConfig.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
-			m_IntakeMotorConfig.Commutation.AdvancedHallSupport = AdvancedHallSupportValue.Enabled;
 			m_IntakeMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
 			// Current Limiting
@@ -138,6 +148,45 @@ public class EndEffectorConstants {
 			m_IntakeMotorConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
 
 			return m_IntakeMotorConfig;
+		}
+		public static TalonFXConfiguration getIndexerMotorConfig() {
+			m_IndexerMotorConfig.MotorOutput.Inverted = indexMotorInvert;
+			m_IndexerMotorConfig.MotorOutput.NeutralMode = indexNeutralMode;
+
+			m_IndexerMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+			// Current Limiting
+			m_IndexerMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+			m_IndexerMotorConfig.CurrentLimits.SupplyCurrentLimit = intakeSupplyCurrentLimit.in(Amps);
+			m_IndexerMotorConfig.CurrentLimits.SupplyCurrentLowerTime =
+					intakeCurrentThresholdTime.in(Seconds);
+			m_IndexerMotorConfig.CurrentLimits.SupplyCurrentLowerLimit =
+					intakeCurrentLowerThreshold.in(Amps);
+
+			m_IndexerMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+			m_IndexerMotorConfig.CurrentLimits.StatorCurrentLimit = intakeStatorCurrentLimit.in(Amps);
+
+			// PID Config
+			m_IndexerMotorConfig.Slot0.kP = intakeVelocityKP;
+			m_IndexerMotorConfig.Slot0.kI = intakeVelocityKI;
+			m_IndexerMotorConfig.Slot0.kD = intakeVelocityKD;
+			m_IndexerMotorConfig.Slot0.kS = intakeVelocityKS;
+
+			m_IndexerMotorConfig.Slot1.kP = intakePositionKP;
+			m_IndexerMotorConfig.Slot1.kI = intakePositionKI;
+			m_IndexerMotorConfig.Slot1.kD = intakePositionKD;
+
+			// Open and Closed Loop Ramping
+			m_IndexerMotorConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = openLoopRamp;
+			m_IndexerMotorConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = openLoopRamp;
+
+			m_IndexerMotorConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = closedLoopRamp;
+			m_IndexerMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = closedLoopRamp;
+
+			m_IndexerMotorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp;
+			m_IndexerMotorConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
+
+			return m_IndexerMotorConfig;
 		}
         
         public static TalonFXConfiguration getPivotConfiguration() {
