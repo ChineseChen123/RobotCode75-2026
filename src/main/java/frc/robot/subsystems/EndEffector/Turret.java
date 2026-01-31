@@ -166,8 +166,19 @@ public class Turret extends SubsystemBase {
 		Angle turretTarget =
 				fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
 		if (Math.abs(turretTarget.in(Degrees)) > turretRingGearRange.in(Degrees) / 2.0) {
-			turretTargetAngleAbsolute = Degrees.of(0);
-			turretTargetAngleMotor = Degrees.of(0);
+			double angleDeg = turretTarget.in(Degrees);
+			// Map [135, 180] -> [135, 0] linearly
+			if (angleDeg > 135.0) { // (135, 180]
+				double t = (angleDeg - 135.0) / 45.0;   // 0..1
+				angleDeg = 135.0 * (1.0 - t);               // 135..0
+			} else {
+				// Map [-180, -135] -> [0, -135] linearly
+				// angleDeg in [-180, -135)
+				double t = (angleDeg + 180.0) / 45.0;       // 0..1
+				angleDeg = -135.0 * t;  
+			}
+			turretTargetAngleAbsolute = Degrees.of(angleDeg);
+			turretTargetAngleMotor = turretTargetAngleAbsolute.div(motorToMechanismRatio);
 			return;
 		}
 		turretTargetAngleAbsolute = turretTarget;
