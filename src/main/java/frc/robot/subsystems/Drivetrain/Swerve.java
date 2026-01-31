@@ -197,6 +197,11 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		return this.getState().Pose;
 	}
 
+	@Logged(key = "Field Relative Chassis Speeds", importance = Importance.CRITICAL)
+	public ChassisSpeeds getFieldRleativeChassisSpeeds() {
+		return ChassisSpeeds.fromRobotRelativeSpeeds(this.getChassisSpeeds(), getHeading());
+	}
+
 	/** Reset odometry pose. */
 	public void setPose(Pose2d pose) {
 		this.resetPose(pose);
