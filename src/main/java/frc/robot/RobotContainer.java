@@ -24,6 +24,7 @@ import frc.robot.state.Operator;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.controllers.ChezyController;
 import frc.robot.subsystems.Drivetrain.controllers.RotationController;
+import frc.robot.subsystems.Turret;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 import frc.robot.subsystems.Vision.Limelight;
 
@@ -50,6 +51,8 @@ public class RobotContainer {
 					BackLeft,
 					BackRight);
 
+	public static final Turret m_Turret = new Turret();
+
 	private static final ChezyController m_ChezyController = new ChezyController();
 
 	private static final RotationController m_RotationController = new RotationController();
@@ -73,6 +76,7 @@ public class RobotContainer {
 	private void configureLogging() {
 		RaiderLog.register("Swerve", m_Swerve);
 		RaiderLog.register("Limelight", m_Limelight);
+		RaiderLog.register("Turret", m_Turret);
 	}
 
 	private void configureDefaultCommands() {
