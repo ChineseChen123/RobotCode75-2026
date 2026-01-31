@@ -5,10 +5,10 @@
 package frc.robot.Constants;
 
 /**
- * This class is meant to house the configs for specific motors All configs from CTRE motors are
- * unit-aware, especially configs for closed loop gains timeSync can only be used on a CANivore any
- * TorqueCurrentFOC gains/control modes can only be used with Phoenix pro (HIGHLY RECCOMENDED TO
- * USE)
+ * This class is meant ry.TrapezoidProflie; import edu.first.first.math.etil.Units; to house the
+ * configs for specific motors All configs from CTRE motors are unit-aware, especially configs for
+ * closed loop gains timeSync can only be used on a CANivore any TorqueCurrentFOC gains/control
+ * modes can only be used with Phoenix pro (HIGHLY RECCOMENDED TO USE)
  */
 public final class RobotConstants {
 	public static final String superstructureCANBusName = "Superstructure";
