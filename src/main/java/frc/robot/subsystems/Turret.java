@@ -48,7 +48,7 @@ public class Turret extends SubsystemBase {
 		m_TurretEncoder1 = new DutyCycleEncoder(encoder1Port, 1, encoder1Offset.in(Rotations));
 		m_TurretEncoder2 = new DutyCycleEncoder(encoder2Port, 1, encoder2Offset.in(Rotations));
 
-		m_TurretMotor.getConfigurator().apply(MotorConfigs.getTurretMotorConfig());
+		// m_TurretMotor.getConfigurator().apply(MotorConfigs.getTurretMotorConfig());
 
 		turretRequest.UpdateFreqHz = 0;
 		turretRequest.UseTimesync = true;
@@ -60,7 +60,7 @@ public class Turret extends SubsystemBase {
 		if (turretPosition.isEmpty()) {
 			return;
 		}
-		m_TurretMotor.setPosition(turretPosition.get().div(motorToMechanismRatio));
+		// m_TurretMotor.setPosition(turretPosition.get().div(motorToMechanismRatio));
 		isReset = true;
 	}
 
@@ -204,6 +204,6 @@ public class Turret extends SubsystemBase {
 
 		updateTurretTarget();
 
-		m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngleMotor));
+		// m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngleMotor));
 	}
 }
