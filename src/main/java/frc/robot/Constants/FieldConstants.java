@@ -17,5 +17,5 @@ public class FieldConstants {
 	// public static final Map<FieldElement, Integer> redTags = Map.ofEntries();
 
 	public static final Pose2d blueHub = new Pose2d(0, 0, Rotation2d.kZero);
-	public static final Pose2d redHub = new Pose2d(0, 0, Rotation2d.kZero);
+	public static final Pose2d redHub = new Pose2d(12, 4, Rotation2d.kZero);
 }

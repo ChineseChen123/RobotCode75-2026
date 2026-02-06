@@ -19,19 +19,19 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
-import frc.robot.Constants.ShooterConstants.Turret.MotorConfigs;
 import frc.robot.state.RobotStates;
 import java.util.Optional;
 
 public class Turret extends SubsystemBase {
 
-	private final TalonFX m_TurretMotor = null;
+	// private final TalonFX m_TurretMotor = null;
 
-	private final DutyCycleEncoder m_TurretEncoder1;
-	private final DutyCycleEncoder m_TurretEncoder2;
+	// private final DutyCycleEncoder m_TurretEncoder1;
+	// private final DutyCycleEncoder m_TurretEncoder2;
 
 	private final MotionMagicExpoTorqueCurrentFOC turretRequest =
 			new MotionMagicExpoTorqueCurrentFOC(Rotations.of(0));
@@ -45,8 +45,8 @@ public class Turret extends SubsystemBase {
 	public Turret() {
 		// m_TurretMotor = new TalonFX(turretMotorCanID, superstructureCANBusName);
 
-		m_TurretEncoder1 = new DutyCycleEncoder(encoder1Port, 1, encoder1Offset.in(Rotations));
-		m_TurretEncoder2 = new DutyCycleEncoder(encoder2Port, 1, encoder2Offset.in(Rotations));
+		// m_TurretEncoder1 = new DutyCycleEncoder(encoder1Port, 1, encoder1Offset.in(Rotations));
+		// m_TurretEncoder2 = new DutyCycleEncoder(encoder2Port, 1, encoder2Offset.in(Rotations));
 
 		// m_TurretMotor.getConfigurator().apply(MotorConfigs.getTurretMotorConfig());
 
@@ -56,106 +56,107 @@ public class Turret extends SubsystemBase {
 
 	// given mechanism rotation, reset motor encoder to match
 	public void resetMotorPosition() {
-		Optional<Angle> turretPosition = getTurretHeadingCRT();
-		if (turretPosition.isEmpty()) {
-			return;
-		}
+		// Optional<Angle> turretPosition = getTurretHeadingCRT();
+		// if (turretPosition.isEmpty()) {
+		// 	return;
+		// }
 		// m_TurretMotor.setPosition(turretPosition.get().div(motorToMechanismRatio));
 		isReset = true;
 	}
 
-	public double getMotorPositionRotations() {
-		return m_TurretMotor.getPosition().getValue().in(Rotations);
-	}
+	// public double getMotorPositionRotations() {
+	// 	return m_TurretMotor.getPosition().getValue().in(Rotations);
+	// }
 
-	public double getEncoder1PositionDegrees() {
-		return m_TurretEncoder1.get() * 360.0;
-	}
+	// public double getEncoder1PositionDegrees() {
+	// 	return m_TurretEncoder1.get() * 360.0;
+	// }
 
-	public double getEncoder2PositionDegrees() {
-		return m_TurretEncoder2.get() * 360.0;
-	}
+	// public double getEncoder2PositionDegrees() {
+	// 	return m_TurretEncoder2.get() * 360.0;
+	// }
 
 	// -135 deg = CW limit, 135 deg = CCW limit (CCW positive)
 	// robot relative heading
-	public Optional<Angle> getTurretHeadingCRT() {
-		Angle encoder1Position = Degrees.of(getEncoder1PositionDegrees());
-		Angle encoder2Position = Degrees.of(getEncoder2PositionDegrees());
+	// public Optional<Angle> getTurretHeadingCRT() {
+	// 	Angle encoder1Position = Degrees.of(getEncoder1PositionDegrees());
+	// 	Angle encoder2Position = Degrees.of(getEncoder2PositionDegrees());
 
-		Angle possibleMechRot =
-				Rotations.of(encoder1Position.in(Rotations) * encoderPinion1Teeth / ringGearTeeth);
+	// 	Angle possibleMechRot =
+	// 			Rotations.of(encoder1Position.in(Rotations) * encoderPinion1Teeth / ringGearTeeth);
 
-		// calculate minimum possible solution for encoder 1 (closest to CW limit)
-		possibleMechRot =
-				Rotations.of(
-						MathUtil.inputModulus(
-								possibleMechRot.in(Rotations), 0, encoderPinion1Teeth / ringGearTeeth));
+	// 	// calculate minimum possible solution for encoder 1 (closest to CW limit)
+	// 	possibleMechRot =
+	// 			Rotations.of(
+	// 					MathUtil.inputModulus(
+	// 							possibleMechRot.in(Rotations), 0, encoderPinion1Teeth / ringGearTeeth));
 
-		// iterate through possible encoder 2 solutions
-		Angle bestErr = Rotations.of(Double.MAX_VALUE);
-		Angle secondErr = Rotations.of(Double.MAX_VALUE);
-		Angle bestRot = Rotations.of(0);
-		while (possibleMechRot.lte(turretRingGearRange)) {
-			Angle encoder2Solution =
-					Rotations.of((possibleMechRot.in(Rotations) * ringGearTeeth / encoderPinion2Teeth) % 1.0);
+	// 	// iterate through possible encoder 2 solutions
+	// 	Angle bestErr = Rotations.of(Double.MAX_VALUE);
+	// 	Angle secondErr = Rotations.of(Double.MAX_VALUE);
+	// 	Angle bestRot = Rotations.of(0);
+	// 	while (possibleMechRot.lte(turretRingGearRange)) {
+	// 		Angle encoder2Solution =
+	// 				Rotations.of((possibleMechRot.in(Rotations) * ringGearTeeth / encoderPinion2Teeth) % 1.0);
 
-			Angle err = Rotations.of(encoder2Position.minus(encoder2Solution).abs(Rotations));
-			if (err.gt(Rotations.of(0.5))) {
-				err = Rotations.of(1.0).minus(err);
-			}
-			if (err.lt(bestErr)) {
-				secondErr = bestErr;
-				bestErr = err;
-				bestRot = possibleMechRot;
-			} else if (err.lt(secondErr)) {
-				secondErr = err;
-			}
+	// 		Angle err = Rotations.of(encoder2Position.minus(encoder2Solution).abs(Rotations));
+	// 		if (err.gt(Rotations.of(0.5))) {
+	// 			err = Rotations.of(1.0).minus(err);
+	// 		}
+	// 		if (err.lt(bestErr)) {
+	// 			secondErr = bestErr;
+	// 			bestErr = err;
+	// 			bestRot = possibleMechRot;
+	// 		} else if (err.lt(secondErr)) {
+	// 			secondErr = err;
+	// 		}
 
-			possibleMechRot = possibleMechRot.plus(Rotations.of(encoderPinion1Teeth / ringGearTeeth));
-		}
+	// 		possibleMechRot = possibleMechRot.plus(Rotations.of(encoderPinion1Teeth / ringGearTeeth));
+	// 	}
 
-		// no solution found
-		if (bestErr.in(Rotations) == Double.MAX_VALUE || bestErr.gt(matchTolerance)) {
-			return Optional.empty();
-		}
+	// 	// no solution found
+	// 	if (bestErr.in(Rotations) == Double.MAX_VALUE || bestErr.gt(matchTolerance)) {
+	// 		return Optional.empty();
+	// 	}
 
-		// ambiguous solutions
-		if (secondErr.lt(matchTolerance)
-				&& Math.abs(secondErr.in(Rotations) - bestErr.in(Rotations))
-						< ambiguityTolerance.in(Rotations)) {
-			return Optional.empty();
-		}
+	// 	// ambiguous solutions
+	// 	if (secondErr.lt(matchTolerance)
+	// 			&& Math.abs(secondErr.in(Rotations) - bestErr.in(Rotations))
+	// 					< ambiguityTolerance.in(Rotations)) {
+	// 		return Optional.empty();
+	// 	}
 
-		// convert range from [0, 270] to [-135, 135]
-		return Optional.of(bestRot.plus(turretRingGearRange.div(2.0)));
-	}
+	// 	// convert range from [0, 270] to [-135, 135]
+	// 	return Optional.of(bestRot.plus(turretRingGearRange.div(2.0)));
+	// }
 
-	public Angle getTurretHeadingFromMotor() {
-		return Rotations.of(getMotorPositionRotations() * motorToMechanismRatio);
-	}
+	// public Angle getTurretHeadingFromMotor() {
+	// 	return Rotations.of(getMotorPositionRotations() * motorToMechanismRatio);
+	// }
 
 	@Logged(key = "Turret Target", importance = Importance.DEBUG)
-	public Angle getTurretTargetAbsolute() {
-		return turretTargetAngleAbsolute;
+	public double getTurretTargetAbsolute() {
+		return turretTargetAngleAbsolute.in(Degrees);
 	}
 
 	@Logged(key = "Turret Pose", importance = Importance.DEBUG)
 	public Pose2d getTurretPose() {
 		Pose2d pose = RobotStates.robotPose.get();
-		if (!isReset) {
-			return pose;
-		}
+		Rotation2d robotHeading = pose.getRotation();
+		// if (!isReset) {
+		// 	return pose;
+		// }
 		// Angle turretHeading = getTurretHeadingFromMotor();
 		Angle turretHeading = turretTargetAngleAbsolute;
 		Translation2d translation =
 				pose.getTranslation()
-						.plus(
-								new Translation2d(
-										turretPositionOffset.getMeasureX().times(Math.cos(turretHeading.in(Radians))),
-										turretPositionOffset.getMeasureY().times(Math.sin(turretHeading.in(Radians)))));
+						.plus(new Translation2d(turretPositionOffset.getNorm(), robotHeading.plus(turretPositionOffset.getAngle())));
 		Rotation2d rotation = pose.getRotation().plus(new Rotation2d(turretHeading));
 		return new Pose2d(translation, rotation);
 	}
+
+	@Logged(key = "target angle", importance = Importance.DEBUG)
+	Rotation2d fieldRelativeToHub;
 
 	public void updateTurretTarget() {
 		// if (!isReset) {
@@ -167,24 +168,27 @@ public class Turret extends SubsystemBase {
 								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
 						? blueHub
 						: redHub;
-		Rotation2d fieldRelativeToHub =
+		fieldRelativeToHub =
 				new Rotation2d(
 						targetHubPose.getTranslation().getX() - turretPose.getTranslation().getX(),
 						targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
 		Angle turretTarget =
 				fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
-		if (Math.abs(turretTarget.in(Degrees)) > turretRingGearRange.in(Degrees) / 2.0) {
-			double angleDeg = turretTarget.in(Degrees);
+		double angleDeg = turretTarget.in(Degrees); // (-180,180)
+		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
+		angleDeg -= 180;
+		SmartDashboard.putNumber("angleDeg", angleDeg);
+		if (Math.abs(angleDeg) > turretRingGearRange.in(Degrees) / 2.0) {
 			double turnLimit = turretRingGearRange.in(Degrees) / 2.0;
 			// Map [135, 180] -> [135, 0] linearly
 			if (angleDeg > turnLimit) { // (135, 180]
 				double t = (angleDeg - turnLimit) / (180 - turnLimit); // 0..1
-				angleDeg = turnLimit * (1.0 - t); // 135..0
+				angleDeg = turnLimit * (1.0 - t) - 180; // 135..0
 			} else {
 				// Map [-180, -135] -> [0, -135] linearly
 				// angleDeg in [-180, -135)
 				double t = (angleDeg + 180.0) / (180 - turnLimit); // 0..1
-				angleDeg = -turnLimit * t;
+				angleDeg = -turnLimit * t + 180;
 			}
 			turretTargetAngleAbsolute = Degrees.of(angleDeg);
 			turretTargetAngleMotor = turretTargetAngleAbsolute.div(motorToMechanismRatio);

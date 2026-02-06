@@ -23,9 +23,9 @@ public class VisionConstants {
 					new Rotation3d(
 							Units.degreesToRadians(0),
 							Units.degreesToRadians(15), // positive up
-							Units.degreesToRadians(180)));
+							Units.degreesToRadians(0)));
 
-	public static final String llName = "limelight";
+	public static final String llName = "limelight-backup";
 	public static final int[] validMT2Tags = {1, 6, 7, 8, 9, 10, 11};
 
 	public static final double minTagAreaThreshold = 0.15;

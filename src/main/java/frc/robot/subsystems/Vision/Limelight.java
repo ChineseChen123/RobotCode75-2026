@@ -17,6 +17,7 @@ import frc.robot.RobotContainer;
 public class Limelight extends SubsystemBase {
 
 	private boolean isIMUReset = false;
+	private double ambiguity = 0;
 
 	public Limelight() {
 		// set valid tags for pose estimation
@@ -46,6 +47,7 @@ public class Limelight extends SubsystemBase {
 		if (!isIMUReset) {
 			resetInternalIMU();
 		}
+		ambiguity = 0;
 		LimelightHelpers.PoseEstimate mt2Estimate =
 				LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(llName);
 		if (mt2Estimate == null || mt2Estimate.tagCount == 0) {
@@ -64,6 +66,7 @@ public class Limelight extends SubsystemBase {
 			// if (mt2Estimate.tagCount > 1 && tag.ambiguity > multiTagAmbiguityThreshold) {
 			// 	return null;
 			// }
+			ambiguity = Math.max(ambiguity, tag.ambiguity);
 		}
 		return mt2Estimate;
 	}
@@ -72,9 +75,16 @@ public class Limelight extends SubsystemBase {
 	public Pose2d logPose() {
 		LimelightHelpers.PoseEstimate pose = getEstimatedPose();
 		if (pose != null) {
-			return pose.pose.rotateAround(pose.pose.getTranslation(), Rotation2d.k180deg);
+			return pose.pose;
+			// return pose.pose.rotateAround(pose.pose.getTranslation(), Rotation2d.k180deg);
 		}
 		return new Pose2d();
+	}
+
+	@Logged(key = "Multitag Ambiguity", importance = Importance.CRITICAL)
+	public double getAmbiguity() {
+		LimelightHelpers.PoseEstimate pose = getEstimatedPose();
+		return ambiguity;
 	}
 
 	@Override
