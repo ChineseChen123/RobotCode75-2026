@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants.Turret.MotorConfigs;
 import frc.robot.state.RobotStates;
@@ -138,13 +139,12 @@ public class Turret extends SubsystemBase {
 		if (!isReset) {
 			return pose;
 		}
+		Rotation2d robotHeading = pose.getRotation();
+
 		Angle turretHeading = getTurretHeadingFromMotor();
 		Translation2d translation =
 				pose.getTranslation()
-						.plus(
-								new Translation2d(
-										turretPositionOffset.getMeasureX().times(Math.cos(turretHeading.in(Radians))),
-										turretPositionOffset.getMeasureY().times(Math.sin(turretHeading.in(Radians)))));
+						.plus(new Translation2d(turretPositionOffset.getNorm(), robotHeading.plus(turretPositionOffset.getAngle())));
 		Rotation2d rotation = pose.getRotation().plus(new Rotation2d(turretHeading));
 		return new Pose2d(translation, rotation);
 	}
@@ -165,18 +165,21 @@ public class Turret extends SubsystemBase {
 						targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
 		Angle turretTarget =
 				fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
-		if (Math.abs(turretTarget.in(Degrees)) > turretRingGearRange.in(Degrees) / 2.0) {
-			double angleDeg = turretTarget.in(Degrees);
+		double angleDeg = turretTarget.in(Degrees); // (-180,180)
+		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
+		angleDeg -= 180;
+		SmartDashboard.putNumber("angleDeg", angleDeg);
+		if (Math.abs(angleDeg) > turretRingGearRange.in(Degrees) / 2.0) {
 			double turnLimit = turretRingGearRange.in(Degrees) / 2.0;
 			// Map [135, 180] -> [135, 0] linearly
 			if (angleDeg > turnLimit) { // (135, 180]
-				double t = (angleDeg - turnLimit) / (180 - turnLimit);   // 0..1
-				angleDeg = turnLimit * (1.0 - t);               // 135..0
+				double t = (angleDeg - turnLimit) / (180 - turnLimit); // 0..1
+				angleDeg = turnLimit * (1.0 - t) - 180; // 135..0
 			} else {
 				// Map [-180, -135] -> [0, -135] linearly
 				// angleDeg in [-180, -135)
-				double t = (angleDeg + 180.0) / (180 - turnLimit);       // 0..1
-				angleDeg = -turnLimit * t;  
+				double t = (angleDeg + 180.0) / (180 - turnLimit); // 0..1
+				angleDeg = -turnLimit * t + 180;
 			}
 			turretTargetAngleAbsolute = Degrees.of(angleDeg);
 			turretTargetAngleMotor = turretTargetAngleAbsolute.div(motorToMechanismRatio);

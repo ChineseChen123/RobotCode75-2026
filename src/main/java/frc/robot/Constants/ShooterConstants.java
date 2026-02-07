@@ -168,7 +168,7 @@ public class ShooterConstants {
 		public static final double motorToMechanismRatio = 1.0 / 1.0;
 		// translation from robot center to turret center, climber is forward
 		public static final Translation2d turretPositionOffset =
-				new Translation2d(Inches.of(0), Inches.of(0));
+				new Translation2d(Inches.of(2), Inches.of(10));;
 
 		// at CW limit
 		public static final Angle encoder1Offset = Rotations.of(0);
