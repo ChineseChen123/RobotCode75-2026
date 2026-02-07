@@ -135,6 +135,10 @@ public class ShooterPhysics {
         //    This gives us a reasonable baseline without needing a
         //    full iterative solver.
         // ------------------------------------------------------------
+
+        // TODO: THIS IS A MAJOR ESTIMATE. TECHNICALLY THIS ISNT A FULL SOLVE
+        // BASICALLY THIS TIME IS IF WE WERE STATIONARY!!
+        // prob should change this...
         Time tofEstimate = calculateTimeToScore(robotPose);
         double t = tofEstimate.in(Seconds);
 
