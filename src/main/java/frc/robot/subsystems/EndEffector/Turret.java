@@ -17,11 +17,14 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.ShooterPhysics;
 import frc.robot.Constants.ShooterConstants.Turret.MotorConfigs;
 import frc.robot.state.RobotStates;
 import java.util.Optional;
@@ -165,10 +168,20 @@ public class Turret extends SubsystemBase {
 						targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
 		Angle turretTarget =
 				fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
+
+		Angle compensatedTurretTarget = ShooterPhysics.calculateCompensatedTurretAngle(RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get());
+		// check if compensated angle is within range, otherwise fallback to turret target
+		double angleDegCompensated = compensatedTurretTarget.in(Degrees); // (-180,180)
+		angleDegCompensated = (angleDegCompensated < 0) ? (360 - Math.abs(angleDegCompensated) % 360) % 360 : (angleDegCompensated % 360);
+		angleDegCompensated -= 180;
+		if (Math.abs(angleDegCompensated) < turretRingGearRange.in(Degrees) / 2.0) {
+			turretTarget = compensatedTurretTarget;
+		}
+
 		double angleDeg = turretTarget.in(Degrees); // (-180,180)
 		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
 		angleDeg -= 180;
-		SmartDashboard.putNumber("angleDeg", angleDeg);
+
 		if (Math.abs(angleDeg) > turretRingGearRange.in(Degrees) / 2.0) {
 			double turnLimit = turretRingGearRange.in(Degrees) / 2.0;
 			// Map [135, 180] -> [135, 0] linearly
@@ -181,11 +194,10 @@ public class Turret extends SubsystemBase {
 				double t = (angleDeg + 180.0) / (180 - turnLimit); // 0..1
 				angleDeg = -turnLimit * t + 180;
 			}
-			turretTargetAngleAbsolute = Degrees.of(angleDeg);
-			turretTargetAngleMotor = turretTargetAngleAbsolute.div(motorToMechanismRatio);
-			return;
+
 		}
-		turretTargetAngleAbsolute = turretTarget;
+
+		turretTargetAngleAbsolute = Degrees.of(angleDeg);
 		turretTargetAngleMotor = turretTargetAngleAbsolute.div(motorToMechanismRatio);
 	}
 

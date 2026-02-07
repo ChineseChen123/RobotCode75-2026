@@ -66,7 +66,9 @@ public class Shooter extends SubsystemBase {
 	public void periodic() {
 		if (m_ShooterState == ShooterStates.SHOOTING) {
 			// variable speeds
-			AngularVelocity velocity = ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get());
+			AngularVelocity velocity = ShooterPhysics.calculateCompensatedAngularVelocity(RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get());
+			// AngularVelocity velocity = ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get());
+
 			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(velocity));
 			m_ShooterMotor2.setControl(m_VelocityRequest.withVelocity(velocity));
 		} else {
