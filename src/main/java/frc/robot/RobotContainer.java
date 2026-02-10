@@ -25,16 +25,16 @@ import frc.robot.subsystems.EndEffector.Intake;
 public class RobotContainer {
 
 	// Initialize Phoenix swerve
-	private static final Swerve m_Swerve =
-			new Swerve(
-					DrivetrainConstants.SwerveDrivetrainConstants,
-					0, // Defaults to 250 hz
-					moduleMatrix,
-					visionMatrix,
-					DrivetrainConstants.FrontLeft,
-					DrivetrainConstants.FrontRight,
-					DrivetrainConstants.BackLeft,
-					DrivetrainConstants.BackRight);
+	// private static final Swerve m_Swerve =
+	// 		new Swerve(
+	// 				DrivetrainConstants.SwerveDrivetrainConstants,
+	// 				0, // Defaults to 250 hz
+	// 				moduleMatrix,
+	// 				visionMatrix,
+	// 				DrivetrainConstants.FrontLeft,
+	// 				DrivetrainConstants.FrontRight,
+	// 				DrivetrainConstants.BackLeft,
+	// 				DrivetrainConstants.BackRight);
 
 	private static final Intake m_Intake = new Intake();
 	// Define IO controls
@@ -56,7 +56,9 @@ public class RobotContainer {
 
 	// Register any subsystems to be logged
 	private void configureLogging() {
-		RaiderLog.register("Swerve", m_Swerve);
+		// RaiderLog.register("Swerve", m_Swerve);
+		RaiderLog.register("Intake", m_Intake);
+
 	}
 
 	// Configure button bindings based on driving mode
@@ -86,7 +88,7 @@ public class RobotContainer {
 	}
 
 	public static Swerve getSwerve() {
-		return m_Swerve;
+		return null;
 	}
 
 	public static Driver getDriver() {

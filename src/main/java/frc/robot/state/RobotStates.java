@@ -24,9 +24,17 @@ public class RobotStates {
 
 	/** Intake & Pivot states */
 
+
 	/** */
 
 	// ── Actions ──────────────────────────────────────────────────────────────────
+
+	//** Intake Actions */
+	public static Trigger actionIntake =
+		m_Operator.A.and(teleop);
+	public static Trigger actionIntakeReverse =
+		m_Operator.B.and(teleop);
+
 
 	/** Swerve actions */
 	public static Trigger actionRobotRelative =

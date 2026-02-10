@@ -31,8 +31,11 @@ public class EndEffectorConstants {
 		public static final int intakeEncoderPort = 0;
 		public static final int pivotEncoderPort = 0;
 
+		public static final Angle pivotZeroPoint = Rotations.of(0);
+		public static final Angle encoderOffset = Rotations.of(0);
+
 		public static final Angle pivotEncoderOffset = Rotations.of(0); // TODO figure out
-		public static final double pivotGearRatio = 1; // TODO figure out
+		public static final double pivotGearRatio = 48.0 / 1.0; // TODO figure out
 		public static final double pivotToleranceAbsolute = 0.05; // rotations, TODO figure out
 
 		// TODO figure out
@@ -159,6 +162,7 @@ public class EndEffectorConstants {
 						pivotStatorCurrentLimitForward.in(Amps);
 				m_PivotConfig.TorqueCurrent.PeakReverseTorqueCurrent =
 						pivotStatorCurrentLimitReverse.in(Amps);
+
 
 				// PID Config
 				m_PivotConfig.Slot0.kP = pivotKP;
