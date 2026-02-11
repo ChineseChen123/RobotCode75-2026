@@ -5,8 +5,6 @@
 package frc.robot;
 
 import static frc.robot.Constants.IOConstants.*;
-import static frc.robot.Constants.VisionConstants.moduleMatrix;
-import static frc.robot.Constants.VisionConstants.visionMatrix;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -14,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.RaiderLog.RaiderLog;
-import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.state.Bindings;
 import frc.robot.state.Driver;
 import frc.robot.state.Operator;
@@ -44,7 +41,7 @@ public class RobotContainer {
 			new Operator(new CommandXboxController(controllerPort));
 	private static final Bindings m_Bindings = new Bindings();
 
-	private final AutoSelector m_AutoSelector = new AutoSelector();
+	// private final AutoSelector m_AutoSelector = new AutoSelector();
 
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */
 	public RobotContainer() {
@@ -58,7 +55,6 @@ public class RobotContainer {
 	private void configureLogging() {
 		// RaiderLog.register("Swerve", m_Swerve);
 		RaiderLog.register("Intake", m_Intake);
-
 	}
 
 	// Configure button bindings based on driving mode
@@ -72,13 +68,14 @@ public class RobotContainer {
 
 	// Configure auto selector
 	private void configureChooser() {
-		m_AutoSelector.setupAutoTab();
-		m_AutoSelector.clearAll();
+		// m_AutoSelector.setupAutoTab();
+		// m_AutoSelector.clearAll();
 	}
 
 	public Command getAutonomousCommand() {
-		m_AutoSelector.generatePaths();
-		return m_AutoSelector.getAutoCommand();
+		// m_AutoSelector.generatePaths();
+		// return m_AutoSelector.getAutoCommand();
+		return null;
 	}
 
 	// Methods to return instances of static subsystems

@@ -25,27 +25,26 @@ import edu.wpi.first.units.measure.Time;
 public class EndEffectorConstants {
 
 	public class Intake {
-		public static final int intakeMotorCanID = 0; // Kraken X44
-		public static final int pivotCanID = 0; // Kraken X60
+		public static final int intakeMotorCanID = 52; // Kraken X44
+		public static final int pivotCanID = 51; // Kraken X60
 
-		public static final int intakeEncoderPort = 0;
 		public static final int pivotEncoderPort = 0;
 
 		public static final Angle pivotZeroPoint = Rotations.of(0);
 		public static final Angle encoderOffset = Rotations.of(0);
 
-		public static final Angle pivotEncoderOffset = Rotations.of(0); // TODO figure out
-		public static final double pivotGearRatio = 48.0 / 1.0; // TODO figure out
+		public static final Angle pivotEncoderOffset = Rotations.of(0.528); // TODO figure out
+		public static final double pivotMotorToMechanismRatio = 1.0 / 48.0; // TODO figure out
 		public static final double pivotToleranceAbsolute = 0.05; // rotations, TODO figure out
 
 		// TODO figure out
-		public static final Angle pivotDownAngle = Rotations.of(0);
-		public static final Angle pivotHalfwayAngle = Rotations.of(1);
-		public static final Angle pivotUpAngle = Rotations.of(2);
+		public static final Angle pivotDownAngle = Rotations.of(0.5);
+		public static final Angle pivotHalfwayAngle = Rotations.of(11.765);
+		public static final Angle pivotUpAngle = Rotations.of(17.65);
 
 		public static final AngularVelocity defaultIntakeSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(2);
-		public static final AngularVelocity intakeReversingSpeed = RotationsPerSecond.of(-2);
+		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(30);
+		public static final AngularVelocity intakeReversingSpeed = RotationsPerSecond.of(-30);
 
 		public static final class MotorConfigs {
 
@@ -53,7 +52,7 @@ public class EndEffectorConstants {
 			public static final TalonFXConfiguration m_PivotConfig = new TalonFXConfiguration();
 
 			public static final InvertedValue intakeMotorInvert = InvertedValue.CounterClockwise_Positive;
-			public static final InvertedValue pivotInvert = InvertedValue.CounterClockwise_Positive;
+			public static final InvertedValue pivotInvert = InvertedValue.Clockwise_Positive;
 
 			public static final NeutralModeValue intakeNeutralMode = NeutralModeValue.Brake;
 			public static final NeutralModeValue pivotNeutralMode = NeutralModeValue.Brake;
@@ -76,8 +75,8 @@ public class EndEffectorConstants {
 			public static final Current pivotStatorCurrentLimitForward = Amps.of(60);
 			public static final Current pivotStatorCurrentLimitReverse = Amps.of(-60);
 
-			public static final Angle pivotForwardSoftLimit = Rotations.of(12.5);
-			public static final Angle pivotReverseSoftLimit = Rotations.of(-3);
+			public static final Angle pivotForwardSoftLimit = Rotations.of(18);
+			public static final Angle pivotReverseSoftLimit = Rotations.of(-0.25);
 
 			public static final Time pivotCurrentThresholdTime = Seconds.of(0.50);
 
@@ -85,23 +84,20 @@ public class EndEffectorConstants {
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double intakeVelocityKP = 0.3;
+			public static final double intakeVelocityKP = 3.5;
 			public static final double intakeVelocityKI = 0.0;
-			public static final double intakeVelocityKD = 0.0;
-			public static final double intakeVelocityKS = 4.9;
+			public static final double intakeVelocityKD = 0.01;
+			public static final double intakeVelocityKS = 20;
 
-			public static final double intakePositionKP = 0.75;
-			public static final double intakePositionKI = 0.0;
-			public static final double intakePositionKD = 0.0;
-
-			public static final double pivotKP = 10;
+			// good enough for now
+			public static final double pivotKP = 1;
 			public static final double pivotKI = 0.0;
-			public static final double pivotKD = 3;
+			public static final double pivotKD = 0;
 			public static final double pivotKS = 4;
 			public static final double pivotKG = 6;
 
-			public static final double pivotMMKa = 0.1;
-			public static final double pivotMMKv = 0.15;
+			public static final double pivotMMKa = 0;
+			public static final double pivotMMKv = 0;
 			public static final double pivotMMAcc = 30;
 			public static final double pivotMMVel = 50;
 			public static final double pivotMMJerk = 500;
@@ -110,7 +106,6 @@ public class EndEffectorConstants {
 				m_IntakeMotorConfig.MotorOutput.Inverted = intakeMotorInvert;
 				m_IntakeMotorConfig.MotorOutput.NeutralMode = intakeNeutralMode;
 
-				m_IntakeMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
 				// Current Limiting
 				m_IntakeMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -129,10 +124,6 @@ public class EndEffectorConstants {
 				m_IntakeMotorConfig.Slot0.kD = intakeVelocityKD;
 				m_IntakeMotorConfig.Slot0.kS = intakeVelocityKS;
 
-				m_IntakeMotorConfig.Slot1.kP = intakePositionKP;
-				m_IntakeMotorConfig.Slot1.kI = intakePositionKI;
-				m_IntakeMotorConfig.Slot1.kD = intakePositionKD;
-
 				// Open and Closed Loop Ramping
 				m_IntakeMotorConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = openLoopRamp;
 				m_IntakeMotorConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = openLoopRamp;
@@ -147,7 +138,7 @@ public class EndEffectorConstants {
 			}
 
 			public static TalonFXConfiguration getPivotConfiguration() {
-				m_PivotConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+				m_PivotConfig.MotorOutput.Inverted = pivotInvert;
 				m_PivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
 				// Current Limiting
@@ -162,7 +153,6 @@ public class EndEffectorConstants {
 						pivotStatorCurrentLimitForward.in(Amps);
 				m_PivotConfig.TorqueCurrent.PeakReverseTorqueCurrent =
 						pivotStatorCurrentLimitReverse.in(Amps);
-
 
 				// PID Config
 				m_PivotConfig.Slot0.kP = pivotKP;

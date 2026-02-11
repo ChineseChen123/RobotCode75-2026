@@ -11,6 +11,6 @@ package frc.robot.Constants;
  * USE)
  */
 public final class RobotConstants {
-	public static final String superstructureCANBusName = "Superstructure";
+	public static final String superstructureCANBusName = "superstructure";
 	public static final boolean TUNING_MODE = true; // Set to true for tunable numbers
 }
