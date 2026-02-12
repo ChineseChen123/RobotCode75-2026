@@ -38,9 +38,9 @@ public class EndEffectorConstants {
 		public static final double pivotToleranceAbsolute = 0.05; // rotations, TODO figure out
 
 		// TODO figure out
-		public static final Angle pivotDownAngle = Rotations.of(0.5);
-		public static final Angle pivotHalfwayAngle = Rotations.of(11.765);
-		public static final Angle pivotUpAngle = Rotations.of(17.65);
+		public static final Angle pivotDownAngle = Rotations.of(0.5 * pivotMotorToMechanismRatio);
+		public static final Angle pivotHalfwayAngle = Rotations.of(11.765 * pivotMotorToMechanismRatio);
+		public static final Angle pivotUpAngle = Rotations.of(17.65 * pivotMotorToMechanismRatio);
 
 		public static final AngularVelocity defaultIntakeSpeed = RotationsPerSecond.of(0);
 		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(30);
@@ -51,7 +51,7 @@ public class EndEffectorConstants {
 			public static final TalonFXConfiguration m_IntakeMotorConfig = new TalonFXConfiguration();
 			public static final TalonFXConfiguration m_PivotConfig = new TalonFXConfiguration();
 
-			public static final InvertedValue intakeMotorInvert = InvertedValue.CounterClockwise_Positive;
+			public static final InvertedValue intakeMotorInvert = InvertedValue.Clockwise_Positive;
 			public static final InvertedValue pivotInvert = InvertedValue.Clockwise_Positive;
 
 			public static final NeutralModeValue intakeNeutralMode = NeutralModeValue.Brake;
@@ -153,6 +153,8 @@ public class EndEffectorConstants {
 						pivotStatorCurrentLimitForward.in(Amps);
 				m_PivotConfig.TorqueCurrent.PeakReverseTorqueCurrent =
 						pivotStatorCurrentLimitReverse.in(Amps);
+
+				m_PivotConfig.Feedback.SensorToMechanismRatio = 1 / pivotMotorToMechanismRatio;
 
 				// PID Config
 				m_PivotConfig.Slot0.kP = pivotKP;

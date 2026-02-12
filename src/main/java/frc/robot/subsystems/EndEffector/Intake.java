@@ -117,7 +117,7 @@ public class Intake extends SubsystemBase {
 
 		Timer.delay(5);
 		m_PivotMotor.setPosition(
-				(pivotEncoderOffset.in(Rotations) - getAbsolutePosition()) / pivotMotorToMechanismRatio);
+				(pivotEncoderOffset.in(Rotations) - getAbsolutePosition())/*  / pivotMotorToMechanismRatio*/);
 	}
 
 	/** return through-bore encoder position */
