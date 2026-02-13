@@ -29,7 +29,8 @@ public class RobotStates {
 
 	public static final Supplier<Pose2d> robotPose = m_Swerve::getPose;
 	public static final Supplier<Rotation2d> robotHeading = m_Swerve::getHeading;
-	public static final Supplier<ChassisSpeeds> fieldRelativeSpeeds = m_Swerve::getFieldRleativeChassisSpeeds;
+	public static final Supplier<ChassisSpeeds> fieldRelativeSpeeds =
+			m_Swerve::getFieldRleativeChassisSpeeds;
 
 	// ── Actions ──────────────────────────────────────────────────────────────────
 

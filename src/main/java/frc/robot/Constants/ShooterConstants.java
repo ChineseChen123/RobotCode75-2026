@@ -40,9 +40,10 @@ public class ShooterConstants {
 		public static final AngularVelocity defaultShooterSpeed = RotationsPerSecond.of(0);
 		public static final AngularVelocity reverseShooterSpeed = RotationsPerSecond.of(-5);
 
-		// Note that the flywheel MOI effective to the motors is multiplied by the gear ratio squared. <-- from recalc
-		public static final double flywheelMOI = 0;  // in^2 / lbs
-		public static final double shooterWheelMOI = 0;  // in^2 / lbs
+		// Note that the flywheel MOI effective to the motors is multiplied by the gear ratio squared.
+		// <-- from recalc
+		public static final double flywheelMOI = 0; // in^2 / lbs
+		public static final double shooterWheelMOI = 0; // in^2 / lbs
 		public static final double ballWeight = 0; // lbs
 		public static final Angle shooterAngleWithHorizontal = null;
 		public static final Distance shooterHeight = null;
@@ -175,7 +176,8 @@ public class ShooterConstants {
 		public static final double motorToMechanismRatio = 1.0 / 1.0;
 		// translation from robot center to turret center, climber is forward
 		public static final Translation2d turretPositionOffset =
-				new Translation2d(Inches.of(2), Inches.of(10));;
+				new Translation2d(Inches.of(2), Inches.of(10));
+		;
 
 		// at CW limit
 		public static final Angle encoder1Offset = Rotations.of(0);
