@@ -24,6 +24,7 @@ public class Bindings {
 
 		RobotStates.actionIntake.whileTrue(intake.setStateCommand(IntakeStates.INTAKING));
 		RobotStates.actionIntakeReverse.whileTrue(intake.setStateCommand(IntakeStates.REVERSING));
+		RobotStates.actionIntakeStow.whileTrue(intake.setStateCommand(IntakeStates.STARTING));
 	}
 
 	/** rebinds actions to match one driver controls */

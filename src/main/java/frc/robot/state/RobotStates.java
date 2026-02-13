@@ -33,6 +33,8 @@ public class RobotStates {
 
 	public static Trigger actionIntakeReverse = m_Operator.B.and(teleop);
 
+	public static Trigger actionIntakeStow = m_Operator.Y.and(teleop);
+
 	/** Swerve actions */
 	public static Trigger actionRobotRelative =
 			m_Driver.getRightButton(robotRelativeButton).and(teleop);

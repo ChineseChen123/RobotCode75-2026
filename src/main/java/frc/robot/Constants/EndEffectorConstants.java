@@ -38,9 +38,9 @@ public class EndEffectorConstants {
 		public static final double pivotToleranceAbsolute = 0.05; // rotations, TODO figure out
 
 		// TODO figure out
-		public static final Angle pivotDownAngle = Rotations.of(0.5 * pivotMotorToMechanismRatio);
-		public static final Angle pivotHalfwayAngle = Rotations.of(11.765 * pivotMotorToMechanismRatio);
-		public static final Angle pivotUpAngle = Rotations.of(17.65 * pivotMotorToMechanismRatio);
+		public static final Angle pivotDownAngle = Rotations.of(-0.005);
+		public static final Angle pivotHalfwayAngle = Rotations.of(0.21);
+		public static final Angle pivotUpAngle = Rotations.of(0.4);
 
 		public static final AngularVelocity defaultIntakeSpeed = RotationsPerSecond.of(0);
 		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(30);
@@ -84,17 +84,18 @@ public class EndEffectorConstants {
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
+			// good enough for now
 			public static final double intakeVelocityKP = 3.5;
 			public static final double intakeVelocityKI = 0.0;
 			public static final double intakeVelocityKD = 0.01;
 			public static final double intakeVelocityKS = 20;
 
 			// good enough for now
-			public static final double pivotKP = 1;
+			public static final double pivotKP = 70;
 			public static final double pivotKI = 0.0;
-			public static final double pivotKD = 0;
-			public static final double pivotKS = 4;
-			public static final double pivotKG = 6;
+			public static final double pivotKD = 7;
+			public static final double pivotKS = 20;
+			public static final double pivotKG = 9;
 
 			public static final double pivotMMKa = 0;
 			public static final double pivotMMKv = 0;
