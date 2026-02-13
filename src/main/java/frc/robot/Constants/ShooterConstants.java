@@ -30,8 +30,8 @@ public class ShooterConstants {
 
 	public class Shooter {
 		// Kraken X60s
-		public static final int shooterMotor1CanID = 0;
-		public static final int shooterMotor2CanID = 0;
+		public static final int shooterMotor1CanID = 41;
+		public static final int shooterMotor2CanID = 42;
 
 		public static final double shooterGearRatio = 1;
 
