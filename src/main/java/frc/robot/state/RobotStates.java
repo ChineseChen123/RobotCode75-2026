@@ -4,6 +4,7 @@ import static frc.robot.Constants.IOConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
@@ -28,6 +29,7 @@ public class RobotStates {
 
 	public static final Supplier<Pose2d> robotPose = m_Swerve::getPose;
 	public static final Supplier<Rotation2d> robotHeading = m_Swerve::getHeading;
+	public static final Supplier<ChassisSpeeds> fieldRelativeSpeeds = m_Swerve::getFieldRleativeChassisSpeeds;
 
 	// ── Actions ──────────────────────────────────────────────────────────────────
 
