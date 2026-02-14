@@ -11,10 +11,15 @@ import static frc.robot.Constants.ShooterConstants.Shooter.*;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.ShooterPhysics;
+import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.Shooter.MotorConfigs;
 import frc.robot.state.RobotStates;
 
@@ -97,10 +102,20 @@ public class Shooter extends SubsystemBase {
 		}
 
 		if (m_ShooterState == ShooterStates.SHOOTING) {
+					// lookup table stuff
+		Pose2d targetHubPose =
+				DriverStation.getAlliance().isPresent()
+								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+						? FieldConstants.blueHub
+						: FieldConstants.redHub;
+
 			// variable speeds
+				if (ShooterConstants.useVirtualTarget) {
+					targetHubPose =
+							ShooterPhysics.getVirtualTarget(targetHubPose, RobotStates.fieldRelativeSpeeds.get(), 5);
+				}
 			AngularVelocity velocity =
-					ShooterPhysics.calculateCompensatedAngularVelocity(
-							RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get());
+					ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);
 			// AngularVelocity velocity =
 			// ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get());
 

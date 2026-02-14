@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.ShooterPhysics;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.Turret.MotorConfigs;
 import frc.robot.state.RobotStates;
 import java.util.Optional;
@@ -152,7 +153,6 @@ public class Turret extends SubsystemBase {
 	}
 
 	// compensation or virtual target
-	private boolean useVirtualTarget = false;
 
 	public void updateTurretTarget() {
 		if (!isReset) {
@@ -164,9 +164,9 @@ public class Turret extends SubsystemBase {
 								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
 						? blueHub
 						: redHub;
-		if (useVirtualTarget) {
+		if (ShooterConstants.useVirtualTarget) {
 			targetHubPose =
-					ShooterPhysics.getVirtualTarget(targetHubPose, RobotStates.fieldRelativeSpeeds.get());
+					ShooterPhysics.getVirtualTarget(targetHubPose, RobotStates.fieldRelativeSpeeds.get(), 5);
 		}
 		Rotation2d fieldRelativeToHub =
 				new Rotation2d(
@@ -175,24 +175,24 @@ public class Turret extends SubsystemBase {
 		Angle turretTarget =
 				fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
 
-		if (!useVirtualTarget) {
-			Angle compensatedTurretTarget =
-					ShooterPhysics.calculateCompensatedTurretAngle(
-							RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get());
-			// check if compensated angle is within range, otherwise fallback to turret target
-			double angleDegCompensated =
-					compensatedTurretTarget
-							.minus(RobotStates.robotHeading.get().getMeasure())
-							.in(Degrees); // (-180,180)
-			angleDegCompensated =
-					(angleDegCompensated < 0)
-							? (360 - Math.abs(angleDegCompensated) % 360) % 360
-							: (angleDegCompensated % 360);
-			angleDegCompensated -= 180;
-			if (Math.abs(angleDegCompensated) < turretRingGearRange.in(Degrees) / 2.0) {
-				turretTarget = compensatedTurretTarget;
-			}
-		}
+		// if (!ShooterConstants.useVirtualTarget) { THIS IS OLD COMPENSATION CODE - NO ITERATIONS
+		// 	Angle compensatedTurretTarget =
+		// 			ShooterPhysics.calculateCompensatedTurretAngle(
+		// 					RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get());
+		// 	// check if compensated angle is within range, otherwise fallback to turret target
+		// 	double angleDegCompensated =
+		// 			compensatedTurretTarget
+		// 					.minus(RobotStates.robotHeading.get().getMeasure())
+		// 					.in(Degrees); // (-180,180)
+		// 	angleDegCompensated =
+		// 			(angleDegCompensated < 0)
+		// 					? (360 - Math.abs(angleDegCompensated) % 360) % 360
+		// 					: (angleDegCompensated % 360);
+		// 	angleDegCompensated -= 180;
+		// 	if (Math.abs(angleDegCompensated) < turretRingGearRange.in(Degrees) / 2.0) {
+		// 		turretTarget = compensatedTurretTarget;
+		// 	}
+		// }
 
 		double angleDeg = turretTarget.in(Degrees); // (-180,180)
 		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
