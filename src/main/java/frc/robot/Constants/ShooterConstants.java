@@ -31,6 +31,7 @@ import edu.wpi.first.units.measure.Time;
 public class ShooterConstants {
 
 	public static boolean useVirtualTarget = false; // turret compensation
+	public static int virtualTargetSolveIterations = 6;
 
 	public class Shooter {
 		// Kraken X60s

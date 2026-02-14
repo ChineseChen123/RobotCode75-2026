@@ -112,7 +112,8 @@ public class Shooter extends SubsystemBase {
 			// variable speeds
 				if (ShooterConstants.useVirtualTarget) {
 					targetHubPose =
-							ShooterPhysics.getVirtualTarget(targetHubPose, RobotStates.fieldRelativeSpeeds.get(), 5);
+							ShooterPhysics.getVirtualTarget(targetHubPose, RobotStates.fieldRelativeSpeeds.get(), 
+								ShooterConstants.virtualTargetSolveIterations);
 				}
 			AngularVelocity velocity =
 					ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);

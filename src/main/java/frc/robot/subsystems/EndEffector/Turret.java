@@ -166,7 +166,8 @@ public class Turret extends SubsystemBase {
 						: redHub;
 		if (ShooterConstants.useVirtualTarget) {
 			targetHubPose =
-					ShooterPhysics.getVirtualTarget(targetHubPose, RobotStates.fieldRelativeSpeeds.get(), 5);
+					ShooterPhysics.getVirtualTarget(targetHubPose, RobotStates.fieldRelativeSpeeds.get(), 
+						ShooterConstants.virtualTargetSolveIterations);
 		}
 		Rotation2d fieldRelativeToHub =
 				new Rotation2d(
