@@ -166,38 +166,41 @@ public class Turret extends SubsystemBase {
 						: redHub;
 		if (ShooterConstants.useVirtualTarget) {
 			targetHubPose =
-					ShooterPhysics.getVirtualTarget(targetHubPose, RobotStates.fieldRelativeSpeeds.get(), 
+					ShooterPhysics.getVirtualTarget(RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get(), 
 						ShooterConstants.virtualTargetSolveIterations);
 		}
+
 		Rotation2d fieldRelativeToHub =
 				new Rotation2d(
 						targetHubPose.getTranslation().getX() - turretPose.getTranslation().getX(),
 						targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
 		Angle turretTarget =
 				fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
-
-		// if (!ShooterConstants.useVirtualTarget) { THIS IS OLD COMPENSATION CODE - NO ITERATIONS
-		// 	Angle compensatedTurretTarget =
-		// 			ShooterPhysics.calculateCompensatedTurretAngle(
-		// 					RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get());
-		// 	// check if compensated angle is within range, otherwise fallback to turret target
-		// 	double angleDegCompensated =
-		// 			compensatedTurretTarget
-		// 					.minus(RobotStates.robotHeading.get().getMeasure())
-		// 					.in(Degrees); // (-180,180)
-		// 	angleDegCompensated =
-		// 			(angleDegCompensated < 0)
-		// 					? (360 - Math.abs(angleDegCompensated) % 360) % 360
-		// 					: (angleDegCompensated % 360);
-		// 	angleDegCompensated -= 180;
-		// 	if (Math.abs(angleDegCompensated) < turretRingGearRange.in(Degrees) / 2.0) {
-		// 		turretTarget = compensatedTurretTarget;
-		// 	}
-		// }
-
 		double angleDeg = turretTarget.in(Degrees); // (-180,180)
 		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
 		angleDeg -= 180;
+
+		if (Math.abs(angleDeg) > turretRingGearRange.in(Degrees) / 2.0 && ShooterConstants.useVirtualTarget) {
+			// Basically, if the virtual target is OUTSIDE of range DO NOT do wrap around
+			// instead fall back to normal targeting. Hopefully driver isnt stupid
+			// hopefully this prevents super fast turret movements
+
+			// bad coding prob should use more dry 
+			targetHubPose =
+				DriverStation.getAlliance().isPresent()
+								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+						? blueHub
+						: redHub;
+			fieldRelativeToHub =
+				new Rotation2d(
+						targetHubPose.getTranslation().getX() - turretPose.getTranslation().getX(),
+						targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
+			turretTarget =
+					fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
+			angleDeg = turretTarget.in(Degrees); // (-180,180)
+			angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
+			angleDeg -= 180;
+		}
 
 		if (Math.abs(angleDeg) > turretRingGearRange.in(Degrees) / 2.0) {
 			double turnLimit = turretRingGearRange.in(Degrees) / 2.0;
