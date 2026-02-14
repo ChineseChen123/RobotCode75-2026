@@ -21,8 +21,10 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.ShooterPhysics;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.Turret.MotorConfigs;
 import frc.robot.state.RobotStates;
 import java.util.Optional;
@@ -159,39 +161,46 @@ public class Turret extends SubsystemBase {
 	}
 
 	public void updateTurretTarget() {
-		// if (!isReset) {
-		// 	return;
-		// }
+		if (!isReset) {
+			return;
+		}
 		Pose2d turretPose = getTurretPose();
 		Pose2d targetHubPose =
 				DriverStation.getAlliance().isPresent()
 								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
 						? blueHub
 						: redHub;
+		if (ShooterConstants.useVirtualTarget) {
+			targetHubPose =
+					ShooterPhysics.getVirtualTarget(targetHubPose, RobotStates.fieldRelativeSpeeds.get(), 5);
+		}
 		Rotation2d fieldRelativeToHub =
 				new Rotation2d(
 						targetHubPose.getTranslation().getX() - turretPose.getTranslation().getX(),
 						targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
 		Angle turretTarget =
 				fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
-		if (Math.abs(turretTarget.in(Degrees)) > turretRingGearRange.in(Degrees) / 2.0) {
-			double angleDeg = turretTarget.in(Degrees);
+
+
+		double angleDeg = turretTarget.in(Degrees); // (-180,180)
+		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
+		angleDeg -= 180;
+
+		if (Math.abs(angleDeg) > turretRingGearRange.in(Degrees) / 2.0) {
 			double turnLimit = turretRingGearRange.in(Degrees) / 2.0;
 			// Map [135, 180] -> [135, 0] linearly
 			if (angleDeg > turnLimit) { // (135, 180]
-				double t = (angleDeg - turnLimit) / (180 - turnLimit);   // 0..1
-				angleDeg = turnLimit * (1.0 - t);               // 135..0
+				double t = (angleDeg - turnLimit) / (180 - turnLimit); // 0..1
+				angleDeg = turnLimit * (1.0 - t) - 180; // 135..0
 			} else {
 				// Map [-180, -135] -> [0, -135] linearly
 				// angleDeg in [-180, -135)
-				double t = (angleDeg + 180.0) / (180 - turnLimit);       // 0..1
-				angleDeg = -turnLimit * t;  
+				double t = (angleDeg + 180.0) / (180 - turnLimit); // 0..1
+				angleDeg = -turnLimit * t + 180;
 			}
-			turretTargetAngleAbsolute = Degrees.of(angleDeg);
-			turretTargetAngleMotor = turretTargetAngleAbsolute.div(motorToMechanismRatio);
-			return;
 		}
-		turretTargetAngleAbsolute = turretTarget;
+
+		turretTargetAngleAbsolute = Degrees.of(angleDeg);
 		turretTargetAngleMotor = turretTargetAngleAbsolute.div(motorToMechanismRatio);
 	}
 

@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
@@ -23,15 +24,18 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
 
 /** Add your docs here. */
 public class ShooterConstants {
 
+	public static boolean useVirtualTarget = false; // turret compensation
+
 	public class Shooter {
 		// Kraken X60s
-		public static final int shooterMotor1CanID = 0;
-		public static final int shooterMotor2CanID = 0;
+		public static final int shooterMotor1CanID = 41;
+		public static final int shooterMotor2CanID = 42;
 
 		public static final double shooterGearRatio = 1;
 
@@ -39,6 +43,19 @@ public class ShooterConstants {
 
 		public static final AngularVelocity defaultShooterSpeed = RotationsPerSecond.of(0);
 		public static final AngularVelocity reverseShooterSpeed = RotationsPerSecond.of(-5);
+
+		// Note that the flywheel MOI effective to the motors is multiplied by the gear ratio squared.
+		// <-- from recalc
+		public static final Distance shooterWheelRadius = Inches.of(2);
+		public static final Mass shooterWheelIndividualWeight = Pounds.of(.67);
+		
+
+		public static final double flywheelMOI = 0; // in^2 / lbs
+		public static final double shooterWheelMOI = .5 * (shooterWheelIndividualWeight.in(Pounds) * 2) * 
+							(shooterWheelRadius.in(Inches)*shooterWheelRadius.in(Inches)); // in^2 / lbs, 1/2mr^2 approx.
+		public static final double ballWeight = .474; // lbs
+		public static final Angle shooterAngleWithHorizontal = Degrees.of(12);
+		public static final Distance shooterHeight = Inches.of(19.5);
 
 		public static final class MotorConfigs {
 
@@ -168,7 +185,8 @@ public class ShooterConstants {
 		public static final double motorToMechanismRatio = 1.0 / 1.0;
 		// translation from robot center to turret center, climber is forward
 		public static final Translation2d turretPositionOffset =
-				new Translation2d(Inches.of(10), Inches.of(2));
+				new Translation2d(Inches.of(2), Inches.of(10));
+		;
 
 		// at CW limit
 		public static final Angle encoder1Offset = Rotations.of(0);
