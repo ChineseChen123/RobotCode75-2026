@@ -21,6 +21,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.ShooterPhysics;
+import frc.lib.util.RaiderLog.Logged;
+import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.Turret.MotorConfigs;
 import frc.robot.state.RobotStates;
@@ -28,7 +30,7 @@ import java.util.Optional;
 
 public class Turret extends SubsystemBase {
 
-	private final TalonFX m_TurretMotor;
+	private final TalonFX m_TurretMotor = null;
 
 	private final DutyCycleEncoder m_TurretEncoder1;
 	private final DutyCycleEncoder m_TurretEncoder2;
@@ -43,7 +45,7 @@ public class Turret extends SubsystemBase {
 
 	/** Creates a new Turret. */
 	public Turret() {
-		m_TurretMotor = new TalonFX(turretMotorCanID, superstructureCANBusName);
+		// m_TurretMotor = new TalonFX(turretMotorCanID, superstructureCANBusName);
 
 		m_TurretEncoder1 = new DutyCycleEncoder(encoder1Port, 1, encoder1Offset.in(Rotations));
 		m_TurretEncoder2 = new DutyCycleEncoder(encoder2Port, 1, encoder2Offset.in(Rotations));
@@ -134,6 +136,12 @@ public class Turret extends SubsystemBase {
 		return Rotations.of(getMotorPositionRotations() * motorToMechanismRatio);
 	}
 
+	@Logged(key = "Turret Target", importance = Importance.DEBUG)
+	public Angle getTurretTargetAbsolute() {
+		return turretTargetAngleAbsolute;
+	}
+
+	@Logged(key = "Turret Pose", importance = Importance.DEBUG)
 	public Pose2d getTurretPose() {
 		Pose2d pose = RobotStates.robotPose.get();
 		if (!isReset) {
@@ -176,7 +184,8 @@ public class Turret extends SubsystemBase {
 						targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
 		Angle turretTarget =
 				fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
-		double angleDeg = turretTarget.in(Degrees); // (-180,180)
+		
+    double angleDeg = turretTarget.in(Degrees); // (-180,180)
 		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
 		angleDeg -= 180;
 
@@ -223,10 +232,10 @@ public class Turret extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// This method will be called once per scheduler run
-		if (!isReset) {
-			resetMotorPosition();
-			return;
-		}
+		// if (!isReset) {
+		// 	resetMotorPosition();
+		// 	return;
+		// }
 
 		updateTurretTarget();
 

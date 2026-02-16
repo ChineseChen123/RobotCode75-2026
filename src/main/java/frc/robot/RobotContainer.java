@@ -18,8 +18,8 @@ import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.state.Bindings;
 import frc.robot.state.Driver;
 import frc.robot.state.Operator;
-// import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.Turret;
 
 public class RobotContainer {
 
@@ -34,6 +34,8 @@ public class RobotContainer {
 					DrivetrainConstants.FrontRight,
 					DrivetrainConstants.BackLeft,
 					DrivetrainConstants.BackRight);
+
+	public static final Turret m_Turret = new Turret();
 
 	// Define IO controls
 	private static final Driver m_Driver =
@@ -55,6 +57,7 @@ public class RobotContainer {
 	// Register any subsystems to be logged
 	private void configureLogging() {
 		RaiderLog.register("Swerve", m_Swerve);
+		RaiderLog.register("Turret", m_Turret);
 	}
 
 	// Configure button bindings based on driving mode

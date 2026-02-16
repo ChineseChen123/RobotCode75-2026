@@ -21,7 +21,6 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterConstants;
 
 public class ShooterPhysics {
-	// basically just lookup table
 
 	public static AngularVelocity distanceToAngularVelocity(double distanceToHub) {
 		// calculate from best fit line
