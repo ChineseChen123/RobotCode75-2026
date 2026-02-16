@@ -28,12 +28,12 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
 
 /** Add your docs here. */
-public class ShooterConstants {
+public class ShooterTurretConstants {
 
-	public static boolean useVirtualTarget = false; // turret compensation
+	public static boolean useVirtualTarget = false;
 	public static int virtualTargetSolveIterations = 6;
 
-	public class Shooter {
+	public class ShooterConstants {
 		// Kraken X60s
 		public static final int shooterMotor1CanID = 41;
 		public static final int shooterMotor2CanID = 42;
@@ -49,11 +49,13 @@ public class ShooterConstants {
 		// <-- from recalc
 		public static final Distance shooterWheelRadius = Inches.of(2);
 		public static final Mass shooterWheelIndividualWeight = Pounds.of(.67);
-		
 
 		public static final double flywheelMOI = 0; // in^2 / lbs
-		public static final double shooterWheelMOI = .5 * (shooterWheelIndividualWeight.in(Pounds) * 2) * 
-							(shooterWheelRadius.in(Inches)*shooterWheelRadius.in(Inches)); // in^2 / lbs, 1/2mr^2 approx.
+		public static final double shooterWheelMOI =
+				.5
+						* (shooterWheelIndividualWeight.in(Pounds) * 2)
+						* (shooterWheelRadius.in(Inches)
+								* shooterWheelRadius.in(Inches)); // in^2 / lbs, 1/2mr^2 approx.
 		public static final double ballWeight = .474; // lbs
 		public static final Angle shooterAngleWithHorizontal = Degrees.of(12);
 		public static final Distance shooterHeight = Inches.of(19.5);
@@ -173,7 +175,7 @@ public class ShooterConstants {
 		}
 	}
 
-	public class Turret {
+	public class TurretConstants {
 
 		public static final int turretMotorCanID = 0;
 		public static final int encoder1Port = 0;
@@ -190,8 +192,8 @@ public class ShooterConstants {
 		;
 
 		// at CW limit
-		public static final Angle encoder1Offset = Rotations.of(0);
-		public static final Angle encoder2Offset = Rotations.of(0);
+		public static final Angle encoder1ZeroPoint = Rotations.of(0);
+		public static final Angle encoder2ZeroPoint = Rotations.of(0);
 		// discrepancy threshold between encoders to accept solution
 		public static final Angle matchTolerance = Rotations.of(0.005);
 		// minimum difference between two possible solutions to avoid ambiguity

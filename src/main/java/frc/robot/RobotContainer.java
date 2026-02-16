@@ -19,6 +19,8 @@ import frc.robot.state.Bindings;
 import frc.robot.state.Driver;
 import frc.robot.state.Operator;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.Intake;
+import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Turret;
 
 public class RobotContainer {
@@ -34,6 +36,10 @@ public class RobotContainer {
 					DrivetrainConstants.FrontRight,
 					DrivetrainConstants.BackLeft,
 					DrivetrainConstants.BackRight);
+
+	public static final Intake m_Intake = new Intake();
+
+	public static final Shooter m_Shooter = new Shooter();
 
 	public static final Turret m_Turret = new Turret();
 

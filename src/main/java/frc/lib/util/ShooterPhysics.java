@@ -12,13 +12,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.ShooterTurretConstants;
 
 public class ShooterPhysics {
 
@@ -39,10 +38,10 @@ public class ShooterPhysics {
 	public static LinearVelocity shooterAngularVelocityToLinearVelocity(
 			AngularVelocity shooterVelocity) {
 		double totalMOI =
-				ShooterConstants.Shooter.flywheelMOI
-						+ ShooterConstants.Shooter.shooterWheelMOI; // in^2 / lbs
+				ShooterTurretConstants.ShooterConstants.flywheelMOI
+						+ ShooterTurretConstants.ShooterConstants.shooterWheelMOI; // in^2 / lbs
 		double shooterWheelRadiusInches =
-				(ShooterConstants.Shooter.shooterWheelDiameter.in(Inches) / 2);
+				(ShooterTurretConstants.ShooterConstants.shooterWheelDiameter.in(Inches) / 2);
 		LinearVelocity surfaceWheelSpeed =
 				InchesPerSecond.of(shooterVelocity.in(RadiansPerSecond) * shooterWheelRadiusInches);
 
@@ -50,7 +49,7 @@ public class ShooterPhysics {
 		double speedTransferPercentage =
 				(20 * totalMOI)
 						/ (7
-										* ShooterConstants.Shooter.ballWeight
+										* ShooterTurretConstants.ShooterConstants.ballWeight
 										* shooterWheelRadiusInches
 										* shooterWheelRadiusInches
 										/ 2
@@ -63,14 +62,14 @@ public class ShooterPhysics {
 			LinearVelocity projectileSpeed) {
 
 		double totalMOI =
-				ShooterConstants.Shooter.flywheelMOI
-						+ ShooterConstants.Shooter.shooterWheelMOI; // in^2 / lbs
+				ShooterTurretConstants.ShooterConstants.flywheelMOI
+						+ ShooterTurretConstants.ShooterConstants.shooterWheelMOI; // in^2 / lbs
 		double shooterWheelRadiusInches =
-				(ShooterConstants.Shooter.shooterWheelDiameter.in(Inches) / 2);
+				(ShooterTurretConstants.ShooterConstants.shooterWheelDiameter.in(Inches) / 2);
 		double speedTransferPercentage =
 				(20 * totalMOI)
 						/ (7
-										* ShooterConstants.Shooter.ballWeight
+										* ShooterTurretConstants.ShooterConstants.ballWeight
 										* shooterWheelRadiusInches
 										* shooterWheelRadiusInches
 										/ 2
@@ -95,11 +94,12 @@ public class ShooterPhysics {
 		double g = 386.09;
 		LinearVelocity yComponent =
 				projectileSpeed.times(
-						Math.sin(ShooterConstants.Shooter.shooterAngleWithHorizontal.in(Radians)));
+						Math.sin(
+								ShooterTurretConstants.ShooterConstants.shooterAngleWithHorizontal.in(Radians)));
 		double yComponentInches = yComponent.in(InchesPerSecond);
 		double heightDiffInches =
 				FieldConstants.hubEntranceHeight.in(Inches)
-						- ShooterConstants.Shooter.shooterHeight.in(Inches);
+						- ShooterTurretConstants.ShooterConstants.shooterHeight.in(Inches);
 
 		double secondsToScore =
 				(yComponentInches
@@ -109,24 +109,25 @@ public class ShooterPhysics {
 		return Seconds.of(secondsToScore);
 	}
 
-	public static Pose2d getVirtualTarget(Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds, int iterations) {
+	public static Pose2d getVirtualTarget(
+			Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds, int iterations) {
 
 		Pose2d virtualTargetPose =
 				DriverStation.getAlliance().isPresent()
 								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
 						? FieldConstants.blueHub
 						: FieldConstants.redHub;
-        
-        for (int i=0; i<iterations; i++) {
-            Time tofEstimate = calculateTimeToScore(robotPose, virtualTargetPose);
 
-            Translation2d targetTranslation =
-                    new Translation2d(
-                            MetersPerSecond.of(-fieldRelativeSpeeds.vxMetersPerSecond).times(tofEstimate),
-                            MetersPerSecond.of(-fieldRelativeSpeeds.vyMetersPerSecond).times(tofEstimate));
-            virtualTargetPose =
-                    virtualTargetPose.plus(new Transform2d(targetTranslation, Rotation2d.kZero));
-        }
+		for (int i = 0; i < iterations; i++) {
+			Time tofEstimate = calculateTimeToScore(robotPose, virtualTargetPose);
+
+			Translation2d targetTranslation =
+					new Translation2d(
+							MetersPerSecond.of(-fieldRelativeSpeeds.vxMetersPerSecond).times(tofEstimate),
+							MetersPerSecond.of(-fieldRelativeSpeeds.vyMetersPerSecond).times(tofEstimate));
+			virtualTargetPose =
+					virtualTargetPose.plus(new Transform2d(targetTranslation, Rotation2d.kZero));
+		}
 		return virtualTargetPose;
 	}
 }

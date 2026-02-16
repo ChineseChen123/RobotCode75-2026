@@ -8,7 +8,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
-import static frc.robot.Constants.ShooterConstants.Turret.*;
+import static frc.robot.Constants.ShooterTurretConstants.TurretConstants.*;
 
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -20,17 +20,17 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.util.ShooterPhysics;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
-import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.ShooterConstants.Turret.MotorConfigs;
+import frc.lib.util.ShooterPhysics;
+import frc.robot.Constants.ShooterTurretConstants;
+import frc.robot.Constants.ShooterTurretConstants.TurretConstants.MotorConfigs;
 import frc.robot.state.RobotStates;
 import java.util.Optional;
 
 public class Turret extends SubsystemBase {
 
-	private final TalonFX m_TurretMotor = null;
+	private final TalonFX m_TurretMotor;
 
 	private final DutyCycleEncoder m_TurretEncoder1;
 	private final DutyCycleEncoder m_TurretEncoder2;
@@ -45,10 +45,10 @@ public class Turret extends SubsystemBase {
 
 	/** Creates a new Turret. */
 	public Turret() {
-		// m_TurretMotor = new TalonFX(turretMotorCanID, superstructureCANBusName);
+		m_TurretMotor = new TalonFX(turretMotorCanID, superstructureCANBusName);
 
-		m_TurretEncoder1 = new DutyCycleEncoder(encoder1Port, 1, encoder1Offset.in(Rotations));
-		m_TurretEncoder2 = new DutyCycleEncoder(encoder2Port, 1, encoder2Offset.in(Rotations));
+		m_TurretEncoder1 = new DutyCycleEncoder(encoder1Port, 1, encoder1ZeroPoint.in(Rotations));
+		m_TurretEncoder2 = new DutyCycleEncoder(encoder2Port, 1, encoder2ZeroPoint.in(Rotations));
 
 		m_TurretMotor.getConfigurator().apply(MotorConfigs.getTurretMotorConfig());
 
@@ -172,10 +172,12 @@ public class Turret extends SubsystemBase {
 								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
 						? blueHub
 						: redHub;
-		if (ShooterConstants.useVirtualTarget) {
+		if (ShooterTurretConstants.useVirtualTarget) {
 			targetHubPose =
-					ShooterPhysics.getVirtualTarget(RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get(), 
-						ShooterConstants.virtualTargetSolveIterations);
+					ShooterPhysics.getVirtualTarget(
+							RobotStates.robotPose.get(),
+							RobotStates.fieldRelativeSpeeds.get(),
+							ShooterTurretConstants.virtualTargetSolveIterations);
 		}
 
 		Rotation2d fieldRelativeToHub =
@@ -184,26 +186,27 @@ public class Turret extends SubsystemBase {
 						targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
 		Angle turretTarget =
 				fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
-		
-    double angleDeg = turretTarget.in(Degrees); // (-180,180)
+
+		double angleDeg = turretTarget.in(Degrees); // (-180,180)
 		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
 		angleDeg -= 180;
 
-		if (Math.abs(angleDeg) > turretRingGearRange.in(Degrees) / 2.0 && ShooterConstants.useVirtualTarget) {
+		if (Math.abs(angleDeg) > turretRingGearRange.in(Degrees) / 2.0
+				&& ShooterTurretConstants.useVirtualTarget) {
 			// Basically, if the virtual target is OUTSIDE of range DO NOT do wrap around
 			// instead fall back to normal targeting. Hopefully driver isnt stupid
 			// hopefully this prevents super fast turret movements
 
-			// bad coding prob should use more dry 
+			// bad coding prob should use more dry
 			targetHubPose =
-				DriverStation.getAlliance().isPresent()
-								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
-						? blueHub
-						: redHub;
+					DriverStation.getAlliance().isPresent()
+									&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+							? blueHub
+							: redHub;
 			fieldRelativeToHub =
-				new Rotation2d(
-						targetHubPose.getTranslation().getX() - turretPose.getTranslation().getX(),
-						targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
+					new Rotation2d(
+							targetHubPose.getTranslation().getX() - turretPose.getTranslation().getX(),
+							targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
 			turretTarget =
 					fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
 			angleDeg = turretTarget.in(Degrees); // (-180,180)
@@ -232,10 +235,10 @@ public class Turret extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// This method will be called once per scheduler run
-		// if (!isReset) {
-		// 	resetMotorPosition();
-		// 	return;
-		// }
+		if (!isReset) {
+			resetMotorPosition();
+			return;
+		}
 
 		updateTurretTarget();
 

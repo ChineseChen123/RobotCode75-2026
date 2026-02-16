@@ -1,6 +1,7 @@
 package frc.robot.Constants;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Feet;
+import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,8 +18,10 @@ public class FieldConstants {
 	// Map of field elements and tags on red field
 	public static final Map<FieldElement, Integer> redTags = Map.ofEntries();
 
-	public static final Pose2d blueHub = new Pose2d(0, 0, Rotation2d.kZero);
-	public static final Pose2d redHub = new Pose2d(12, 4, Rotation2d.kZero);
+	public static final Pose2d blueHub =
+			new Pose2d(Meters.of(4.626), Meters.of(4.035), Rotation2d.kZero);
+	public static final Pose2d redHub =
+			new Pose2d(Meters.of(11.915), Meters.of(4.035), Rotation2d.kZero);
 
 	public static final Distance hubEntranceHeight = Feet.of(6);
 }
