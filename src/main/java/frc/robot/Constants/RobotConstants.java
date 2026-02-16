@@ -11,6 +11,6 @@ package frc.robot.Constants;
  * modes can only be used with Phoenix pro (HIGHLY RECCOMENDED TO USE)
  */
 public final class RobotConstants {
-	public static final String superstructureCANBusName = "Superstructure";
+	public static final String superstructureCANBusName = "superstructure";
 	public static final boolean TUNING_MODE = true; // Set to true for tunable numbers
 }

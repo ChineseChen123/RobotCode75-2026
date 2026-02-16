@@ -8,12 +8,15 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 import static frc.robot.Constants.ShooterConstants.Shooter.*;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.ShooterPhysics;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterConstants;
@@ -40,6 +43,12 @@ public class Shooter extends SubsystemBase {
 	private final TalonFX m_ShooterMotor2;
 	private final VelocityTorqueCurrentFOC m_VelocityRequest = new VelocityTorqueCurrentFOC(0);
 
+	private final Slot0Configs shooterPIDConfigs = new Slot0Configs();
+	private final TunableNumber shooterKp;
+	private final TunableNumber shooterKi;
+	private final TunableNumber shooterKd;
+	private final TunableNumber shooterKs;
+
 	public Shooter() {
 		m_ShooterMotor1 = new TalonFX(shooterMotor1CanID, superstructureCANBusName);
 		m_ShooterMotor2 = new TalonFX(shooterMotor2CanID, superstructureCANBusName);
@@ -48,6 +57,17 @@ public class Shooter extends SubsystemBase {
 		m_ShooterMotor2.getConfigurator().apply(MotorConfigs.getShooterMotor2MotorConfiguration());
 
 		m_ShooterState = ShooterStates.DEFAULT;
+
+		shooterPIDConfigs
+				.withKP(MotorConfigs.shooterMotor1VelocityKP)
+				.withKI(MotorConfigs.shooterMotor1VelocityKI)
+				.withKD(MotorConfigs.shooterMotor1VelocityKD)
+				.withKS(MotorConfigs.shooterMotor1VelocityKS);
+
+		shooterKp = new TunableNumber("Shooter/Kp", MotorConfigs.shooterMotor1VelocityKP);
+		shooterKi = new TunableNumber("Shooter/Ki", MotorConfigs.shooterMotor1VelocityKI);
+		shooterKd = new TunableNumber("Shooter/Kd", MotorConfigs.shooterMotor1VelocityKD);
+		shooterKs = new TunableNumber("Shooter/Ks", MotorConfigs.shooterMotor1VelocityKS);
 	}
 
 	public double getFlyWheelVelocity() {
@@ -66,16 +86,24 @@ public class Shooter extends SubsystemBase {
 		m_ShooterState = state;
 	}
 
-	public AngularVelocity calculateShooterSpeed(Pose2d robotPose) {
-		// lookup table stuff
-		return null;
-	}
-
 	@Override
 	public void periodic() {
+
+		if (shooterKp.getNumber() != shooterPIDConfigs.kP
+				|| shooterKi.getNumber() != shooterPIDConfigs.kI
+				|| shooterKd.getNumber() != shooterPIDConfigs.kD
+				|| shooterKs.getNumber() != shooterPIDConfigs.kS) {
+			shooterPIDConfigs.kP = shooterKp.getNumber();
+			shooterPIDConfigs.kI = shooterKi.getNumber();
+			shooterPIDConfigs.kD = shooterKd.getNumber();
+			shooterPIDConfigs.kS = shooterKs.getNumber();
+			m_ShooterMotor1.getConfigurator().apply(shooterPIDConfigs);
+			m_ShooterMotor2.getConfigurator().apply(shooterPIDConfigs);
+		}
+
 		if (m_ShooterState == ShooterStates.SHOOTING) {
-			// variable speeds
-			Pose2d targetHubPose =
+					// lookup table stuff
+		Pose2d targetHubPose =
 				DriverStation.getAlliance().isPresent()
 								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
 						? FieldConstants.blueHub
@@ -84,7 +112,8 @@ public class Shooter extends SubsystemBase {
 			// variable speeds
 				if (ShooterConstants.useVirtualTarget) {
 					targetHubPose =
-							ShooterPhysics.getVirtualTarget(targetHubPose, RobotStates.fieldRelativeSpeeds.get(), 5);
+							ShooterPhysics.getVirtualTarget(RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get(), 
+								ShooterConstants.virtualTargetSolveIterations);
 				}
 			AngularVelocity velocity =
 					ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);

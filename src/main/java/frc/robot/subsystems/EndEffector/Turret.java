@@ -5,7 +5,6 @@
 package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
@@ -148,17 +147,20 @@ public class Turret extends SubsystemBase {
 		if (!isReset) {
 			return pose;
 		}
-		// Angle turretHeading = getTurretHeadingFromMotor();
-		Angle turretHeading = turretTargetAngleAbsolute;
+		Rotation2d robotHeading = pose.getRotation();
+
+		Angle turretHeading = getTurretHeadingFromMotor();
 		Translation2d translation =
 				pose.getTranslation()
 						.plus(
 								new Translation2d(
-										turretPositionOffset.getMeasureX().times(Math.cos(turretHeading.in(Radians))),
-										turretPositionOffset.getMeasureY().times(Math.sin(turretHeading.in(Radians)))));
+										turretPositionOffset.getNorm(),
+										robotHeading.plus(turretPositionOffset.getAngle())));
 		Rotation2d rotation = pose.getRotation().plus(new Rotation2d(turretHeading));
 		return new Pose2d(translation, rotation);
 	}
+
+	// compensation or virtual target
 
 	public void updateTurretTarget() {
 		if (!isReset) {
@@ -172,19 +174,42 @@ public class Turret extends SubsystemBase {
 						: redHub;
 		if (ShooterConstants.useVirtualTarget) {
 			targetHubPose =
-					ShooterPhysics.getVirtualTarget(targetHubPose, RobotStates.fieldRelativeSpeeds.get(), 5);
+					ShooterPhysics.getVirtualTarget(RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get(), 
+						ShooterConstants.virtualTargetSolveIterations);
 		}
+
 		Rotation2d fieldRelativeToHub =
 				new Rotation2d(
 						targetHubPose.getTranslation().getX() - turretPose.getTranslation().getX(),
 						targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
 		Angle turretTarget =
 				fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
-
-
-		double angleDeg = turretTarget.in(Degrees); // (-180,180)
+		
+    double angleDeg = turretTarget.in(Degrees); // (-180,180)
 		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
 		angleDeg -= 180;
+
+		if (Math.abs(angleDeg) > turretRingGearRange.in(Degrees) / 2.0 && ShooterConstants.useVirtualTarget) {
+			// Basically, if the virtual target is OUTSIDE of range DO NOT do wrap around
+			// instead fall back to normal targeting. Hopefully driver isnt stupid
+			// hopefully this prevents super fast turret movements
+
+			// bad coding prob should use more dry 
+			targetHubPose =
+				DriverStation.getAlliance().isPresent()
+								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+						? blueHub
+						: redHub;
+			fieldRelativeToHub =
+				new Rotation2d(
+						targetHubPose.getTranslation().getX() - turretPose.getTranslation().getX(),
+						targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
+			turretTarget =
+					fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
+			angleDeg = turretTarget.in(Degrees); // (-180,180)
+			angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
+			angleDeg -= 180;
+		}
 
 		if (Math.abs(angleDeg) > turretRingGearRange.in(Degrees) / 2.0) {
 			double turnLimit = turretRingGearRange.in(Degrees) / 2.0;

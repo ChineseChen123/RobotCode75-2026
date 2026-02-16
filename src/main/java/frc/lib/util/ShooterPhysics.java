@@ -21,16 +21,6 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterConstants;
 
 public class ShooterPhysics {
-	// basically just lookup table
-	public static class CompensatedShot {
-		public final Angle turretAngle; // field-relative yaw to aim turret
-		public final AngularVelocity shooterSpeed; // compensated shooter wheel speed
-
-		public CompensatedShot(Angle turretAngle, AngularVelocity shooterSpeed) {
-			this.turretAngle = turretAngle;
-			this.shooterSpeed = shooterSpeed;
-		}
-	}
 
 	public static AngularVelocity distanceToAngularVelocity(double distanceToHub) {
 		// calculate from best fit line
@@ -113,114 +103,10 @@ public class ShooterPhysics {
 
 		double secondsToScore =
 				(yComponentInches
-								+ Math.sqrt(yComponentInches * yComponentInches - 2 * g * (heightDiffInches)))
+								+ Math.sqrt(yComponentInches * yComponentInches + 2 * g * (heightDiffInches)))
 						/ g;
 
 		return Seconds.of(secondsToScore);
-	}
-
-	public static AngularVelocity calculateCompensatedAngularVelocity(
-			Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds) {
-		return calculateCompensatedShot(robotPose, fieldRelativeSpeeds).shooterSpeed;
-	}
-
-	public static Angle calculateCompensatedTurretAngle(
-			Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds) {
-		return calculateCompensatedShot(robotPose, fieldRelativeSpeeds).turretAngle;
-	}
-
-	public static CompensatedShot calculateCompensatedShot(
-			Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds) {
-
-		// ------------------------------------------------------------
-		// 1. Determine which hub to target (same logic you already use)
-		// ------------------------------------------------------------
-		Pose2d targetHubPose =
-				DriverStation.getAlliance().isPresent()
-								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
-						? FieldConstants.blueHub
-						: FieldConstants.redHub;
-
-		Translation2d robotTranslation = robotPose.getTranslation();
-		Translation2d hubTranslation = targetHubPose.getTranslation();
-
-		// Horizontal displacement vector from robot to hub
-		double dxMeters = hubTranslation.getX() - robotTranslation.getX();
-		double dyMeters = hubTranslation.getY() - robotTranslation.getY();
-
-		double horizontalDistanceMeters = Math.hypot(dxMeters, dyMeters);
-
-		// Unit vector toward hub in field coordinates
-		double ux = dxMeters / horizontalDistanceMeters;
-		double uy = dyMeters / horizontalDistanceMeters;
-
-		// ------------------------------------------------------------
-		// 2. Estimate time of flight using existing stationary physics
-		//    This gives us a reasonable baseline without needing a
-		//    full iterative solver.
-		// ------------------------------------------------------------
-
-		// TODO: THIS IS A MAJOR ESTIMATE. TECHNICALLY THIS ISNT A FULL SOLVE
-		// BASICALLY THIS TIME IS IF WE WERE STATIONARY!!
-		// prob should change this...
-		Time tofEstimate = calculateTimeToScore(robotPose, targetHubPose);
-		double t = tofEstimate.in(Seconds);
-
-		// ------------------------------------------------------------
-		// 3. Compute required WORLD-FRAME projectile velocity
-		//    to reach the hub in time t
-		//
-		// Horizontal:
-		//   v_world_xy = distance / t
-		//
-		// Vertical:
-		//   v_world_z = (Δh + 0.5 g t²) / t
-		// ------------------------------------------------------------
-		double distanceInches = Inches.of(horizontalDistanceMeters).in(Inches);
-		double vWorldHorizontalInchesPerSec = distanceInches / t;
-
-		// Height difference
-		double heightDiffInches =
-				FieldConstants.hubEntranceHeight.in(Inches)
-						- ShooterConstants.Shooter.shooterHeight.in(Inches);
-
-		// gravity in inches/sec^2
-		double g = 386.09;
-
-		double vWorldZ = (heightDiffInches + 0.5 * g * t * t) / t;
-
-		// Horizontal world velocity vector toward hub
-		double vWorldX = vWorldHorizontalInchesPerSec * ux;
-		double vWorldY = vWorldHorizontalInchesPerSec * uy;
-
-		// ------------------------------------------------------------
-		// 4. Subtract robot velocity to get REQUIRED RELATIVE velocity
-		//
-		// v_rel = v_world - v_robot
-		// ------------------------------------------------------------
-		double robotVxInches =
-				MetersPerSecond.of(fieldRelativeSpeeds.vxMetersPerSecond).in(InchesPerSecond);
-		double robotVyInches =
-				MetersPerSecond.of(fieldRelativeSpeeds.vyMetersPerSecond).in(InchesPerSecond);
-
-		double vRelX = vWorldX - robotVxInches;
-		double vRelY = vWorldY - robotVyInches;
-		double vRelZ = vWorldZ;
-
-		// ------------------------------------------------------------
-		// 5. Compute required relative exit speed magnitude
-		// ------------------------------------------------------------
-		double requiredExitSpeedIPS = Math.sqrt(vRelX * vRelX + vRelY * vRelY + vRelZ * vRelZ);
-		LinearVelocity requiredExitSpeed = InchesPerSecond.of(requiredExitSpeedIPS);
-
-		// Convert exit speed → angular velocity
-		// (You will need to implement this mapping)
-		AngularVelocity compensatedShooterSpeed =
-				linearVelocityToShooterAngularVelocity(requiredExitSpeed);
-
-		Angle turretYaw = Radians.of(Math.atan2(vRelY, vRelX));
-
-		return new CompensatedShot(turretYaw, compensatedShooterSpeed);
 	}
 
 	public static Pose2d getVirtualTarget(Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds, int iterations) {
