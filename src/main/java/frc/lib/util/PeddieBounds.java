@@ -10,8 +10,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.util.FieldPose.FieldElement;
+import frc.robot.Constants.FieldConstants;
+
 import java.util.List;
 
 class IDVectorPair {
@@ -31,7 +34,7 @@ class IDVectorPair {
 // inspired by Peddie 5895
 public class PeddieBounds {
 
-	private static final AprilTagFields m_field = AprilTagFields.k2025ReefscapeWelded;
+	private static final AprilTagFields m_field = AprilTagFields.k2026RebuiltWelded;
 
 	/** returns field element associated with closest tag to current pose */
 	public static FieldElement nearestElement(Pose2d pose) {
@@ -92,5 +95,28 @@ public class PeddieBounds {
 				poseToDrive.getX(),
 				poseToDrive.getY(),
 				Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 180));
+	}
+
+	public static Pose2d getHubTarget() {
+		return DriverStation.getAlliance().isPresent()
+								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+						? FieldConstants.blueHub
+						: FieldConstants.redHub;
+	}
+
+	public static boolean isInNeutralZone(Pose2d pose) {
+		return pose.getX() > blueHub.getX() && pose.getX() < redHub.getX();
+	}
+
+	public static boolean isInOwnZone(Pose2d pose) {
+		if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+			return pose.getX() < blueHub.getX();
+		} else {
+			return pose.getX() > redHub.getX();
+		}
+	}
+
+	public static boolean isInTrench(Pose2d pose) {
+		return Math.abs(pose.getX() - blueHub.getX()) < 0.03 || Math.abs(pose.getX() - redHub.getX()) < 0.03;
 	}
 }

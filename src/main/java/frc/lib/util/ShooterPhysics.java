@@ -112,11 +112,7 @@ public class ShooterPhysics {
 	public static Pose2d getVirtualTarget(
 			Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds, int iterations) {
 
-		Pose2d virtualTargetPose =
-				DriverStation.getAlliance().isPresent()
-								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
-						? FieldConstants.blueHub
-						: FieldConstants.redHub;
+		Pose2d virtualTargetPose = PeddieBounds.getHubTarget();
 
 		for (int i = 0; i < iterations; i++) {
 			Time tofEstimate = calculateTimeToScore(robotPose, virtualTargetPose);
