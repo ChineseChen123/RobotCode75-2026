@@ -5,6 +5,7 @@
 package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.IntakeIndexConstants.IntakeConstants.*;
 import static frc.robot.Constants.IntakeIndexConstants.IntakeConstants.MotorConfigs.*;
 import static frc.robot.Constants.RobotConstants.*;
@@ -29,7 +30,7 @@ import frc.lib.util.RaiderLog.RaiderLog.Importance;
 public class Intake extends SubsystemBase {
 
 	public static enum IntakeStates {
-		STARTING(pivotUpAngle, defaultIntakeSpeed),
+		STOWED(pivotUpAngle, defaultIntakeSpeed),
 		DEFAULT(pivotHalfwayAngle, defaultIntakeSpeed),
 		INTAKING(pivotDownAngle, intakeRunningSpeed),
 		REVERSING(pivotDownAngle, intakeReversingSpeed);
@@ -79,6 +80,7 @@ public class Intake extends SubsystemBase {
 		m_PivotMotor = new TalonFX(pivotCanID, superstructureCANBusName);
 		m_PivotMotor.getConfigurator().apply(getPivotConfiguration());
 		m_IntakeMotor.getConfigurator().apply(getIntakeMotorConfiguration());
+		
 		m_IntakeState = IntakeStates.DEFAULT;
 
 		PivotMMConfigs.withMotionMagicAcceleration(pivotMMAcc)
@@ -118,28 +120,32 @@ public class Intake extends SubsystemBase {
 		Timer.delay(5);
 		m_PivotMotor.setPosition(
 				(pivotEncoderOffset.in(Rotations)
-						- getAbsolutePosition()) /*  / pivotMotorToMechanismRatio*/);
+						- getThroughborePosition()));
 	}
 
 	/** return through-bore encoder position */
 	@Logged(key = "Abs Encoder Position", importance = Importance.CRITICAL)
-	public double getAbsolutePosition() {
+	public double getThroughborePosition() {
 		return m_absoluteEncoder.get();
 	}
 
-	@Logged(key = "Pivot Rotations", importance = Importance.CRITICAL)
-	public double getPivotRotations() {
-		return m_PivotMotor.getPosition().getValueAsDouble();
+	@Logged(key = "Pivot Motor Rotations", importance = Importance.CRITICAL)
+	public double getMotorRotations() {
+		return m_PivotMotor.getPosition().getValue().in(Rotations);
 	}
 
 	@Logged(key = "Intake Velocity", importance = Importance.CRITICAL)
 	public double getIntakeVelocity() {
-		return m_IntakeMotor.getVelocity().getValueAsDouble();
+		return m_IntakeMotor.getVelocity().getValue().in(RotationsPerSecond);
 	}
 
 	@Logged(key = "Intake State", importance = Importance.CRITICAL)
 	public IntakeStates getIntakeState() {
 		return m_IntakeState;
+	}
+
+	public boolean isAtPosition(IntakeStates state) {
+		return Math.abs(state.pivotPosition.in(Rotations) - getMotorRotations()) < pivotToleranceAbsolute;
 	}
 
 	public void setState(IntakeStates state) {

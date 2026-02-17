@@ -198,7 +198,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	@Logged(key = "Field Relative Chassis Speeds", importance = Importance.CRITICAL)
-	public ChassisSpeeds getFieldRleativeChassisSpeeds() {
+	public ChassisSpeeds getFieldRelativeChassisSpeeds() {
 		return ChassisSpeeds.fromRobotRelativeSpeeds(this.getChassisSpeeds(), getHeading());
 	}
 

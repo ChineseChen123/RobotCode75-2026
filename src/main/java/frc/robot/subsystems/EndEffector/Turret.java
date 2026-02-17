@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
+import frc.lib.util.PeddieBounds;
 import frc.lib.util.ShooterPhysics;
 import frc.robot.Constants.ShooterTurretConstants;
 import frc.robot.Constants.ShooterTurretConstants.TurretConstants.MotorConfigs;
@@ -40,8 +41,7 @@ public class Turret extends SubsystemBase {
 
 	private boolean isReset = false;
 
-	private Angle turretTargetAngleAbsolute = Degrees.of(0);
-	private Angle turretTargetAngleMotor = Degrees.of(0);
+	private Angle turretTargetAngle = Degrees.of(0);
 
 	/** Creates a new Turret. */
 	public Turret() {
@@ -56,26 +56,31 @@ public class Turret extends SubsystemBase {
 		turretRequest.UseTimesync = true;
 	}
 
+	@Logged(key = "Turret Reset", importance = Importance.DEBUG)
+	public boolean isReset() {
+		return isReset;
+	}
+
 	// given mechanism rotation, reset motor encoder to match
 	public void resetMotorPosition() {
 		Optional<Angle> turretPosition = getTurretHeadingCRT();
 		if (turretPosition.isEmpty()) {
 			return;
 		}
-		m_TurretMotor.setPosition(turretPosition.get().div(motorToMechanismRatio));
+		m_TurretMotor.setPosition(turretPosition.get().div(motorToTurretRatio));
 		isReset = true;
 	}
 
-	public double getMotorPositionRotations() {
-		return m_TurretMotor.getPosition().getValue().in(Rotations);
+	public Angle getPositionFromMotor() {
+		return m_TurretMotor.getPosition(true).getValue();
 	}
 
 	public double getEncoder1PositionDegrees() {
-		return m_TurretEncoder1.get() * 360.0;
+		return m_TurretEncoder1.get() * 360.0 * (encoder1Invert ? -1 : 1);
 	}
 
 	public double getEncoder2PositionDegrees() {
-		return m_TurretEncoder2.get() * 360.0;
+		return m_TurretEncoder2.get() * 360.0 * (encoder2Invert ? -1 : 1);
 	}
 
 	// -135 deg = CW limit, 135 deg = CCW limit (CCW positive)
@@ -97,7 +102,7 @@ public class Turret extends SubsystemBase {
 		Angle bestErr = Rotations.of(Double.MAX_VALUE);
 		Angle secondErr = Rotations.of(Double.MAX_VALUE);
 		Angle bestRot = Rotations.of(0);
-		while (possibleMechRot.lte(turretRingGearRange)) {
+		while (possibleMechRot.lte(turretRange)) {
 			Angle encoder2Solution =
 					Rotations.of((possibleMechRot.in(Rotations) * ringGearTeeth / encoderPinion2Teeth) % 1.0);
 
@@ -129,16 +134,21 @@ public class Turret extends SubsystemBase {
 		}
 
 		// convert range from [0, 270] to [-135, 135]
-		return Optional.of(bestRot.plus(turretRingGearRange.div(2.0)));
+		return Optional.of(bestRot.minus(turretRange.div(2)));
 	}
 
-	public Angle getTurretHeadingFromMotor() {
-		return Rotations.of(getMotorPositionRotations() * motorToMechanismRatio);
+	@Logged(key = "Turret Position Error", importance = Importance.CRITICAL)
+	public double getTurretPositionErrorDegrees() {
+		return Math.abs(turretTargetAngle.minus(getPositionFromMotor()).in(Degrees));
+	}
+
+	public boolean atTargetHeading() {
+		return getTurretPositionErrorDegrees() < turretPositionToleranceDegrees;
 	}
 
 	@Logged(key = "Turret Target", importance = Importance.DEBUG)
 	public Angle getTurretTargetAbsolute() {
-		return turretTargetAngleAbsolute;
+		return turretTargetAngle;
 	}
 
 	@Logged(key = "Turret Pose", importance = Importance.DEBUG)
@@ -149,7 +159,7 @@ public class Turret extends SubsystemBase {
 		}
 		Rotation2d robotHeading = pose.getRotation();
 
-		Angle turretHeading = getTurretHeadingFromMotor();
+		Angle turretHeading = getPositionFromMotor();
 		Translation2d translation =
 				pose.getTranslation()
 						.plus(
@@ -160,18 +170,14 @@ public class Turret extends SubsystemBase {
 		return new Pose2d(translation, rotation);
 	}
 
-	// compensation or virtual target
-
+	// virtual target
 	public void updateTurretTarget() {
 		if (!isReset) {
 			return;
 		}
 		Pose2d turretPose = getTurretPose();
-		Pose2d targetHubPose =
-				DriverStation.getAlliance().isPresent()
-								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
-						? blueHub
-						: redHub;
+		Pose2d targetHubPose = PeddieBounds.getHubTarget();
+		
 		if (ShooterTurretConstants.useVirtualTarget) {
 			targetHubPose =
 					ShooterPhysics.getVirtualTarget(
@@ -191,7 +197,7 @@ public class Turret extends SubsystemBase {
 		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
 		angleDeg -= 180;
 
-		if (Math.abs(angleDeg) > turretRingGearRange.in(Degrees) / 2.0
+		if (Math.abs(angleDeg) > turretRange.in(Degrees) / 2.0
 				&& ShooterTurretConstants.useVirtualTarget) {
 			// Basically, if the virtual target is OUTSIDE of range DO NOT do wrap around
 			// instead fall back to normal targeting. Hopefully driver isnt stupid
@@ -214,8 +220,8 @@ public class Turret extends SubsystemBase {
 			angleDeg -= 180;
 		}
 
-		if (Math.abs(angleDeg) > turretRingGearRange.in(Degrees) / 2.0) {
-			double turnLimit = turretRingGearRange.in(Degrees) / 2.0;
+		if (Math.abs(angleDeg) > turretRange.in(Degrees) / 2.0) {
+			double turnLimit = turretRange.in(Degrees) / 2.0;
 			// Map [135, 180] -> [135, 0] linearly
 			if (angleDeg > turnLimit) { // (135, 180]
 				double t = (angleDeg - turnLimit) / (180 - turnLimit); // 0..1
@@ -228,8 +234,7 @@ public class Turret extends SubsystemBase {
 			}
 		}
 
-		turretTargetAngleAbsolute = Degrees.of(angleDeg);
-		turretTargetAngleMotor = turretTargetAngleAbsolute.div(motorToMechanismRatio);
+		turretTargetAngle = Degrees.of(angleDeg);
 	}
 
 	@Override
@@ -242,6 +247,6 @@ public class Turret extends SubsystemBase {
 
 		updateTurretTarget();
 
-		m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngleMotor));
+		m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngle));
 	}
 }

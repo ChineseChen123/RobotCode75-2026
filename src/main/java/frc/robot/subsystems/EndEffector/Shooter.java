@@ -16,6 +16,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
+import frc.lib.util.PeddieBounds;
 import frc.lib.util.ShooterPhysics;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterTurretConstants;
@@ -37,6 +38,7 @@ public class Shooter extends SubsystemBase {
 	}
 
 	private ShooterStates m_ShooterState;
+	private AngularVelocity shooterTargetVelocity = RotationsPerSecond.of(0);
 
 	private final TalonFX m_ShooterMotor1;
 	private final TalonFX m_ShooterMotor2;
@@ -58,23 +60,23 @@ public class Shooter extends SubsystemBase {
 		m_ShooterState = ShooterStates.DEFAULT;
 
 		shooterPIDConfigs
-				.withKP(MotorConfigs.shooterMotor1VelocityKP)
-				.withKI(MotorConfigs.shooterMotor1VelocityKI)
-				.withKD(MotorConfigs.shooterMotor1VelocityKD)
-				.withKS(MotorConfigs.shooterMotor1VelocityKS);
+				.withKP(MotorConfigs.shooterMotorVelocityKP)
+				.withKI(MotorConfigs.shooterMotorVelocityKI)
+				.withKD(MotorConfigs.shooterMotorVelocityKD)
+				.withKS(MotorConfigs.shooterMotorVelocityKS);
 
-		shooterKp = new TunableNumber("Shooter/Kp", MotorConfigs.shooterMotor1VelocityKP);
-		shooterKi = new TunableNumber("Shooter/Ki", MotorConfigs.shooterMotor1VelocityKI);
-		shooterKd = new TunableNumber("Shooter/Kd", MotorConfigs.shooterMotor1VelocityKD);
-		shooterKs = new TunableNumber("Shooter/Ks", MotorConfigs.shooterMotor1VelocityKS);
+		shooterKp = new TunableNumber("Shooter/Kp", MotorConfigs.shooterMotorVelocityKP);
+		shooterKi = new TunableNumber("Shooter/Ki", MotorConfigs.shooterMotorVelocityKI);
+		shooterKd = new TunableNumber("Shooter/Kd", MotorConfigs.shooterMotorVelocityKD);
+		shooterKs = new TunableNumber("Shooter/Ks", MotorConfigs.shooterMotorVelocityKS);
 	}
 
-	public double getFlyWheelVelocity() {
-		return m_ShooterMotor1.getVelocity(true).getValue().in(RotationsPerSecond);
+	public AngularVelocity getVelocity() {
+		return m_ShooterMotor1.getVelocity(true).getValue().plus(m_ShooterMotor2.getVelocity(true).getValue()).div(2);
 	}
 
-	public double getRollerVelocity() {
-		return m_ShooterMotor2.getVelocity(true).getValue().in(RotationsPerSecond);
+	public boolean atTargetVelocity() {
+		return getVelocity().minus(shooterTargetVelocity).abs(RotationsPerSecond) < shooterVelocityTolerance;
 	}
 
 	public ShooterStates getShooterState() {
@@ -102,11 +104,7 @@ public class Shooter extends SubsystemBase {
 
 		if (m_ShooterState == ShooterStates.SHOOTING) {
 			// lookup table stuff
-			Pose2d targetHubPose =
-					DriverStation.getAlliance().isPresent()
-									&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
-							? FieldConstants.blueHub
-							: FieldConstants.redHub;
+			Pose2d targetHubPose = PeddieBounds.getHubTarget();
 
 			// variable speeds
 			if (ShooterTurretConstants.useVirtualTarget) {
@@ -118,14 +116,14 @@ public class Shooter extends SubsystemBase {
 			}
 			AngularVelocity velocity =
 					ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);
-			// AngularVelocity velocity =
-			// ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get());
 
 			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(velocity));
 			m_ShooterMotor2.setControl(m_VelocityRequest.withVelocity(velocity));
+			shooterTargetVelocity = velocity;
 		} else {
 			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
 			m_ShooterMotor2.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
+			shooterTargetVelocity = m_ShooterState.shooterSpeed;
 		}
 	}
 }

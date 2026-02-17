@@ -38,22 +38,25 @@ public class ShooterTurretConstants {
 		public static final int shooterMotor1CanID = 41;
 		public static final int shooterMotor2CanID = 42;
 
-		public static final double shooterGearRatio = 1;
+		public static final double shooterGearRatio = 1.0; // 1.5 / 1.0
 
 		public static final Distance shooterWheelDiameter = Inches.of(4);
 
 		public static final AngularVelocity defaultShooterSpeed = RotationsPerSecond.of(0);
 		public static final AngularVelocity reverseShooterSpeed = RotationsPerSecond.of(-5);
 
+		public static final double shooterVelocityTolerance = 50.0 / 60.0; // rotations per second
+
 		// Note that the flywheel MOI effective to the motors is multiplied by the gear ratio squared.
 		// <-- from recalc
 		public static final Distance shooterWheelRadius = Inches.of(2);
 		public static final Mass shooterWheelIndividualWeight = Pounds.of(.67);
+		public static final int numberOfShooterWheels = 2;
 
 		public static final double flywheelMOI = 0; // in^2 / lbs
 		public static final double shooterWheelMOI =
 				.5
-						* (shooterWheelIndividualWeight.in(Pounds) * 2)
+						* (shooterWheelIndividualWeight.in(Pounds) * numberOfShooterWheels)
 						* (shooterWheelRadius.in(Inches)
 								* shooterWheelRadius.in(Inches)); // in^2 / lbs, 1/2mr^2 approx.
 		public static final double ballWeight = .474; // lbs
@@ -70,59 +73,49 @@ public class ShooterTurretConstants {
 					InvertedValue.CounterClockwise_Positive;
 			public static final InvertedValue shooterMotor2Inverted = InvertedValue.Clockwise_Positive;
 
-			public static final NeutralModeValue shooterMotor1NeutralMode = NeutralModeValue.Coast;
-			public static final NeutralModeValue shooterMotor2NeutralMode = NeutralModeValue.Coast;
+			public static final NeutralModeValue shooterMotorNeutralMode = NeutralModeValue.Coast;
 
 			public static final Frequency timeSyncFreq = Hertz.of(250);
 
-			public static final Time shooterMotor1CurrentThresholdTime = Seconds.of(0.5);
-			public static final Time shooterMotor2CurrentThresholdTime = Seconds.of(0.5);
+			public static final Time shooterMotorCurrentThresholdTime = Seconds.of(0.5);
 
-			public static final Current shooterMotor1SupplyCurrentLimit = Amps.of(40);
-			public static final Current shooterMotor1CurrentLowerThreshold = Amps.of(30);
-			public static final Current shooterMotor1StatorCurrentLimit = Amps.of(60);
-
-			public static final Current shooterMotor2SupplyCurrentLimit = Amps.of(40);
-			public static final Current shooterMotor2CurrentLowerThreshold = Amps.of(30);
-			public static final Current shooterMotor2StatorCurrentLimit = Amps.of(60);
+			public static final Current shooterMotorSupplyCurrentLimit = Amps.of(40);
+			public static final Current shooterMotorCurrentLowerThreshold = Amps.of(30);
+			public static final Current shooterMotorStatorCurrentLimit = Amps.of(60);
 
 			// Torque PI
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double shooterMotor1VelocityKP = 0.3;
-			public static final double shooterMotor1VelocityKI = 0.0;
-			public static final double shooterMotor1VelocityKD = 0.0;
-			public static final double shooterMotor1VelocityKS = 4.9;
-
-			public static final double shooterMotor2VelocityKP = 0.3;
-			public static final double shooterMotor2VelocityKI = 0.0;
-			public static final double shooterMotor2VelocityKD = 0.0;
-			public static final double shooterMotor2VelocityKS = 4.9;
+			public static final double shooterMotorVelocityKP = 0.3;
+			public static final double shooterMotorVelocityKI = 0.0;
+			public static final double shooterMotorVelocityKD = 0.0;
+			public static final double shooterMotorVelocityKS = 4.9;
 
 			public static TalonFXConfiguration getShooterMotor1MotorConfiguration() {
 
 				m_shooterMotor1Config.MotorOutput.Inverted = shooterMotor1Inverted;
-				m_shooterMotor1Config.MotorOutput.NeutralMode = shooterMotor1NeutralMode;
+				m_shooterMotor1Config.MotorOutput.NeutralMode = shooterMotorNeutralMode;
+
+				m_shooterMotor1Config.Feedback.SensorToMechanismRatio = 1 / shooterGearRatio;
 
 				// Current Limiting
 				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLimitEnable = true;
 				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLimit =
-						shooterMotor1SupplyCurrentLimit.in(Amps);
+						shooterMotorSupplyCurrentLimit.in(Amps);
 				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLowerTime =
-						shooterMotor1CurrentThresholdTime.in(Seconds);
+						shooterMotorCurrentThresholdTime.in(Seconds);
 				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLowerLimit =
-						shooterMotor1CurrentLowerThreshold.in(Amps);
-
+						shooterMotorCurrentLowerThreshold.in(Amps);
 				m_shooterMotor1Config.CurrentLimits.StatorCurrentLimitEnable = true;
 				m_shooterMotor1Config.CurrentLimits.StatorCurrentLimit =
-						shooterMotor1StatorCurrentLimit.in(Amps);
+						shooterMotorStatorCurrentLimit.in(Amps);
 
 				// PID Config
-				m_shooterMotor1Config.Slot0.kP = shooterMotor1VelocityKP;
-				m_shooterMotor1Config.Slot0.kI = shooterMotor1VelocityKI;
-				m_shooterMotor1Config.Slot0.kD = shooterMotor1VelocityKD;
-				m_shooterMotor1Config.Slot0.kS = shooterMotor1VelocityKS;
+				m_shooterMotor1Config.Slot0.kP = shooterMotorVelocityKP;
+				m_shooterMotor1Config.Slot0.kI = shooterMotorVelocityKI;
+				m_shooterMotor1Config.Slot0.kD = shooterMotorVelocityKD;
+				m_shooterMotor1Config.Slot0.kS = shooterMotorVelocityKS;
 
 				// Open and Closed Loop Ramping
 				m_shooterMotor1Config.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = openLoopRamp;
@@ -140,25 +133,26 @@ public class ShooterTurretConstants {
 			public static TalonFXConfiguration getShooterMotor2MotorConfiguration() {
 
 				m_shooterMotor2Config.MotorOutput.Inverted = shooterMotor2Inverted;
-				m_shooterMotor2Config.MotorOutput.NeutralMode = shooterMotor2NeutralMode;
+				m_shooterMotor2Config.MotorOutput.NeutralMode = shooterMotorNeutralMode;
+
+				m_shooterMotor2Config.Feedback.SensorToMechanismRatio = 1 / shooterGearRatio;
 
 				// Current Limiting
 				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLimitEnable = true;
 				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLimit =
-						shooterMotor2SupplyCurrentLimit.in(Amps);
+						shooterMotorSupplyCurrentLimit.in(Amps);
 				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLowerTime =
-						shooterMotor2CurrentThresholdTime.in(Seconds);
 				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLowerLimit =
-						shooterMotor2CurrentLowerThreshold.in(Amps);
+						shooterMotorCurrentLowerThreshold.in(Amps);
 				m_shooterMotor2Config.CurrentLimits.StatorCurrentLimitEnable = true;
 				m_shooterMotor2Config.CurrentLimits.StatorCurrentLimit =
-						shooterMotor2StatorCurrentLimit.in(Amps);
+						shooterMotorStatorCurrentLimit.in(Amps);
 
 				// PID Config
-				m_shooterMotor2Config.Slot0.kP = shooterMotor2VelocityKP;
-				m_shooterMotor2Config.Slot0.kI = shooterMotor2VelocityKI;
-				m_shooterMotor2Config.Slot0.kD = shooterMotor2VelocityKD;
-				m_shooterMotor2Config.Slot0.kS = shooterMotor2VelocityKS;
+				m_shooterMotor2Config.Slot0.kP = shooterMotorVelocityKP;
+				m_shooterMotor2Config.Slot0.kI = shooterMotorVelocityKI;
+				m_shooterMotor2Config.Slot0.kD = shooterMotorVelocityKD;
+				m_shooterMotor2Config.Slot0.kS = shooterMotorVelocityKS;
 
 				// Open and Closed Loop Ramping
 				m_shooterMotor2Config.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = openLoopRamp;
@@ -177,31 +171,34 @@ public class ShooterTurretConstants {
 
 	public class TurretConstants {
 
-		public static final int turretMotorCanID = 0;
-		public static final int encoder1Port = 0;
-		public static final int encoder2Port = 0;
+		public static final int turretMotorCanID = 43;
+		public static final int encoder1Port = 1;
+		public static final int encoder2Port = 2;
 
 		public static final int ringGearTeeth = 102;
 		public static final int encoderPinion1Teeth = 18;
 		public static final int encoderPinion2Teeth = 19;
 
-		public static final double motorToMechanismRatio = 1.0 / 1.0;
+		public static final double motorToTurretRatio = 1.0 / 25.0; // TODO figure out
 		// translation from robot center to turret center, climber is forward
 		public static final Translation2d turretPositionOffset =
 				new Translation2d(Inches.of(2), Inches.of(10));
-		;
+		public static final double turretPositionToleranceDegrees = 1.5;
 
 		// at CW limit
 		public static final Angle encoder1ZeroPoint = Rotations.of(0);
 		public static final Angle encoder2ZeroPoint = Rotations.of(0);
+
+		public static final boolean encoder1Invert = false;
+		public static final boolean encoder2Invert = false;
+
 		// discrepancy threshold between encoders to accept solution
 		public static final Angle matchTolerance = Rotations.of(0.005);
 		// minimum difference between two possible solutions to avoid ambiguity
 		public static final Angle ambiguityTolerance = Rotations.of(0.001);
 
 		// abs for both
-		public static final Angle turretRingGearRange = Degrees.of(270);
-		public static final Angle turretMotorRange = Rotations.of(100);
+		public static final Angle turretRange = Degrees.of(270);
 
 		public static class MotorConfigs {
 			public static final Time closedLoopRamp = Seconds.of(0.25);
@@ -215,15 +212,15 @@ public class ShooterTurretConstants {
 			public static final Current statorForwardCurrentLimit = Amps.of(100);
 			public static final Current statorReverseCurrentLimit = Amps.of(100);
 
-			public static final Angle forwardSoftLimit = Rotations.of(50); // TODO test
-			public static final Angle reverseSoftLimit = Rotations.of(-50);
+			public static final Angle forwardSoftLimit = turretRange.div(2);
+			public static final Angle reverseSoftLimit = turretRange.div(-2);
 
 			public static final Frequency timeSyncFreq = Hertz.of(250);
 
-			public static final double kA = 0.1; // current per unit of acceleration
-			public static final double kG = 0; // current to overcome gravity
-			public static final double kS = 0; // current to overcome static friction
-			public static final double kV = 0.1; // current per unit of requested velocity
+			public static final double kA = 0.1; // voltage per unit of acceleration
+			public static final double kG = 0; // voltage to overcome gravity
+			public static final double kS = 0; // voltage to overcome static friction
+			public static final double kV = 0.1; // voltage per unit of requested velocity
 			public static final double kP = 5;
 			public static final double kI = 0;
 			public static final double kD = 2;
@@ -237,6 +234,8 @@ public class ShooterTurretConstants {
 				TalonFXConfiguration m_TurretMotorConfig = new TalonFXConfiguration();
 
 				m_TurretMotorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp.in(Seconds);
+
+				m_TurretMotorConfig.Feedback.SensorToMechanismRatio = 1 / motorToTurretRatio;
 
 				m_TurretMotorConfig.CurrentLimits.StatorCurrentLimit = statorCurrentLimit.in(Amps);
 				m_TurretMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -268,10 +267,10 @@ public class ShooterTurretConstants {
 				m_TurretMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent =
 						statorReverseCurrentLimit.in(Amps);
 
-				m_TurretMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+				m_TurretMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 				m_TurretMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
 						forwardSoftLimit.in(Rotations);
-				m_TurretMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
+				m_TurretMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 				m_TurretMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
 						reverseSoftLimit.in(Rotations);
 

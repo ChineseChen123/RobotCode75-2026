@@ -19,6 +19,7 @@ import frc.robot.state.Bindings;
 import frc.robot.state.Driver;
 import frc.robot.state.Operator;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.Indexer;
 import frc.robot.subsystems.EndEffector.Intake;
 import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Turret;
@@ -38,6 +39,8 @@ public class RobotContainer {
 					DrivetrainConstants.BackRight);
 
 	public static final Intake m_Intake = new Intake();
+
+	public static final Indexer m_Indexer = new Indexer();
 
 	public static final Shooter m_Shooter = new Shooter();
 
@@ -90,6 +93,22 @@ public class RobotContainer {
 
 	public static Swerve getSwerve() {
 		return m_Swerve;
+	}
+
+	public static Intake getIntake() {
+		return m_Intake;
+	}
+
+	public static Indexer getIndexer() {
+		return m_Indexer;
+	}
+
+	public static Shooter getShooter() {
+		return m_Shooter;
+	}
+
+	public static Turret getTurret() {
+		return m_Turret;
 	}
 
 	public static Driver getDriver() {
