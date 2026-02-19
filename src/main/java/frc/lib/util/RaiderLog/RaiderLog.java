@@ -198,7 +198,7 @@ public class RaiderLog extends DogLog {
 	}
 
 	/** log output to DogLog by type */
-	private static void logOutput(String key, Object value) {
+	public static void logOutput(String key, Object value) {
 		if (value instanceof Number) {
 			DogLog.log(key, ((Number) value).doubleValue());
 		} else if (value instanceof String) {
@@ -207,7 +207,8 @@ public class RaiderLog extends DogLog {
 			DogLog.log(key, (Boolean) value);
 		} /*else if (value instanceof Enum<?>) {
 				DogLog.log(key, (Enum<?>) value);
-			}*/ else if (value instanceof StructSerializable) {
+			}*/
+		else if (value instanceof StructSerializable) {
 			DogLog.log(key, (StructSerializable) value);
 		} else if (value instanceof double[]) {
 			DogLog.log(key, (double[]) value);

@@ -2,6 +2,7 @@ package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.Constants.IOConstants.oneDriver;
+import static frc.robot.Constants.VisionConstants.useFomWeighting;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.Utils;
@@ -19,6 +20,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -34,9 +36,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
+import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.controllers.ChezyController;
 import frc.robot.subsystems.Drivetrain.controllers.RotationController;
+import frc.robot.subsystems.Vision.Limelight;
 
 public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> implements Subsystem {
 
@@ -327,23 +331,43 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 							});
 		}
 
-		// if (!Utils.isSimulation()) {
-		// 	AprilTagCamera[] cameras = RobotContainer.getAprilTagCameras();
-		// 	if (estimatedPosesFromCameras == null || cameras.length != estimatedPosesFromCameras.length)
-		// {
-		// 		estimatedPosesFromCameras = new Pose2d[cameras.length];
-		// 	}
-		// 	for (int i = 0; i < cameras.length; i++) {
-		// 		cameras[i].updateHeading(getHeading());
-		// 		cameras[i].updatePoseEstimator(getPose());
-		// 		if (cameras[i].getEstimatedPose() != null) {
-		// 			addVisionMeasurement(
-		// 					cameras[i].getEstimatedPose().estimatedPose.toPose2d(),
-		// 					cameras[i].getEstimatedPose().timestampSeconds);
-		// 			estimatedPosesFromCameras[i] = cameras[i].getEstimatedPose().estimatedPose.toPose2d();
-		// 		}
-		// 	}
-		// }
+		if (!Utils.isSimulation()) {
+			Limelight[] limelights = RobotContainer.getLimelights();
+			if (estimatedPosesFromCameras == null || limelights.length != estimatedPosesFromCameras.length) {
+				estimatedPosesFromCameras = new Pose2d[limelights.length];
+			}
+			double[] timestamps = new double[limelights.length];
+
+			Pose2d fusedVisionPose = new Pose2d(0, 0, new Rotation2d());
+			double sumRecipFomSq = 0;
+
+			for (int i = 0; i < limelights.length; i++) {
+				LimelightHelpers.PoseEstimate estimate = limelights[i].getEstimatedPose();
+				if (estimate == null) continue;
+
+				if (!useFomWeighting) {
+					addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
+					continue;
+				}
+				
+				estimatedPosesFromCameras[i] = estimate.pose;
+				timestamps[i] = estimate.timestampSeconds;
+				double fom = limelights[i].getFOM(estimate);
+
+				sumRecipFomSq += 1.0 / Math.pow(fom, 2);
+
+				Transform2d weightedPose = new Transform2d(estimatedPosesFromCameras[i].getTranslation(), estimatedPosesFromCameras[i].getRotation()).div(Math.pow(fom, 2));
+				fusedVisionPose = fusedVisionPose.plus(weightedPose);
+			}
+
+			if (useFomWeighting && sumRecipFomSq > 0) {
+				fusedVisionPose = fusedVisionPose.div(sumRecipFomSq);
+
+				for (int i = 0; i < limelights.length; i++) {
+					addVisionMeasurement(fusedVisionPose, timestamps[i]);
+				}
+			}
+		}
 	}
 
 	// ── Internals ────────────────────────────────────────────────────────────────

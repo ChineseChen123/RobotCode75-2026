@@ -71,6 +71,11 @@ public class Turret extends SubsystemBase {
 		isReset = true;
 	}
 
+	@Logged(key = "Turret Position Deg", importance = Importance.DEBUG)
+	public double getPositionFromMotorDegrees() {
+		return getPositionFromMotor().in(Degrees);
+	}
+
 	public Angle getPositionFromMotor() {
 		return m_TurretMotor.getPosition(true).getValue();
 	}
@@ -137,7 +142,7 @@ public class Turret extends SubsystemBase {
 		return Optional.of(bestRot.minus(turretRange.div(2)));
 	}
 
-	@Logged(key = "Turret Position Error", importance = Importance.CRITICAL)
+	@Logged(key = "Turret Position Error Deg", importance = Importance.DEBUG)
 	public double getTurretPositionErrorDegrees() {
 		return Math.abs(turretTargetAngle.minus(getPositionFromMotor()).in(Degrees));
 	}
@@ -151,7 +156,7 @@ public class Turret extends SubsystemBase {
 		return turretTargetAngle;
 	}
 
-	@Logged(key = "Turret Pose", importance = Importance.DEBUG)
+	@Logged(key = "Turret Pose", importance = Importance.CRITICAL)
 	public Pose2d getTurretPose() {
 		Pose2d pose = RobotStates.robotPose.get();
 		if (!isReset) {
@@ -204,11 +209,7 @@ public class Turret extends SubsystemBase {
 			// hopefully this prevents super fast turret movements
 
 			// bad coding prob should use more dry
-			targetHubPose =
-					DriverStation.getAlliance().isPresent()
-									&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
-							? blueHub
-							: redHub;
+			targetHubPose = PeddieBounds.getHubTarget();
 			fieldRelativeToHub =
 					new Rotation2d(
 							targetHubPose.getTranslation().getX() - turretPose.getTranslation().getX(),
@@ -220,6 +221,7 @@ public class Turret extends SubsystemBase {
 			angleDeg -= 180;
 		}
 
+		// Interpolate blind spot in opposite direction by factor of 3
 		if (Math.abs(angleDeg) > turretRange.in(Degrees) / 2.0) {
 			double turnLimit = turretRange.in(Degrees) / 2.0;
 			// Map [135, 180] -> [135, 0] linearly
