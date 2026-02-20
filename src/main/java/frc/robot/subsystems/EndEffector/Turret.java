@@ -66,7 +66,7 @@ public class Turret extends SubsystemBase {
 		if (turretPosition.isEmpty()) {
 			return;
 		}
-		m_TurretMotor.setPosition(turretPosition.get().div(motorToTurretRatio));
+		m_TurretMotor.setPosition(turretPosition.get());
 		isReset = true;
 	}
 
@@ -93,6 +93,9 @@ public class Turret extends SubsystemBase {
 		Angle encoder1Position = Degrees.of(getEncoder1PositionDegrees());
 		Angle encoder2Position = Degrees.of(getEncoder2PositionDegrees());
 
+		encoder1Position = Rotations.of(MathUtil.inputModulus(encoder1Position.in(Rotations), 0, 1));
+		encoder2Position = Rotations.of(MathUtil.inputModulus(encoder2Position.in(Rotations), 0, 1));
+
 		Angle possibleMechRot =
 				Rotations.of(encoder1Position.in(Rotations) * encoderPinion1Teeth / ringGearTeeth);
 
@@ -108,7 +111,7 @@ public class Turret extends SubsystemBase {
 		Angle bestRot = Rotations.of(0);
 		while (possibleMechRot.lte(turretRange)) {
 			Angle encoder2Solution =
-					Rotations.of((possibleMechRot.in(Rotations) * ringGearTeeth / encoderPinion2Teeth) % 1.0);
+					Rotations.of(MathUtil.inputModulus(possibleMechRot.in(Rotations) * ringGearTeeth / encoderPinion2Teeth, 0, 1));
 
 			Angle err = Rotations.of(encoder2Position.minus(encoder2Solution).abs(Rotations));
 			if (err.gt(Rotations.of(0.5))) {
@@ -126,12 +129,12 @@ public class Turret extends SubsystemBase {
 		}
 
 		// no solution found
-		if (bestErr.in(Rotations) == Double.MAX_VALUE || bestErr.gt(matchTolerance)) {
+		if (!Double.isFinite(bestErr.in(Rotations)) || bestErr.gt(matchTolerance)) {
 			return Optional.empty();
 		}
 
 		// ambiguous solutions
-		if (secondErr.lt(matchTolerance)
+		if (secondErr.lte(matchTolerance)
 				&& Math.abs(secondErr.in(Rotations) - bestErr.in(Rotations))
 						< ambiguityTolerance.in(Rotations)) {
 			return Optional.empty();
