@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.robot.Constants.FieldConstants;
-
 import java.util.List;
 
 class IDVectorPair {
@@ -99,9 +98,9 @@ public class PeddieBounds {
 
 	public static Pose2d getHubTarget() {
 		return DriverStation.getAlliance().isPresent()
-								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
-						? FieldConstants.blueHub
-						: FieldConstants.redHub;
+						&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+				? FieldConstants.blueHub
+				: FieldConstants.redHub;
 	}
 
 	public static boolean isInNeutralZone(Pose2d pose) {
@@ -109,7 +108,8 @@ public class PeddieBounds {
 	}
 
 	public static boolean isInOwnZone(Pose2d pose) {
-		if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+		if (DriverStation.getAlliance().isPresent()
+				&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
 			return pose.getX() < blueHub.getX();
 		} else {
 			return pose.getX() > redHub.getX();
@@ -117,6 +117,7 @@ public class PeddieBounds {
 	}
 
 	public static boolean isInTrench(Pose2d pose) {
-		return Math.abs(pose.getX() - blueHub.getX()) < 0.03 || Math.abs(pose.getX() - redHub.getX()) < 0.03;
+		return Math.abs(pose.getX() - blueHub.getX()) < 0.03
+				|| Math.abs(pose.getX() - redHub.getX()) < 0.03;
 	}
 }

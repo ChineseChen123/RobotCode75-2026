@@ -16,18 +16,16 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.PeddieBounds;
-import frc.lib.util.ShooterPhysics;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
-import frc.robot.Constants.FieldConstants;
+import frc.lib.util.ShooterPhysics;
 import frc.robot.Constants.ShooterTurretConstants;
 import frc.robot.Constants.ShooterTurretConstants.ShooterConstants.MotorConfigs;
 import frc.robot.state.RobotStates;
@@ -83,25 +81,23 @@ public class Shooter extends SubsystemBase {
 		shooterKd = new TunableNumber("Shooter/Kd", MotorConfigs.shooterMotorVelocityKD);
 		shooterKs = new TunableNumber("Shooter/Ks", MotorConfigs.shooterMotorVelocityKS);
 
-		m_sysIdRoutine = new SysIdRoutine(
-      new SysIdRoutine.Config(
-         null,        // Use default ramp rate (1 V/s)
-         Volts.of(8), // Reduce dynamic step voltage to 4 to prevent brownout
-         null,        // Use default timeout (10 s)
-                      // Log state with Phoenix SignalLogger class
-         (state) -> SignalLogger.writeString("state", state.toString())
-      ),
-      new SysIdRoutine.Mechanism(
-         (volts) -> {
-			m_ShooterMotor1.setControl(m_voltReq.withOutput(volts.in(Volts)));
-			m_ShooterMotor2.setControl(m_voltReq.withOutput(volts.in(Volts)));
-		 },
-         null,
-         this
-      )
-   );
-		 m_VelocityRequest.UpdateFreqHz = 0;
-		 m_VelocityRequest.UseTimesync = true;
+		m_sysIdRoutine =
+				new SysIdRoutine(
+						new SysIdRoutine.Config(
+								null, // Use default ramp rate (1 V/s)
+								Volts.of(8), // Reduce dynamic step voltage to 4 to prevent brownout
+								null, // Use default timeout (10 s)
+								// Log state with Phoenix SignalLogger class
+								(state) -> SignalLogger.writeString("state", state.toString())),
+						new SysIdRoutine.Mechanism(
+								(volts) -> {
+									m_ShooterMotor1.setControl(m_voltReq.withOutput(volts.in(Volts)));
+									m_ShooterMotor2.setControl(m_voltReq.withOutput(volts.in(Volts)));
+								},
+								null,
+								this));
+		m_VelocityRequest.UpdateFreqHz = 0;
+		m_VelocityRequest.UseTimesync = true;
 	}
 
 	public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
@@ -118,11 +114,16 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public AngularVelocity getVelocity() {
-		return m_ShooterMotor1.getVelocity(true).getValue().plus(m_ShooterMotor2.getVelocity(true).getValue()).div(2);
+		return m_ShooterMotor1
+				.getVelocity(true)
+				.getValue()
+				.plus(m_ShooterMotor2.getVelocity(true).getValue())
+				.div(2);
 	}
 
 	public boolean atTargetVelocity() {
-		return getVelocity().minus(shooterTargetVelocity).abs(RotationsPerSecond) < shooterVelocityTolerance;
+		return getVelocity().minus(shooterTargetVelocity).abs(RotationsPerSecond)
+				< shooterVelocityTolerance;
 	}
 
 	public ShooterStates getShooterState() {
@@ -172,9 +173,8 @@ public class Shooter extends SubsystemBase {
 			shooterTargetVelocity = m_ShooterState.shooterSpeed;
 		}
 
-		System.out.println("Shooter running " + Timer.getFPGATimestamp());
 		RaiderLog.logOutput("Shooter State", m_ShooterState.toString());
-		RaiderLog.logOutput("TargetVelocity", shooterTargetVelocity.in(RotationsPerSecond) * 60);
+		RaiderLog.logOutput("Target Velocity", shooterTargetVelocity.in(RotationsPerSecond) * 60);
 		RaiderLog.logOutput("Shooter Velocity", getVelocityRPM());
 	}
 }

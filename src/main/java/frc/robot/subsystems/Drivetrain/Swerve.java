@@ -333,7 +333,8 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
 		if (!Utils.isSimulation()) {
 			Limelight[] limelights = RobotContainer.getLimelights();
-			if (estimatedPosesFromCameras == null || limelights.length != estimatedPosesFromCameras.length) {
+			if (estimatedPosesFromCameras == null
+					|| limelights.length != estimatedPosesFromCameras.length) {
 				estimatedPosesFromCameras = new Pose2d[limelights.length];
 			}
 			double[] timestamps = new double[limelights.length];
@@ -349,14 +350,18 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 					addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
 					continue;
 				}
-				
+
 				estimatedPosesFromCameras[i] = estimate.pose;
 				timestamps[i] = estimate.timestampSeconds;
 				double fom = limelights[i].getFOM(estimate);
 
 				sumRecipFomSq += 1.0 / Math.pow(fom, 2);
 
-				Transform2d weightedPose = new Transform2d(estimatedPosesFromCameras[i].getTranslation(), estimatedPosesFromCameras[i].getRotation()).div(Math.pow(fom, 2));
+				Transform2d weightedPose =
+						new Transform2d(
+										estimatedPosesFromCameras[i].getTranslation(),
+										estimatedPosesFromCameras[i].getRotation())
+								.div(Math.pow(fom, 2));
 				fusedVisionPose = fusedVisionPose.plus(weightedPose);
 			}
 

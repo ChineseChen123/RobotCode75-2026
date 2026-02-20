@@ -142,8 +142,8 @@ public class ShooterTurretConstants {
 				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLimit =
 						shooterMotorSupplyCurrentLimit.in(Amps);
 				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLowerTime =
-				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLowerLimit =
-						shooterMotorCurrentLowerThreshold.in(Amps);
+						m_shooterMotor2Config.CurrentLimits.SupplyCurrentLowerLimit =
+								shooterMotorCurrentLowerThreshold.in(Amps);
 				m_shooterMotor2Config.CurrentLimits.StatorCurrentLimitEnable = true;
 				m_shooterMotor2Config.CurrentLimits.StatorCurrentLimit =
 						shooterMotorStatorCurrentLimit.in(Amps);

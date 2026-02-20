@@ -10,13 +10,12 @@ import static frc.robot.Constants.VisionConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
+import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
-import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.state.RobotStates;
 
 public class Limelight extends SubsystemBase {
@@ -93,26 +92,29 @@ public class Limelight extends SubsystemBase {
 		return new Pose2d();
 	}
 
-    public double getFOM(LimelightHelpers.PoseEstimate pose) {
+	public double getFOM(LimelightHelpers.PoseEstimate pose) {
 
-        if (pose == null) {
-            return Double.POSITIVE_INFINITY;
-        }
+		if (pose == null) {
+			return Double.POSITIVE_INFINITY;
+		}
 
-        double fom = 0;
+		double fom = 0;
 
-        double linearSpeed = Math.hypot(RobotStates.fieldRelativeSpeeds.get().vxMetersPerSecond, RobotStates.fieldRelativeSpeeds.get().vyMetersPerSecond);
-        fom += 0.5 * linearSpeed / DrivetrainConstants.maxVelocity.in(MetersPerSecond);
+		double linearSpeed =
+				Math.hypot(
+						RobotStates.fieldRelativeSpeeds.get().vxMetersPerSecond,
+						RobotStates.fieldRelativeSpeeds.get().vyMetersPerSecond);
+		fom += 0.5 * linearSpeed / DrivetrainConstants.maxVelocity.in(MetersPerSecond);
 
-        double angularSpeed = RobotStates.fieldRelativeSpeeds.get().omegaRadiansPerSecond;
-        fom += 0.75 * angularSpeed / DrivetrainConstants.maxAngularVelocity.in(RadiansPerSecond);
+		double angularSpeed = RobotStates.fieldRelativeSpeeds.get().omegaRadiansPerSecond;
+		fom += 0.75 * angularSpeed / DrivetrainConstants.maxAngularVelocity.in(RadiansPerSecond);
 
-        fom *= Math.sqrt(pose.avgTagDist);
+		fom *= Math.sqrt(pose.avgTagDist);
 
 		fom += 4 * minAmbiguity;
 
-        return fom / pose.tagCount;
-    }
+		return fom / pose.tagCount;
+	}
 
 	@Override
 	public void periodic() {}

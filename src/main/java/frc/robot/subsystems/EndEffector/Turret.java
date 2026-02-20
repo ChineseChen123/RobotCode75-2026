@@ -17,12 +17,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.PeddieBounds;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
-import frc.lib.util.PeddieBounds;
 import frc.lib.util.ShooterPhysics;
 import frc.robot.Constants.ShooterTurretConstants;
 import frc.robot.Constants.ShooterTurretConstants.TurretConstants.MotorConfigs;
@@ -182,7 +181,7 @@ public class Turret extends SubsystemBase {
 		}
 		Pose2d turretPose = getTurretPose();
 		Pose2d targetHubPose = PeddieBounds.getHubTarget();
-		
+
 		if (ShooterTurretConstants.useVirtualTarget) {
 			targetHubPose =
 					ShooterPhysics.getVirtualTarget(

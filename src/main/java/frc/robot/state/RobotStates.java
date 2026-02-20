@@ -16,7 +16,6 @@ import frc.robot.subsystems.EndEffector.Intake;
 import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
 import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Turret;
-
 import java.util.function.Supplier;
 
 public class RobotStates {
@@ -42,18 +41,26 @@ public class RobotStates {
 
 	/** Robot info suppliers */
 	public static final Supplier<Pose2d> robotPose = m_Swerve::getPose;
+
 	public static final Supplier<Rotation2d> robotHeading = m_Swerve::getHeading;
 	public static final Supplier<ChassisSpeeds> fieldRelativeSpeeds =
 			m_Swerve::getFieldRelativeChassisSpeeds;
 
 	/** Robot pose info */
-	public static final Trigger isInNeutralZone = new Trigger(() -> PeddieBounds.isInNeutralZone(robotPose.get()));
-	public static final Trigger isInOwnZone = new Trigger(() -> PeddieBounds.isInOwnZone(robotPose.get()));
-	public static final Trigger isInTrench = new Trigger(() -> PeddieBounds.isInTrench(robotPose.get()));
+	// public static final Trigger isInNeutralZone =
+	// 		new Trigger(() -> PeddieBounds.isInNeutralZone(robotPose.get()));
+
+	// public static final Trigger isInOwnZone =
+	// 		new Trigger(() -> PeddieBounds.isInOwnZone(robotPose.get()));
+	// public static final Trigger isInTrench =
+	// 		new Trigger(() -> PeddieBounds.isInTrench(robotPose.get()));
 
 	/** Intake states */
-	public static final Trigger isIntakeDown = new Trigger(() -> m_Intake.isAtPosition(IntakeStates.INTAKING));
-	public static final Trigger isIntakeUp = new Trigger(() -> m_Intake.isAtPosition(IntakeStates.STOWED));
+	public static final Trigger isIntakeDown =
+			new Trigger(() -> m_Intake.isAtPosition(IntakeStates.INTAKING));
+
+	public static final Trigger isIntakeUp =
+			new Trigger(() -> m_Intake.isAtPosition(IntakeStates.STOWED));
 
 	/** Indexer states */
 	public static final Trigger hasFuel = new Trigger(m_Indexer::hasFuel);
@@ -63,6 +70,7 @@ public class RobotStates {
 
 	/** Turret states */
 	public static final Trigger turretReset = new Trigger(m_Turret::isReset);
+
 	public static final Trigger turretAtTarget = new Trigger(m_Turret::atTargetHeading);
 
 	// ── Actions ──────────────────────────────────────────────────────────────────

@@ -11,7 +11,6 @@ import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeIndexConstants.IndexerConstants.MotorConfigs;
 
@@ -49,7 +48,10 @@ public class Indexer extends SubsystemBase {
 		// m_BeamBreak = new DigitalInput(beamBreakPort);
 
 		m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerMotorConfig());
-		m_HopperMotor.getConfigurator().apply(MotorConfigs.getIndexerMotorConfig());
+		m_HopperMotor.getConfigurator().apply(MotorConfigs.getHopperMotorConfig());
+
+		m_VelocityRequest.UpdateFreqHz = 0;
+		m_VelocityRequest.UseTimesync = true;
 	}
 
 	public boolean hasFuel() {

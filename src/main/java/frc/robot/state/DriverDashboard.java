@@ -1,5 +1,3 @@
 package frc.robot.state;
 
-public class DriverDashboard {
-    
-}
+public class DriverDashboard {}

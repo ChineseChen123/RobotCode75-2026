@@ -10,8 +10,10 @@ import edu.wpi.first.math.numbers.N3;
 
 public class VisionConstants {
 	// Standard deviations of odometry/vision pose measurements to supply to Kalman filter
-	public static final Matrix<N3, N1> wheelOdometryStdevs = MatBuilder.fill(Nat.N3(), Nat.N1(), 2, 2, .1);
-	public static final Matrix<N3, N1> visionOdometryStdevs = MatBuilder.fill(Nat.N3(), Nat.N1(), 5, 5, 100);
+	public static final Matrix<N3, N1> wheelOdometryStdevs =
+			MatBuilder.fill(Nat.N3(), Nat.N1(), 2, 2, .1);
+	public static final Matrix<N3, N1> visionOdometryStdevs =
+			MatBuilder.fill(Nat.N3(), Nat.N1(), 5, 5, 100);
 
 	public static final boolean useFomWeighting = true;
 

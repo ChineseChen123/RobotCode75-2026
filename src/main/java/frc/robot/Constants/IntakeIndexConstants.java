@@ -31,7 +31,6 @@ public class IntakeIndexConstants {
 		public static final int pivotEncoderPort = 0;
 
 		public static final Angle pivotZeroPoint = Rotations.of(0);
-		public static final Angle encoderOffset = Rotations.of(0);
 
 		public static final Angle pivotEncoderOffset = Rotations.of(0.528);
 		public static final double pivotMotorToMechanismRatio = 1.0 / 48.0;
@@ -246,8 +245,6 @@ public class IntakeIndexConstants {
 			public static TalonFXConfiguration getIndexerMotorConfig() {
 				m_IndexerMotorConfig.MotorOutput.Inverted = indexerMotorInvert;
 				m_IndexerMotorConfig.MotorOutput.NeutralMode = indexerNeutralMode;
-
-				m_IndexerMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
 				// Current Limiting
 				m_IndexerMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;

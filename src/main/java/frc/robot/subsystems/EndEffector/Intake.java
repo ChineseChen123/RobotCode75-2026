@@ -80,7 +80,7 @@ public class Intake extends SubsystemBase {
 		m_PivotMotor = new TalonFX(pivotCanID, superstructureCANBusName);
 		m_PivotMotor.getConfigurator().apply(getPivotConfiguration());
 		m_IntakeMotor.getConfigurator().apply(getIntakeMotorConfiguration());
-		
+
 		m_IntakeState = IntakeStates.DEFAULT;
 
 		PivotMMConfigs.withMotionMagicAcceleration(pivotMMAcc)
@@ -118,9 +118,7 @@ public class Intake extends SubsystemBase {
 		// reset position after a short delay
 
 		Timer.delay(5);
-		m_PivotMotor.setPosition(
-				(pivotEncoderOffset.in(Rotations)
-						- getThroughborePosition()));
+		m_PivotMotor.setPosition((pivotEncoderOffset.in(Rotations) - getThroughborePosition()));
 	}
 
 	/** return through-bore encoder position */
@@ -145,7 +143,8 @@ public class Intake extends SubsystemBase {
 	}
 
 	public boolean isAtPosition(IntakeStates state) {
-		return Math.abs(state.pivotPosition.in(Rotations) - getMotorRotations()) < pivotToleranceAbsolute;
+		return Math.abs(state.pivotPosition.in(Rotations) - getMotorRotations())
+				< pivotToleranceAbsolute;
 	}
 
 	public void setState(IntakeStates state) {
