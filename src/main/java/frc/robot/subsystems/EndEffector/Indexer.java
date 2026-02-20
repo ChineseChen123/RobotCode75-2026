@@ -35,7 +35,7 @@ public class Indexer extends SubsystemBase {
 
 	private IndexerStates m_IndexerState;
 
-	private final DigitalInput m_BeamBreak;
+	// private final DigitalInput m_BeamBreak;
 
 	private final TalonFX m_IndexerMotor;
 	private final TalonFX m_HopperMotor;
@@ -46,14 +46,15 @@ public class Indexer extends SubsystemBase {
 		m_HopperMotor = new TalonFX(hopperMotorCanID, superstructureCANBusName);
 
 		m_IndexerState = IndexerStates.DEFAULT;
-		m_BeamBreak = new DigitalInput(beamBreakPort);
+		// m_BeamBreak = new DigitalInput(beamBreakPort);
 
 		m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerMotorConfig());
 		m_HopperMotor.getConfigurator().apply(MotorConfigs.getIndexerMotorConfig());
 	}
 
 	public boolean hasFuel() {
-		return !m_BeamBreak.get();
+		// return !m_BeamBreak.get();
+		return false;
 	}
 
 	public double getIndexerVelocity() {

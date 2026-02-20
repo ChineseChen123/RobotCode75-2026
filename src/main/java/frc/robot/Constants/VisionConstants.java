@@ -15,8 +15,8 @@ public class VisionConstants {
 
 	public static final boolean useFomWeighting = true;
 
-	public static final String topLeftLLName = "limelight-tl";
-	public static final String topRightLLName = "limelight-tr";
+	public static final String topLeftLLName = "bright";
+	public static final String topRightLLName = "tright";
 
 	public static final Pose3d topLeftLLPose = new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0));
 	public static final Pose3d topRightLLPose = new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0));

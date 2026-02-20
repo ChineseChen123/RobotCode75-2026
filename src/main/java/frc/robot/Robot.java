@@ -39,8 +39,8 @@ public class Robot extends LoggedRobot {
 		m_robotContainer = new RobotContainer();
 
 		// Configure PhotonVision debug tabs
-		PortForwarder.add(5800, "photon-frontcams.local", 5801);
-		PortForwarder.add(5800, "photon-rearcams.local", 5802);
+		// PortForwarder.add(5800, "photon-frontcams.local", 5801);
+		// PortForwarder.add(5800, "photon-rearcams.local", 5802);
 	}
 
 	@Override

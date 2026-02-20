@@ -47,15 +47,15 @@ public class RobotContainer {
 	public static final Turret m_Turret = new Turret();
 
 	// Cameras
-	// public static final Limelight m_LimelightTL =
-	// 		new Limelight(
-	// 				topLeftLLName,
-	// 				topLeftLLPose);
+	public static final Limelight m_LimelightTL =
+			new Limelight(
+					topLeftLLName,
+					topLeftLLPose);
 	
-	// public static final Limelight m_LimelightTR =
-	// 		new Limelight(
-	// 				topRightLLName,
-	// 				topRightLLPose);
+	public static final Limelight m_LimelightTR =
+			new Limelight(
+					topRightLLName,
+					topRightLLPose);
 
 	// Define IO controls
 	private static final Driver m_Driver =
@@ -76,8 +76,9 @@ public class RobotContainer {
 
 	// Register any subsystems to be logged
 	private void configureLogging() {
-		RaiderLog.register("Swerve", m_Swerve);
-		RaiderLog.register("Turret", m_Turret);
+		// RaiderLog.register("Swerve", m_Swerve);
+		RaiderLog.register("Shooter", m_Shooter);
+		// RaiderLog.register("Turret", m_Turret);
 	}
 
 	// Configure button bindings based on driving mode
@@ -123,8 +124,7 @@ public class RobotContainer {
 	}
 
 	public static Limelight[] getLimelights() {
-		// return new Limelight[] {m_LimelightTL, m_LimelightTR};
-		return new Limelight[] {};
+		return new Limelight[] {m_LimelightTL, m_LimelightTR};
 	}
 
 	public static Driver getDriver() {

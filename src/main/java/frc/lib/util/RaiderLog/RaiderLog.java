@@ -163,6 +163,7 @@ public class RaiderLog extends DogLog {
 			String key = "Telemetry/" + className + "/" + ann.key(); // e.g. "swerve/speed"
 			METHOD_ENTRIES.add(new MethodEntry(obj, m, key));
 		}
+		System.out.println(className + " registered");
 	}
 
 	/** update all logged inputs and outputs and push to log; call from robotPeriodic() */

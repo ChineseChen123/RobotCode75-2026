@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.PeddieBounds;
 import frc.lib.util.ShooterPhysics;
+import frc.lib.util.RaiderLog.Logged;
+import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterTurretConstants;
 import frc.robot.Constants.ShooterTurretConstants.ShooterConstants.MotorConfigs;
@@ -71,6 +73,7 @@ public class Shooter extends SubsystemBase {
 		shooterKs = new TunableNumber("Shooter/Ks", MotorConfigs.shooterMotorVelocityKS);
 	}
 
+	@Logged(key = "Shooter Velocity", importance = Importance.CRITICAL)
 	public AngularVelocity getVelocity() {
 		return m_ShooterMotor1.getVelocity(true).getValue().plus(m_ShooterMotor2.getVelocity(true).getValue()).div(2);
 	}

@@ -93,7 +93,6 @@ public class Limelight extends SubsystemBase {
 		return new Pose2d();
 	}
 
-
     public double getFOM(LimelightHelpers.PoseEstimate pose) {
 
         if (pose == null) {

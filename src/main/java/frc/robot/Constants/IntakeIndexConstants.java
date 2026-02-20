@@ -187,8 +187,8 @@ public class IntakeIndexConstants {
 
 	public class IndexerConstants {
 
-		public static final int indexerMotorCanID = 0;
-		public static final int hopperMotorCanID = 1;
+		public static final int indexerMotorCanID = 54;
+		public static final int hopperMotorCanID = 53;
 
 		public static final int beamBreakPort = 3;
 
