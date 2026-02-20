@@ -5,20 +5,27 @@
 package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 import static frc.robot.Constants.ShooterTurretConstants.ShooterConstants.*;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.PeddieBounds;
 import frc.lib.util.ShooterPhysics;
 import frc.lib.util.RaiderLog.Logged;
+import frc.lib.util.RaiderLog.RaiderLog;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterTurretConstants;
@@ -46,11 +53,15 @@ public class Shooter extends SubsystemBase {
 	private final TalonFX m_ShooterMotor2;
 	private final VelocityTorqueCurrentFOC m_VelocityRequest = new VelocityTorqueCurrentFOC(0);
 
+	private final VoltageOut m_voltReq = new VoltageOut(0.0);
+
 	private final Slot0Configs shooterPIDConfigs = new Slot0Configs();
 	private final TunableNumber shooterKp;
 	private final TunableNumber shooterKi;
 	private final TunableNumber shooterKd;
 	private final TunableNumber shooterKs;
+
+	private final SysIdRoutine m_sysIdRoutine;
 
 	public Shooter() {
 		m_ShooterMotor1 = new TalonFX(shooterMotor1CanID, superstructureCANBusName);
@@ -71,9 +82,41 @@ public class Shooter extends SubsystemBase {
 		shooterKi = new TunableNumber("Shooter/Ki", MotorConfigs.shooterMotorVelocityKI);
 		shooterKd = new TunableNumber("Shooter/Kd", MotorConfigs.shooterMotorVelocityKD);
 		shooterKs = new TunableNumber("Shooter/Ks", MotorConfigs.shooterMotorVelocityKS);
+
+		m_sysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(
+         null,        // Use default ramp rate (1 V/s)
+         Volts.of(8), // Reduce dynamic step voltage to 4 to prevent brownout
+         null,        // Use default timeout (10 s)
+                      // Log state with Phoenix SignalLogger class
+         (state) -> SignalLogger.writeString("state", state.toString())
+      ),
+      new SysIdRoutine.Mechanism(
+         (volts) -> {
+			m_ShooterMotor1.setControl(m_voltReq.withOutput(volts.in(Volts)));
+			m_ShooterMotor2.setControl(m_voltReq.withOutput(volts.in(Volts)));
+		 },
+         null,
+         this
+      )
+   );
+		 m_VelocityRequest.UpdateFreqHz = 0;
+		 m_VelocityRequest.UseTimesync = true;
+	}
+
+	public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+		return m_sysIdRoutine.quasistatic(direction);
+	}
+
+	public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+		return m_sysIdRoutine.dynamic(direction);
 	}
 
 	@Logged(key = "Shooter Velocity", importance = Importance.CRITICAL)
+	public double getVelocityRPM() {
+		return getVelocity().in(RotationsPerSecond) * 60;
+	}
+
 	public AngularVelocity getVelocity() {
 		return m_ShooterMotor1.getVelocity(true).getValue().plus(m_ShooterMotor2.getVelocity(true).getValue()).div(2);
 	}
@@ -120,13 +163,18 @@ public class Shooter extends SubsystemBase {
 			AngularVelocity velocity =
 					ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);
 
-			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(velocity));
-			m_ShooterMotor2.setControl(m_VelocityRequest.withVelocity(velocity));
+			// m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(velocity));
+			// m_ShooterMotor2.setControl(m_VelocityRequest.withVelocity(velocity));
 			shooterTargetVelocity = velocity;
 		} else {
 			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
 			m_ShooterMotor2.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
 			shooterTargetVelocity = m_ShooterState.shooterSpeed;
 		}
+
+		System.out.println("Shooter running " + Timer.getFPGATimestamp());
+		RaiderLog.logOutput("Shooter State", m_ShooterState.toString());
+		RaiderLog.logOutput("TargetVelocity", shooterTargetVelocity.in(RotationsPerSecond) * 60);
+		RaiderLog.logOutput("Shooter Velocity", getVelocityRPM());
 	}
 }

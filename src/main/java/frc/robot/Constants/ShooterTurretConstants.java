@@ -43,7 +43,7 @@ public class ShooterTurretConstants {
 		public static final Distance shooterWheelDiameter = Inches.of(4);
 
 		public static final AngularVelocity defaultShooterSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity reverseShooterSpeed = RotationsPerSecond.of(-5);
+		public static final AngularVelocity reverseShooterSpeed = RotationsPerSecond.of(-10);
 
 		public static final double shooterVelocityTolerance = 50.0 / 60.0; // rotations per second
 

@@ -7,10 +7,15 @@ package frc.robot;
 import static frc.robot.Constants.IOConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.RaiderLog.RaiderLog;
 import frc.robot.Constants.DrivetrainConstants;
@@ -22,6 +27,7 @@ import frc.robot.subsystems.EndEffector.Indexer;
 import frc.robot.subsystems.EndEffector.Intake;
 import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Turret;
+import frc.robot.subsystems.EndEffector.Shooter.ShooterStates;
 import frc.robot.subsystems.Vision.Limelight;
 
 public class RobotContainer {
@@ -88,6 +94,15 @@ public class RobotContainer {
 		} else {
 			m_Bindings.bind2Driver();
 		}
+		CommandXboxController controller = new CommandXboxController(controllerPort);
+		m_Operator.leftBumper.onTrue(Commands.runOnce(SignalLogger::start));
+		m_Operator.rightBumper.onTrue(Commands.runOnce(SignalLogger::stop));
+		controller.a().whileTrue(new InstantCommand(() -> System.out.println("A pressed")).repeatedly());
+		controller.y().whileTrue(new InstantCommand(() -> m_Shooter.setState(ShooterStates.REVERSING), m_Shooter).finallyDo(() -> m_Shooter.setState(ShooterStates.DEFAULT)));
+		// m_Operator.Y.whileTrue(m_Shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+		// m_Operator.A.whileTrue(m_Shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+		// m_Operator.B.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
+		// m_Operator.X.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 	}
 
 	// Configure auto selector
@@ -125,6 +140,7 @@ public class RobotContainer {
 
 	public static Limelight[] getLimelights() {
 		return new Limelight[] {m_LimelightTL, m_LimelightTR};
+		// return new Limelight[] {};
 	}
 
 	public static Driver getDriver() {
