@@ -69,9 +69,8 @@ public class ShooterTurretConstants {
 			public static final TalonFXConfiguration m_shooterMotor2Config = new TalonFXConfiguration();
 
 			// Neutral modes and inverts
-			public static final InvertedValue shooterMotor1Inverted =
+			public static final InvertedValue shooterMotorInverted =
 					InvertedValue.CounterClockwise_Positive;
-			public static final InvertedValue shooterMotor2Inverted = InvertedValue.Clockwise_Positive;
 
 			public static final NeutralModeValue shooterMotorNeutralMode = NeutralModeValue.Coast;
 
@@ -92,9 +91,9 @@ public class ShooterTurretConstants {
 			public static final double shooterMotorVelocityKD = 0.0;
 			public static final double shooterMotorVelocityKS = 4.9;
 
-			public static TalonFXConfiguration getShooterMotor1MotorConfiguration() {
+			public static TalonFXConfiguration getShooterMotorConfiguration() {
 
-				m_shooterMotor1Config.MotorOutput.Inverted = shooterMotor1Inverted;
+				m_shooterMotor1Config.MotorOutput.Inverted = shooterMotorInverted;
 				m_shooterMotor1Config.MotorOutput.NeutralMode = shooterMotorNeutralMode;
 
 				m_shooterMotor1Config.Feedback.SensorToMechanismRatio = 1 / shooterGearRatio;
@@ -128,43 +127,6 @@ public class ShooterTurretConstants {
 				m_shooterMotor1Config.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
 
 				return m_shooterMotor1Config;
-			}
-
-			public static TalonFXConfiguration getShooterMotor2MotorConfiguration() {
-
-				m_shooterMotor2Config.MotorOutput.Inverted = shooterMotor2Inverted;
-				m_shooterMotor2Config.MotorOutput.NeutralMode = shooterMotorNeutralMode;
-
-				m_shooterMotor2Config.Feedback.SensorToMechanismRatio = 1 / shooterGearRatio;
-
-				// Current Limiting
-				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLimitEnable = true;
-				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLimit =
-						shooterMotorSupplyCurrentLimit.in(Amps);
-				m_shooterMotor2Config.CurrentLimits.SupplyCurrentLowerTime =
-						m_shooterMotor2Config.CurrentLimits.SupplyCurrentLowerLimit =
-								shooterMotorCurrentLowerThreshold.in(Amps);
-				m_shooterMotor2Config.CurrentLimits.StatorCurrentLimitEnable = true;
-				m_shooterMotor2Config.CurrentLimits.StatorCurrentLimit =
-						shooterMotorStatorCurrentLimit.in(Amps);
-
-				// PID Config
-				m_shooterMotor2Config.Slot0.kP = shooterMotorVelocityKP;
-				m_shooterMotor2Config.Slot0.kI = shooterMotorVelocityKI;
-				m_shooterMotor2Config.Slot0.kD = shooterMotorVelocityKD;
-				m_shooterMotor2Config.Slot0.kS = shooterMotorVelocityKS;
-
-				// Open and Closed Loop Ramping
-				m_shooterMotor2Config.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = openLoopRamp;
-				m_shooterMotor2Config.OpenLoopRamps.VoltageOpenLoopRampPeriod = openLoopRamp;
-
-				m_shooterMotor2Config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = closedLoopRamp;
-				m_shooterMotor2Config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = closedLoopRamp;
-
-				m_shooterMotor2Config.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp;
-				m_shooterMotor2Config.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
-
-				return m_shooterMotor2Config;
 			}
 		}
 	}

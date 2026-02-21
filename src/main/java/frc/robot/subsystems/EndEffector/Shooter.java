@@ -11,9 +11,12 @@ import static frc.robot.Constants.ShooterTurretConstants.ShooterConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Timer;
@@ -49,7 +52,8 @@ public class Shooter extends SubsystemBase {
 
 	private final TalonFX m_ShooterMotor1;
 	private final TalonFX m_ShooterMotor2;
-	private final VelocityTorqueCurrentFOC m_VelocityRequest = new VelocityTorqueCurrentFOC(0);
+	private final VelocityTorqueCurrentFOC m_VelocityRequest;
+	private final Follower m_FollowerRequest;
 
 	private final VoltageOut m_voltReq = new VoltageOut(0.0);
 
@@ -65,8 +69,11 @@ public class Shooter extends SubsystemBase {
 		m_ShooterMotor1 = new TalonFX(shooterMotor1CanID, superstructureCANBusName);
 		m_ShooterMotor2 = new TalonFX(shooterMotor2CanID, superstructureCANBusName);
 
-		m_ShooterMotor1.getConfigurator().apply(MotorConfigs.getShooterMotor1MotorConfiguration());
-		m_ShooterMotor2.getConfigurator().apply(MotorConfigs.getShooterMotor2MotorConfiguration());
+		m_ShooterMotor1.getConfigurator().apply(MotorConfigs.getShooterMotorConfiguration());
+		m_ShooterMotor2.getConfigurator().apply(MotorConfigs.getShooterMotorConfiguration());
+
+		m_VelocityRequest = new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
+		m_FollowerRequest = new Follower(m_ShooterMotor1.getDeviceID(), MotorAlignmentValue.Opposed);
 
 		m_ShooterState = ShooterStates.DEFAULT;
 
@@ -96,6 +103,7 @@ public class Shooter extends SubsystemBase {
 								},
 								null,
 								this));
+
 		m_VelocityRequest.UpdateFreqHz = 0;
 		m_VelocityRequest.UseTimesync = true;
 	}
@@ -165,11 +173,11 @@ public class Shooter extends SubsystemBase {
 					ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);
 
 			// m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(velocity));
-			// m_ShooterMotor2.setControl(m_VelocityRequest.withVelocity(velocity));
+			// m_ShooterMotor2.setControl(m_FollowerRequest);
 			shooterTargetVelocity = velocity;
 		} else {
 			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
-			m_ShooterMotor2.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
+			m_ShooterMotor2.setControl(m_FollowerRequest);
 			shooterTargetVelocity = m_ShooterState.shooterSpeed;
 		}
 
