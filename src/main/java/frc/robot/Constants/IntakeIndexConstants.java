@@ -192,20 +192,20 @@ public class IntakeIndexConstants {
 		public static final int beamBreakPort = 3;
 
 		public static final AngularVelocity defaultIndexerSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity runningIndexerSpeed = RotationsPerSecond.of(3);
-		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(5);
-		public static final AngularVelocity reverseIndexerSpeed = RotationsPerSecond.of(-3);
+		public static final AngularVelocity runningIndexerSpeed = RotationsPerSecond.of(15);
+		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(45);
+		public static final AngularVelocity reverseIndexerSpeed = RotationsPerSecond.of(-15);
 
 		public static final AngularVelocity defaultHopperSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity runningHopperSpeed = RotationsPerSecond.of(3);
-		public static final AngularVelocity reverseHopperSpeed = RotationsPerSecond.of(-3);
+		public static final AngularVelocity runningHopperSpeed = RotationsPerSecond.of(20);
+		public static final AngularVelocity reverseHopperSpeed = RotationsPerSecond.of(-15);
 
 		public class MotorConfigs {
 			public static final TalonFXConfiguration m_IndexerMotorConfig = new TalonFXConfiguration();
 			public static final TalonFXConfiguration m_HopperMotorConfig = new TalonFXConfiguration();
 
 			public static final InvertedValue indexerMotorInvert =
-					InvertedValue.CounterClockwise_Positive;
+					InvertedValue.Clockwise_Positive;
 			public static final InvertedValue hopperMotorInvert = InvertedValue.CounterClockwise_Positive;
 
 			public static final NeutralModeValue indexerNeutralMode = NeutralModeValue.Brake;
@@ -228,19 +228,19 @@ public class IntakeIndexConstants {
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double indexerVelocityKP = 0.3;
+			public static final double indexerVelocityKP = 15;
 			public static final double indexerVelocityKI = 0.0;
 			public static final double indexerVelocityKD = 0.0;
-			public static final double indexerVelocityKS = 4.9;
+			public static final double indexerVelocityKS = 5;
 
 			public static final double indexerPositionKP = 0.75;
 			public static final double indexerPositionKI = 0.0;
 			public static final double indexerPositionKD = 0.0;
 
-			public static final double hopperVelocityKP = 0.3;
+			public static final double hopperVelocityKP = 10;
 			public static final double hopperVelocityKI = 0.0;
 			public static final double hopperVelocityKD = 0.0;
-			public static final double hopperVelocityKS = 4.9;
+			public static final double hopperVelocityKS = 1.5;
 
 			public static TalonFXConfiguration getIndexerMotorConfig() {
 				m_IndexerMotorConfig.MotorOutput.Inverted = indexerMotorInvert;

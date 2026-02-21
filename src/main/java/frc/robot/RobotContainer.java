@@ -20,7 +20,13 @@ import frc.robot.state.Bindings;
 import frc.robot.state.Driver;
 import frc.robot.state.Operator;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.Indexer;
+import frc.robot.subsystems.EndEffector.Intake;
+import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
+import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Turret;
+import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
+import frc.robot.subsystems.EndEffector.Shooter.ShooterStates;
 import frc.robot.subsystems.Vision.Limelight;
 
 public class RobotContainer {
@@ -37,13 +43,13 @@ public class RobotContainer {
 					DrivetrainConstants.BackLeft,
 					DrivetrainConstants.BackRight);
 
-	// public static final Intake m_Intake = new Intake();
+	public static final Intake m_Intake = new Intake();
 
-	// public static final Indexer m_Indexer = new Indexer();
+	public static final Indexer m_Indexer = new Indexer();
 
-	// public static final Shooter m_Shooter = new Shooter();
+	public static final Shooter m_Shooter = new Shooter();
 
-	public static final Turret m_Turret = new Turret();
+	// public static final Turret m_Turret = new Turret();
 
 	// Cameras
 	// public static final Limelight m_LimelightTL = new Limelight(topLeftLLName, topLeftLLPose);
@@ -70,8 +76,9 @@ public class RobotContainer {
 	// Register any subsystems to be logged
 	private void configureLogging() {
 		// RaiderLog.register("Swerve", m_Swerve);
-		// RaiderLog.register("Shooter", m_Shooter);
-		RaiderLog.register("Turret", m_Turret);
+		RaiderLog.register("Shooter", m_Shooter);
+		// RaiderLog.register("Turret", m_Turret);
+		RaiderLog.register("Indexer", m_Indexer);
 	}
 
 	// Configure button bindings based on driving mode
@@ -82,11 +89,27 @@ public class RobotContainer {
 			m_Bindings.bind2Driver();
 		}
 
-		m_Operator.leftBumper.whileTrue(
-				new InstantCommand(() -> m_Turret.changeHeading(Degrees.of(-1)), m_Turret).repeatedly());
-		m_Operator.rightBumper.whileTrue(
-				new InstantCommand(() -> m_Turret.changeHeading(Degrees.of(1)), m_Turret).repeatedly());
+		// Ball path test
+		// m_Operator.Y.whileTrue(
+		// 	new InstantCommand(() -> {
+		// 		m_Intake.setState(IntakeStates.INTAKING);
+		// 		m_Indexer.setState(IndexerStates.SHOOTING);
+		// 		m_Shooter.setState(ShooterStates.SHOOTING);
+		// 	}, m_Shooter, m_Intake, m_Indexer).repeatedly()
+		// 	.finallyDo(() -> {
+		// 		m_Intake.setState(IntakeStates.DEFAULT);
+		// 		m_Indexer.setState(IndexerStates.DEFAULT);
+		// 		m_Shooter.setState(ShooterStates.DEFAULT);
+		// 	})
+		// );
 
+		// Turret testing binds
+		// m_Operator.leftBumper.whileTrue(
+		// 		new InstantCommand(() -> m_Turret.changeHeading(Degrees.of(-1)), m_Turret).repeatedly());
+		// m_Operator.rightBumper.whileTrue(
+		// 		new InstantCommand(() -> m_Turret.changeHeading(Degrees.of(1)), m_Turret).repeatedly());
+
+		// Shooter testing binds
 		// m_Operator.Y.whileTrue(
 		// 	new InstantCommand(() -> m_Shooter.setState(ShooterStates.SHOOTING), m_Shooter).repeatedly()
 		// 			.finallyDo(() -> m_Shooter.setState(ShooterStates.DEFAULT))
@@ -122,9 +145,9 @@ public class RobotContainer {
 	// 	return m_Shooter;
 	// }
 
-	public static Turret getTurret() {
-		return m_Turret;
-	}
+	// public static Turret getTurret() {
+	// 	return m_Turret;
+	// }
 
 	public static Limelight[] getLimelights() {
 		// return new Limelight[] {m_LimelightTL, m_LimelightTR};
