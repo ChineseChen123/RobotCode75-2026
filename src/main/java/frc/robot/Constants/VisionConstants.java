@@ -15,7 +15,7 @@ public class VisionConstants {
 	public static final Matrix<N3, N1> visionOdometryStdevs =
 			MatBuilder.fill(Nat.N3(), Nat.N1(), 5, 5, 100);
 
-	public static final boolean useFomWeighting = true;
+	public static final boolean useFomWeighting = false;
 
 	public static final String topLeftLLName = "bright";
 	public static final String topRightLLName = "tright";

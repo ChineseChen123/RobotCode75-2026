@@ -10,17 +10,28 @@ import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 import static frc.robot.Constants.ShooterTurretConstants.TurretConstants.*;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import dev.doglog.internal.tunable.Tunable;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.PeddieBounds;
 import frc.lib.util.RaiderLog.Logged;
+import frc.lib.util.RaiderLog.RaiderLog;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.lib.util.ShooterPhysics;
 import frc.robot.Constants.ShooterTurretConstants;
@@ -35,12 +46,27 @@ public class Turret extends SubsystemBase {
 	private final DutyCycleEncoder m_TurretEncoder1;
 	private final DutyCycleEncoder m_TurretEncoder2;
 
-	private final MotionMagicExpoTorqueCurrentFOC turretRequest =
-			new MotionMagicExpoTorqueCurrentFOC(Rotations.of(0));
+	private final PositionVoltage turretRequest =
+			new PositionVoltage(Rotations.of(0));
 
 	private boolean isReset = false;
 
 	private Angle turretTargetAngle = Degrees.of(0);
+
+	private final Slot0Configs turretConfigs = new Slot0Configs();
+	private final MotionMagicConfigs TurretMMConfigs = new MotionMagicConfigs();
+
+	private final TunableNumber turretP = new TunableNumber("Turret/kP", MotorConfigs.kP);
+	private final TunableNumber turretD = new TunableNumber("Turret/kD", MotorConfigs.kD);
+	private final TunableNumber turretS = new TunableNumber("Turret/kS", MotorConfigs.kS);
+
+	private final TunableNumber turretMMAcc;
+	private final TunableNumber turretMMVel;
+	private final TunableNumber turretMMJerk;
+	private final TunableNumber turretMMKa;
+	private final TunableNumber turretMMKv;
+
+	private final TunableNumber turretTarget = new TunableNumber("Turret/Target", 0);
 
 	/** Creates a new Turret. */
 	public Turret() {
@@ -50,6 +76,20 @@ public class Turret extends SubsystemBase {
 		m_TurretEncoder2 = new DutyCycleEncoder(encoder2Port, 1, encoder2ZeroPoint.in(Rotations));
 
 		m_TurretMotor.getConfigurator().apply(MotorConfigs.getTurretMotorConfig());
+
+		turretConfigs.withKP(MotorConfigs.kP).withKD(MotorConfigs.kD).withKS(MotorConfigs.kS);
+
+		TurretMMConfigs.withMotionMagicAcceleration(MotorConfigs.motionMagicCruiseAcceleration)
+				.withMotionMagicCruiseVelocity(MotorConfigs.motionMagicCruiseVelocity)
+				.withMotionMagicJerk(MotorConfigs.motionMagicJerk)
+				.withMotionMagicExpo_kA(MotorConfigs.motionMagickA)
+				.withMotionMagicExpo_kV(MotorConfigs.motionMagickV);
+
+		turretMMAcc = new TunableNumber("Turret/MMAcc", MotorConfigs.motionMagicCruiseAcceleration);
+		turretMMVel = new TunableNumber("Turret/MMVel", MotorConfigs.motionMagicCruiseVelocity);
+		turretMMJerk = new TunableNumber("Turret/MMJerk", MotorConfigs.motionMagicJerk);
+		turretMMKa = new TunableNumber("Turret/MMKa", MotorConfigs.motionMagickA);
+		turretMMKv = new TunableNumber("Turret/MMKv", MotorConfigs.motionMagickV);
 
 		turretRequest.UpdateFreqHz = 0;
 		turretRequest.UseTimesync = true;
@@ -67,6 +107,7 @@ public class Turret extends SubsystemBase {
 			return;
 		}
 		m_TurretMotor.setPosition(turretPosition.get());
+		System.out.println("Turret reset to " + turretPosition.get().in(Degrees) + " deg");
 		isReset = true;
 	}
 
@@ -79,10 +120,12 @@ public class Turret extends SubsystemBase {
 		return m_TurretMotor.getPosition(true).getValue();
 	}
 
+	@Logged(key = "Encoder 1 Position Deg", importance = Importance.DEBUG)
 	public double getEncoder1PositionDegrees() {
 		return m_TurretEncoder1.get() * 360.0 * (encoder1Invert ? -1 : 1);
 	}
 
+	@Logged(key = "Encoder 2 Position Deg", importance = Importance.DEBUG)
 	public double getEncoder2PositionDegrees() {
 		return m_TurretEncoder2.get() * 360.0 * (encoder2Invert ? -1 : 1);
 	}
@@ -99,7 +142,7 @@ public class Turret extends SubsystemBase {
 		Angle possibleMechRot =
 				Rotations.of(encoder1Position.in(Rotations) * encoderPinion1Teeth / ringGearTeeth);
 
-		// calculate minimum possible solution for encoder 1 (closest to CW limit)
+		// calculate minimum possible solution for encoder 1 (closest to 0/CW limit)
 		possibleMechRot =
 				Rotations.of(
 						MathUtil.inputModulus(
@@ -125,11 +168,12 @@ public class Turret extends SubsystemBase {
 				secondErr = err;
 			}
 
-			possibleMechRot = possibleMechRot.plus(Rotations.of(encoderPinion1Teeth / ringGearTeeth));
+			possibleMechRot = possibleMechRot.plus(Rotations.of(encoderPinion1Teeth * 1.0 / ringGearTeeth));
 		}
 
 		// no solution found
 		if (!Double.isFinite(bestErr.in(Rotations)) || bestErr.gt(matchTolerance)) {
+			System.out.println("Best error:" + bestErr.in(Degrees));
 			return Optional.empty();
 		}
 
@@ -249,8 +293,31 @@ public class Turret extends SubsystemBase {
 			return;
 		}
 
-		updateTurretTarget();
+		if (turretP.getNumber() != turretConfigs.kP || turretD.getNumber() != turretConfigs.kD || turretS.getNumber() != turretConfigs.kS) {
+			turretConfigs.kP = turretP.getNumber();
+			turretConfigs.kD = turretD.getNumber();
+			turretConfigs.kS = turretS.getNumber();
+			m_TurretMotor.getConfigurator().apply(turretConfigs);
+		}
 
-		m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngle));
+		if (turretMMAcc.getNumber() != TurretMMConfigs.MotionMagicAcceleration
+				|| turretMMVel.getNumber() != TurretMMConfigs.MotionMagicCruiseVelocity
+				|| turretMMJerk.getNumber() != TurretMMConfigs.MotionMagicJerk
+				|| turretMMKa.getNumber() != TurretMMConfigs.MotionMagicExpo_kA
+				|| turretMMKv.getNumber() != TurretMMConfigs.MotionMagicExpo_kV) {
+			TurretMMConfigs.MotionMagicAcceleration = turretMMAcc.getNumber();
+			TurretMMConfigs.MotionMagicCruiseVelocity = turretMMVel.getNumber();
+			TurretMMConfigs.MotionMagicJerk = turretMMJerk.getNumber();
+			TurretMMConfigs.MotionMagicExpo_kA = turretMMKa.getNumber();
+			TurretMMConfigs.MotionMagicExpo_kV = turretMMKv.getNumber();
+			// m_TurretMotor.getConfigurator().apply(TurretMMConfigs);
+		}
+
+		// m_TurretMotor.setControl(new VoltageOut(-0.4));
+		m_TurretMotor.setControl(turretRequest.withPosition(Rotations.of(turretTarget.getNumber() / 360.0)));
+
+		// updateTurretTarget();
+
+		// m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngle));
 	}
 }

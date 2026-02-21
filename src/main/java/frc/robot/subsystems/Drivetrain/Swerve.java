@@ -347,6 +347,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 				if (estimate == null) continue;
 
 				if (!useFomWeighting) {
+					// TODO - variable vision x y stdevs based on FOM
 					addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
 					continue;
 				}

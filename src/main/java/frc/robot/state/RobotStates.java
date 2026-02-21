@@ -24,10 +24,10 @@ public class RobotStates {
 	public static final Operator m_Operator = RobotContainer.getOperator();
 
 	public static final Swerve m_Swerve = RobotContainer.getSwerve();
-	public static final Intake m_Intake = RobotContainer.getIntake();
-	public static final Indexer m_Indexer = RobotContainer.getIndexer();
-	public static final Shooter m_Shooter = RobotContainer.getShooter();
-	public static final Turret m_Turret = RobotContainer.getTurret();
+	// public static final Intake m_Intake = RobotContainer.getIntake();
+	// public static final Indexer m_Indexer = RobotContainer.getIndexer();
+	// public static final Shooter m_Shooter = RobotContainer.getShooter();
+	// public static final Turret m_Turret = RobotContainer.getTurret();
 
 	/** Game time triggers */
 	public static final Trigger sim = new Trigger(Robot::isSimulation);
@@ -56,22 +56,22 @@ public class RobotStates {
 	// 		new Trigger(() -> PeddieBounds.isInTrench(robotPose.get()));
 
 	/** Intake states */
-	public static final Trigger isIntakeDown =
-			new Trigger(() -> m_Intake.isAtPosition(IntakeStates.INTAKING));
+	// public static final Trigger isIntakeDown =
+	// 		new Trigger(() -> m_Intake.isAtPosition(IntakeStates.INTAKING));
 
-	public static final Trigger isIntakeUp =
-			new Trigger(() -> m_Intake.isAtPosition(IntakeStates.STOWED));
+	// public static final Trigger isIntakeUp =
+	// 		new Trigger(() -> m_Intake.isAtPosition(IntakeStates.STOWED));
 
 	/** Indexer states */
-	public static final Trigger hasFuel = new Trigger(m_Indexer::hasFuel);
+	// public static final Trigger hasFuel = new Trigger(m_Indexer::hasFuel);
 
 	/** Shooter states */
-	public static final Trigger shooterAtSpeed = new Trigger(m_Shooter::atTargetVelocity);
+	// public static final Trigger shooterAtSpeed = new Trigger(m_Shooter::atTargetVelocity);
 
 	/** Turret states */
-	public static final Trigger turretReset = new Trigger(m_Turret::isReset);
+	// public static final Trigger turretReset = new Trigger(m_Turret::isReset);
 
-	public static final Trigger turretAtTarget = new Trigger(m_Turret::atTargetHeading);
+	// public static final Trigger turretAtTarget = new Trigger(m_Turret::atTargetHeading);
 
 	// ── Actions ──────────────────────────────────────────────────────────────────
 
