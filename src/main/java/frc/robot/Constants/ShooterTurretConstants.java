@@ -69,8 +69,7 @@ public class ShooterTurretConstants {
 			public static final TalonFXConfiguration m_shooterMotor2Config = new TalonFXConfiguration();
 
 			// Neutral modes and inverts
-			public static final InvertedValue shooterMotorInverted =
-					InvertedValue.Clockwise_Positive;
+			public static final InvertedValue shooterMotorInverted = InvertedValue.Clockwise_Positive;
 
 			public static final NeutralModeValue shooterMotorNeutralMode = NeutralModeValue.Coast;
 
@@ -141,7 +140,8 @@ public class ShooterTurretConstants {
 		public static final int encoderPinion1Teeth = 18;
 		public static final int encoderPinion2Teeth = 19;
 
-		public static final double motorToTurretRatio = 10.0 / 54.0 * encoderPinion1Teeth / ringGearTeeth;
+		public static final double motorToTurretRatio =
+				10.0 / 54.0 * encoderPinion1Teeth / ringGearTeeth;
 		// translation from robot center to turret center, climber is forward
 		public static final Translation2d turretPositionOffset =
 				new Translation2d(Inches.of(2), Inches.of(10));

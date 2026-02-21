@@ -10,23 +10,16 @@ import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 import static frc.robot.Constants.ShooterTurretConstants.TurretConstants.*;
 
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.CoastOut;
-import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-
-import dev.doglog.internal.tunable.Tunable;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.PeddieBounds;
@@ -46,8 +39,7 @@ public class Turret extends SubsystemBase {
 	private final DutyCycleEncoder m_TurretEncoder1;
 	private final DutyCycleEncoder m_TurretEncoder2;
 
-	private final PositionVoltage turretRequest =
-			new PositionVoltage(Rotations.of(0));
+	private final PositionVoltage turretRequest = new PositionVoltage(Rotations.of(0));
 
 	private boolean isReset = false;
 
@@ -112,11 +104,13 @@ public class Turret extends SubsystemBase {
 	}
 
 	public double getEncoder1PositionDegreesWithOffset() {
-		return MathUtil.inputModulus(getEncoder1PositionDegrees() - encoder1ZeroPoint.in(Degrees), 0, 360);
+		return MathUtil.inputModulus(
+				getEncoder1PositionDegrees() - encoder1ZeroPoint.in(Degrees), 0, 360);
 	}
 
 	public double getEncoder2PositionDegreesWithOffset() {
-		return MathUtil.inputModulus(getEncoder2PositionDegrees() - encoder2ZeroPoint.in(Degrees), 0, 360);
+		return MathUtil.inputModulus(
+				getEncoder2PositionDegrees() - encoder2ZeroPoint.in(Degrees), 0, 360);
 	}
 
 	// -135 deg = CW limit, 135 deg = CCW limit (CCW positive)
@@ -143,7 +137,9 @@ public class Turret extends SubsystemBase {
 		Angle bestRot = Rotations.of(0);
 		while (possibleMechRot.lte(turretRange)) {
 			Angle encoder2Solution =
-					Rotations.of(MathUtil.inputModulus(possibleMechRot.in(Rotations) * ringGearTeeth / encoderPinion2Teeth, 0, 1));
+					Rotations.of(
+							MathUtil.inputModulus(
+									possibleMechRot.in(Rotations) * ringGearTeeth / encoderPinion2Teeth, 0, 1));
 
 			Angle err = Rotations.of(encoder2Position.minus(encoder2Solution).abs(Rotations));
 			if (err.gt(Rotations.of(0.5))) {
@@ -157,7 +153,8 @@ public class Turret extends SubsystemBase {
 				secondErr = err;
 			}
 
-			possibleMechRot = possibleMechRot.plus(Rotations.of(encoderPinion1Teeth * 1.0 / ringGearTeeth));
+			possibleMechRot =
+					possibleMechRot.plus(Rotations.of(encoderPinion1Teeth * 1.0 / ringGearTeeth));
 		}
 
 		// no solution found
@@ -190,7 +187,6 @@ public class Turret extends SubsystemBase {
 	public double getTurretTargetDegrees() {
 		return turretTargetAngle.in(Degrees);
 	}
-
 
 	public Angle getTurretTargetAbsolute() {
 		return turretTargetAngle;
@@ -238,7 +234,6 @@ public class Turret extends SubsystemBase {
 	public Pose2d getHubPose() {
 		return PeddieBounds.getHubTarget();
 	}
-	
 
 	// virtual target
 	public void updateTurretTarget() {
@@ -263,8 +258,7 @@ public class Turret extends SubsystemBase {
 		// Angle turretTarget =
 		// 		fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
 
-		Angle turretTarget =
-				fieldRelativeToHub.getMeasure().minus(heading);
+		Angle turretTarget = fieldRelativeToHub.getMeasure().minus(heading);
 
 		double angleDeg = turretTarget.in(Degrees); // (-180,180)
 		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
@@ -284,8 +278,7 @@ public class Turret extends SubsystemBase {
 							targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
 			// turretTarget =
 			// 		fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
-			turretTarget =
-					fieldRelativeToHub.getMeasure().minus(heading);
+			turretTarget = fieldRelativeToHub.getMeasure().minus(heading);
 			angleDeg = turretTarget.in(Degrees); // (-180,180)
 			angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
 			angleDeg -= 180;
@@ -297,18 +290,18 @@ public class Turret extends SubsystemBase {
 			// Map [135, 180] -> [135, 0] linearly
 			if (angleDeg > turnLimit) { // (135, 180]
 				double t = (angleDeg - turnLimit) / (180 - turnLimit); // 0..1
-				angleDeg = turnLimit * (1.0 - t) - 180; // 135..0
+				angleDeg = turnLimit * (1.0 - t); // 135..0
 			} else {
 				// Map [-180, -135] -> [0, -135] linearly
 				// angleDeg in [-180, -135)
 				double t = (angleDeg + 180.0) / (180 - turnLimit); // 0..1
-				angleDeg = -turnLimit * t + 180;
+				angleDeg = -turnLimit * t;
 			}
 		} else {
-			angleDeg += 180;
+			// angleDeg += 180;
 		}
 
-		angleDeg = MathUtil.inputModulus(angleDeg, -360, 360);
+		angleDeg = MathUtil.inputModulus(angleDeg, -180, 180);
 
 		turretTargetAngle = Degrees.of(angleDeg);
 	}
@@ -321,7 +314,9 @@ public class Turret extends SubsystemBase {
 			return;
 		}
 
-		if (turretP.getNumber() != turretConfigs.kP || turretD.getNumber() != turretConfigs.kD || turretS.getNumber() != turretConfigs.kS) {
+		if (turretP.getNumber() != turretConfigs.kP
+				|| turretD.getNumber() != turretConfigs.kD
+				|| turretS.getNumber() != turretConfigs.kS) {
 			turretConfigs.kP = turretP.getNumber();
 			turretConfigs.kD = turretD.getNumber();
 			turretConfigs.kS = turretS.getNumber();
@@ -329,7 +324,8 @@ public class Turret extends SubsystemBase {
 		}
 
 		// turretTargetAngle = Degrees.of(turretTarget.getNumber());
-		// m_TurretMotor.setControl(turretRequest.withPosition(Rotations.of(turretTarget.getNumber() / 360.0)));
+		// m_TurretMotor.setControl(turretRequest.withPosition(Rotations.of(turretTarget.getNumber() /
+		// 360.0)));
 
 		RaiderLog.logOutput("Turret Voltage", m_TurretMotor.getClosedLoopOutput().getValueAsDouble());
 

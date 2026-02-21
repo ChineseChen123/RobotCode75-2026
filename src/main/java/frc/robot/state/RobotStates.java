@@ -7,15 +7,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.lib.util.PeddieBounds;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.EndEffector.Indexer;
-import frc.robot.subsystems.EndEffector.Intake;
-import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
-import frc.robot.subsystems.EndEffector.Shooter;
-import frc.robot.subsystems.EndEffector.Turret;
 import java.util.function.Supplier;
 
 public class RobotStates {
@@ -24,6 +18,7 @@ public class RobotStates {
 	public static final Operator m_Operator = RobotContainer.getOperator();
 
 	public static final Swerve m_Swerve = RobotContainer.getSwerve();
+
 	// public static final Intake m_Intake = RobotContainer.getIntake();
 	// public static final Indexer m_Indexer = RobotContainer.getIndexer();
 	// public static final Shooter m_Shooter = RobotContainer.getShooter();
