@@ -54,42 +54,23 @@ public class Turret extends SubsystemBase {
 	private Angle turretTargetAngle = Degrees.of(0);
 
 	private final Slot0Configs turretConfigs = new Slot0Configs();
-	private final MotionMagicConfigs TurretMMConfigs = new MotionMagicConfigs();
 
 	private final TunableNumber turretP = new TunableNumber("Turret/kP", MotorConfigs.kP);
 	private final TunableNumber turretD = new TunableNumber("Turret/kD", MotorConfigs.kD);
 	private final TunableNumber turretS = new TunableNumber("Turret/kS", MotorConfigs.kS);
 
-	private final TunableNumber turretMMAcc;
-	private final TunableNumber turretMMVel;
-	private final TunableNumber turretMMJerk;
-	private final TunableNumber turretMMKa;
-	private final TunableNumber turretMMKv;
-
-	private final TunableNumber turretTarget = new TunableNumber("Turret/Target", 0);
+	private final TunableNumber turretTarget = new TunableNumber("Turret/Run Turret", 0);
 
 	/** Creates a new Turret. */
 	public Turret() {
 		m_TurretMotor = new TalonFX(turretMotorCanID, superstructureCANBusName);
 
-		m_TurretEncoder1 = new DutyCycleEncoder(encoder1Port, 1, encoder1ZeroPoint.in(Rotations));
-		m_TurretEncoder2 = new DutyCycleEncoder(encoder2Port, 1, encoder2ZeroPoint.in(Rotations));
+		m_TurretEncoder1 = new DutyCycleEncoder(encoder1Port, 1, 0);
+		m_TurretEncoder2 = new DutyCycleEncoder(encoder2Port, 1, 0);
 
 		m_TurretMotor.getConfigurator().apply(MotorConfigs.getTurretMotorConfig());
 
 		turretConfigs.withKP(MotorConfigs.kP).withKD(MotorConfigs.kD).withKS(MotorConfigs.kS);
-
-		TurretMMConfigs.withMotionMagicAcceleration(MotorConfigs.motionMagicCruiseAcceleration)
-				.withMotionMagicCruiseVelocity(MotorConfigs.motionMagicCruiseVelocity)
-				.withMotionMagicJerk(MotorConfigs.motionMagicJerk)
-				.withMotionMagicExpo_kA(MotorConfigs.motionMagickA)
-				.withMotionMagicExpo_kV(MotorConfigs.motionMagickV);
-
-		turretMMAcc = new TunableNumber("Turret/MMAcc", MotorConfigs.motionMagicCruiseAcceleration);
-		turretMMVel = new TunableNumber("Turret/MMVel", MotorConfigs.motionMagicCruiseVelocity);
-		turretMMJerk = new TunableNumber("Turret/MMJerk", MotorConfigs.motionMagicJerk);
-		turretMMKa = new TunableNumber("Turret/MMKa", MotorConfigs.motionMagickA);
-		turretMMKv = new TunableNumber("Turret/MMKv", MotorConfigs.motionMagickV);
 
 		turretRequest.UpdateFreqHz = 0;
 		turretRequest.UseTimesync = true;
@@ -120,21 +101,29 @@ public class Turret extends SubsystemBase {
 		return m_TurretMotor.getPosition(true).getValue();
 	}
 
-	@Logged(key = "Encoder 1 Position Deg", importance = Importance.DEBUG)
+	@Logged(key = "Encoder 1 Position Deg No Offset", importance = Importance.DEBUG)
 	public double getEncoder1PositionDegrees() {
-		return m_TurretEncoder1.get() * 360.0 * (encoder1Invert ? -1 : 1);
+		return m_TurretEncoder1.get() * 360.0;
 	}
 
-	@Logged(key = "Encoder 2 Position Deg", importance = Importance.DEBUG)
+	@Logged(key = "Encoder 2 Position Deg No Offset", importance = Importance.DEBUG)
 	public double getEncoder2PositionDegrees() {
-		return m_TurretEncoder2.get() * 360.0 * (encoder2Invert ? -1 : 1);
+		return m_TurretEncoder2.get() * 360.0;
+	}
+
+	public double getEncoder1PositionDegreesWithOffset() {
+		return MathUtil.inputModulus(getEncoder1PositionDegrees() - encoder1ZeroPoint.in(Degrees), 0, 360);
+	}
+
+	public double getEncoder2PositionDegreesWithOffset() {
+		return MathUtil.inputModulus(getEncoder2PositionDegrees() - encoder2ZeroPoint.in(Degrees), 0, 360);
 	}
 
 	// -135 deg = CW limit, 135 deg = CCW limit (CCW positive)
 	// robot relative heading
 	public Optional<Angle> getTurretHeadingCRT() {
-		Angle encoder1Position = Degrees.of(getEncoder1PositionDegrees());
-		Angle encoder2Position = Degrees.of(getEncoder2PositionDegrees());
+		Angle encoder1Position = Degrees.of(getEncoder1PositionDegreesWithOffset());
+		Angle encoder2Position = Degrees.of(getEncoder2PositionDegreesWithOffset());
 
 		encoder1Position = Rotations.of(MathUtil.inputModulus(encoder1Position.in(Rotations), 0, 1));
 		encoder2Position = Rotations.of(MathUtil.inputModulus(encoder2Position.in(Rotations), 0, 1));
@@ -198,6 +187,11 @@ public class Turret extends SubsystemBase {
 	}
 
 	@Logged(key = "Turret Target", importance = Importance.DEBUG)
+	public double getTurretTargetDegrees() {
+		return turretTargetAngle.in(Degrees);
+	}
+
+
 	public Angle getTurretTargetAbsolute() {
 		return turretTargetAngle;
 	}
@@ -208,18 +202,43 @@ public class Turret extends SubsystemBase {
 		if (!isReset) {
 			return pose;
 		}
-		Rotation2d robotHeading = pose.getRotation();
+		// Rotation2d robotHeading = pose.getRotation();
+		Rotation2d robotHeading = new Rotation2d(heading);
 
-		Angle turretHeading = getPositionFromMotor();
+		// Angle turretHeading = getPositionFromMotor();
+		Angle turretHeading = turretTargetAngle;
 		Translation2d translation =
 				pose.getTranslation()
 						.plus(
 								new Translation2d(
 										turretPositionOffset.getNorm(),
 										robotHeading.plus(turretPositionOffset.getAngle())));
-		Rotation2d rotation = pose.getRotation().plus(new Rotation2d(turretHeading));
+		Rotation2d rotation = robotHeading.plus(new Rotation2d(turretHeading));
 		return new Pose2d(translation, rotation);
 	}
+
+	private Angle heading = Degrees.of(0);
+
+	public void changeHeading(Angle amount) {
+		heading = heading.plus(amount);
+	}
+
+	@Logged(key = "Sim Robot Heading", importance = Importance.DEBUG)
+	public double headingDegrees() {
+		return heading.in(Degrees);
+	}
+
+	@Logged(key = "Sim Robot Pose", importance = Importance.DEBUG)
+	public Pose2d simRobotPose() {
+		Pose2d pose = RobotStates.robotPose.get();
+		return new Pose2d(pose.getTranslation(), pose.getRotation().plus(new Rotation2d(heading)));
+	}
+
+	@Logged(key = "Hub Pose", importance = Importance.DEBUG)
+	public Pose2d getHubPose() {
+		return PeddieBounds.getHubTarget();
+	}
+	
 
 	// virtual target
 	public void updateTurretTarget() {
@@ -241,14 +260,17 @@ public class Turret extends SubsystemBase {
 				new Rotation2d(
 						targetHubPose.getTranslation().getX() - turretPose.getTranslation().getX(),
 						targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
+		// Angle turretTarget =
+		// 		fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
+
 		Angle turretTarget =
-				fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
+				fieldRelativeToHub.getMeasure().minus(heading);
 
 		double angleDeg = turretTarget.in(Degrees); // (-180,180)
 		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
 		angleDeg -= 180;
 
-		if (Math.abs(angleDeg) > turretRange.in(Degrees) / 2.0
+		if (Math.abs(angleDeg) > turretSoftRange.in(Degrees) / 2.0
 				&& ShooterTurretConstants.useVirtualTarget) {
 			// Basically, if the virtual target is OUTSIDE of range DO NOT do wrap around
 			// instead fall back to normal targeting. Hopefully driver isnt stupid
@@ -260,16 +282,18 @@ public class Turret extends SubsystemBase {
 					new Rotation2d(
 							targetHubPose.getTranslation().getX() - turretPose.getTranslation().getX(),
 							targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
+			// turretTarget =
+			// 		fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
 			turretTarget =
-					fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
+					fieldRelativeToHub.getMeasure().minus(heading);
 			angleDeg = turretTarget.in(Degrees); // (-180,180)
 			angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
 			angleDeg -= 180;
 		}
 
 		// Interpolate blind spot in opposite direction by factor of 3
-		if (Math.abs(angleDeg) > turretRange.in(Degrees) / 2.0) {
-			double turnLimit = turretRange.in(Degrees) / 2.0;
+		if (Math.abs(angleDeg) > turretSoftRange.in(Degrees) / 2.0) {
+			double turnLimit = turretSoftRange.in(Degrees) / 2.0;
 			// Map [135, 180] -> [135, 0] linearly
 			if (angleDeg > turnLimit) { // (135, 180]
 				double t = (angleDeg - turnLimit) / (180 - turnLimit); // 0..1
@@ -280,7 +304,11 @@ public class Turret extends SubsystemBase {
 				double t = (angleDeg + 180.0) / (180 - turnLimit); // 0..1
 				angleDeg = -turnLimit * t + 180;
 			}
+		} else {
+			angleDeg += 180;
 		}
+
+		angleDeg = MathUtil.inputModulus(angleDeg, -360, 360);
 
 		turretTargetAngle = Degrees.of(angleDeg);
 	}
@@ -300,24 +328,17 @@ public class Turret extends SubsystemBase {
 			m_TurretMotor.getConfigurator().apply(turretConfigs);
 		}
 
-		if (turretMMAcc.getNumber() != TurretMMConfigs.MotionMagicAcceleration
-				|| turretMMVel.getNumber() != TurretMMConfigs.MotionMagicCruiseVelocity
-				|| turretMMJerk.getNumber() != TurretMMConfigs.MotionMagicJerk
-				|| turretMMKa.getNumber() != TurretMMConfigs.MotionMagicExpo_kA
-				|| turretMMKv.getNumber() != TurretMMConfigs.MotionMagicExpo_kV) {
-			TurretMMConfigs.MotionMagicAcceleration = turretMMAcc.getNumber();
-			TurretMMConfigs.MotionMagicCruiseVelocity = turretMMVel.getNumber();
-			TurretMMConfigs.MotionMagicJerk = turretMMJerk.getNumber();
-			TurretMMConfigs.MotionMagicExpo_kA = turretMMKa.getNumber();
-			TurretMMConfigs.MotionMagicExpo_kV = turretMMKv.getNumber();
-			// m_TurretMotor.getConfigurator().apply(TurretMMConfigs);
+		// turretTargetAngle = Degrees.of(turretTarget.getNumber());
+		// m_TurretMotor.setControl(turretRequest.withPosition(Rotations.of(turretTarget.getNumber() / 360.0)));
+
+		RaiderLog.logOutput("Turret Voltage", m_TurretMotor.getClosedLoopOutput().getValueAsDouble());
+
+		updateTurretTarget();
+
+		if (turretTarget.getNumber() != 0) {
+			m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngle));
+		} else {
+			m_TurretMotor.setControl(new CoastOut());
 		}
-
-		// m_TurretMotor.setControl(new VoltageOut(-0.4));
-		m_TurretMotor.setControl(turretRequest.withPosition(Rotations.of(turretTarget.getNumber() / 360.0)));
-
-		// updateTurretTarget();
-
-		// m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngle));
 	}
 }

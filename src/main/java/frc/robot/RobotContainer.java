@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.Constants.IOConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
@@ -86,6 +87,9 @@ public class RobotContainer {
 		} else {
 			m_Bindings.bind2Driver();
 		}
+
+		m_Operator.leftBumper.whileTrue(new InstantCommand(() -> m_Turret.changeHeading(Degrees.of(-1)), m_Turret).repeatedly());
+		m_Operator.rightBumper.whileTrue(new InstantCommand(() -> m_Turret.changeHeading(Degrees.of(1)), m_Turret).repeatedly());
 		
 		// m_Operator.Y.whileTrue(
 		// 	new InstantCommand(() -> m_Shooter.setState(ShooterStates.SHOOTING), m_Shooter).repeatedly()

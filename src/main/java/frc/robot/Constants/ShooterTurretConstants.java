@@ -30,8 +30,8 @@ import edu.wpi.first.units.measure.Time;
 /** Add your docs here. */
 public class ShooterTurretConstants {
 
-	public static boolean useVirtualTarget = false;
-	public static int virtualTargetSolveIterations = 6;
+	public static final boolean useVirtualTarget = false;
+	public static final int virtualTargetSolveIterations = 6;
 
 	public class ShooterConstants {
 		// Kraken X60s
@@ -148,11 +148,8 @@ public class ShooterTurretConstants {
 		public static final double turretPositionToleranceDegrees = 1.5;
 
 		// at CW limit
-		public static final Angle encoder1ZeroPoint = Degrees.of(249.2);
-		public static final Angle encoder2ZeroPoint = Degrees.of(56.9);
-
-		public static final boolean encoder1Invert = false;
-		public static final boolean encoder2Invert = false;
+		public static final Angle encoder1ZeroPoint = Degrees.of(91.6);
+		public static final Angle encoder2ZeroPoint = Degrees.of(62.8);
 
 		// discrepancy threshold between encoders to accept solution
 		public static final Angle matchTolerance = Degrees.of(8);
@@ -161,6 +158,7 @@ public class ShooterTurretConstants {
 
 		// abs for both
 		public static final Angle turretRange = Degrees.of(270);
+		public static final Angle turretSoftRange = Degrees.of(260);
 
 		public static class MotorConfigs {
 			public static final Time closedLoopRamp = Seconds.of(0.25);
@@ -174,18 +172,18 @@ public class ShooterTurretConstants {
 			public static final Current statorForwardCurrentLimit = Amps.of(60);
 			public static final Current statorReverseCurrentLimit = Amps.of(60);
 
-			public static final Angle forwardSoftLimit = turretRange.div(2).minus(Degrees.of(10));
-			public static final Angle reverseSoftLimit = turretRange.div(-2).plus(Degrees.of(10));
+			public static final Angle forwardSoftLimit = turretRange.div(2).minus(Degrees.of(5));
+			public static final Angle reverseSoftLimit = turretRange.div(-2).plus(Degrees.of(5));
 
 			public static final Frequency timeSyncFreq = Hertz.of(250);
 
 			public static final double kA = 0; // voltage per unit of acceleration
 			public static final double kG = 0; // voltage to overcome gravity
-			public static final double kS = 0; // voltage to overcome static friction
+			public static final double kS = 3.2; // voltage to overcome static friction
 			public static final double kV = 0; // voltage per unit of requested velocity
-			public static final double kP = 0.001;
+			public static final double kP = 70;
 			public static final double kI = 0;
-			public static final double kD = 0;
+			public static final double kD = 3;
 
 			public static final double motionMagicCruiseVelocity = 5;
 			public static final double motionMagicCruiseAcceleration = 5;
