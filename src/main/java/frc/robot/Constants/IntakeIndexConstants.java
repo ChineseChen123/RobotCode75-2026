@@ -219,7 +219,7 @@ public class IntakeIndexConstants {
 			public static final Current hopperSupplyCurrentLimit = Amps.of(40);
 			public static final Current hopperCurrentLowerThreshold = Amps.of(30);
 
-			public static final Current indexerStatorCurrentLimit = Amps.of(60);
+			public static final Current indexerStatorCurrentLimit = Amps.of(80);
 			public static final Current hopperStatorCurrentLimit = Amps.of(60);
 
 			public static final Time indexerCurrentThresholdTime = Seconds.of(0.50);

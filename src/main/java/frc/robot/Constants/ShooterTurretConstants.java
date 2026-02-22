@@ -79,7 +79,7 @@ public class ShooterTurretConstants {
 
 			public static final Current shooterMotorSupplyCurrentLimit = Amps.of(40);
 			public static final Current shooterMotorCurrentLowerThreshold = Amps.of(30);
-			public static final Current shooterMotorStatorCurrentLimit = Amps.of(60);
+			public static final Current shooterMotorStatorCurrentLimit = Amps.of(80);
 
 			// Torque PI
 			public static final double openLoopRamp = 0.1;
