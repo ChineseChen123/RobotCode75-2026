@@ -260,7 +260,9 @@ public class Turret extends SubsystemBase {
 
 		Angle turretTarget = fieldRelativeToHub.getMeasure().minus(heading);
 
-		double angleDeg = turretTarget.in(Degrees); // (-180,180)
+		double angleDeg = turretTarget.in(Degrees);
+		// Wrap angle to [-180, 180)
+		angleDeg += 180;
 		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
 		angleDeg -= 180;
 
@@ -297,11 +299,7 @@ public class Turret extends SubsystemBase {
 				double t = (angleDeg + 180.0) / (180 - turnLimit); // 0..1
 				angleDeg = -turnLimit * t;
 			}
-		} else {
-			// angleDeg += 180;
 		}
-
-		angleDeg = MathUtil.inputModulus(angleDeg, -180, 180);
 
 		turretTargetAngle = Degrees.of(angleDeg);
 	}
