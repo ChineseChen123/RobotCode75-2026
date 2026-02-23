@@ -82,7 +82,7 @@ public class Shooter extends SubsystemBase {
 		m_VelocityRequest.UseTimesync = true;
 	}
 
-	@Logged(key = "Shooter Velocity", importance = Importance.CRITICAL)
+	@Logged(key = "Shooter Velocity RPM", importance = Importance.CRITICAL)
 	public double getVelocityRPM() {
 		return getVelocity().in(RotationsPerSecond) * 60;
 	}
@@ -133,33 +133,33 @@ public class Shooter extends SubsystemBase {
 			m_ShooterMotor2.getConfigurator().apply(shooterPIDConfigs);
 		}
 
-		if (m_ShooterState == ShooterStates.SHOOTING) {
-			// // lookup table stuff
-			// Pose2d targetHubPose = PeddieBounds.getHubTarget();
+		// if (m_ShooterState == ShooterStates.SHOOTING) {
+		// 	// // lookup table stuff
+		// 	// Pose2d targetHubPose = PeddieBounds.getHubTarget();
 
-			// // variable speeds
-			// if (ShooterTurretConstants.useVirtualTarget) {
-			// 	targetHubPose =
-			// 			ShooterPhysics.getVirtualTarget(
-			// 					RobotStates.robotPose.get(),
-			// 					RobotStates.fieldRelativeSpeeds.get(),
-			// 					ShooterTurretConstants.virtualTargetSolveIterations);
-			// }
-			// AngularVelocity velocity =
-			// 		ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);
+		// 	// // variable speeds
+		// 	// if (ShooterTurretConstants.useVirtualTarget) {
+		// 	// 	targetHubPose =
+		// 	// 			ShooterPhysics.getVirtualTarget(
+		// 	// 					RobotStates.robotPose.get(),
+		// 	// 					RobotStates.fieldRelativeSpeeds.get(),
+		// 	// 					ShooterTurretConstants.virtualTargetSolveIterations);
+		// 	// }
+		// 	// AngularVelocity velocity =
+		// 	// 		ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);
 
-			AngularVelocity velocity = RotationsPerSecond.of(3000 / 60);
+		// 	AngularVelocity velocity = RotationsPerSecond.of(3000 / 60);
 
-			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(velocity));
-			m_ShooterMotor2.setControl(m_FollowerRequest);
-			shooterTargetVelocity = velocity;
-		} else if (m_ShooterState == ShooterStates.DEFAULT) {
-			m_ShooterMotor1.setControl(new CoastOut());
-			m_ShooterMotor2.setControl(m_FollowerRequest);
-		} else {
-			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
-			m_ShooterMotor2.setControl(m_FollowerRequest);
-			shooterTargetVelocity = m_ShooterState.shooterSpeed;
-		}
+		// 	m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(velocity));
+		// 	m_ShooterMotor2.setControl(m_FollowerRequest);
+		// 	shooterTargetVelocity = velocity;
+		// } else if (m_ShooterState == ShooterStates.DEFAULT) {
+		// 	m_ShooterMotor1.setControl(new CoastOut());
+		// 	m_ShooterMotor2.setControl(m_FollowerRequest);
+		// } else {
+		// 	m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
+		// 	m_ShooterMotor2.setControl(m_FollowerRequest);
+		// 	shooterTargetVelocity = m_ShooterState.shooterSpeed;
+		// }
 	}
 }
