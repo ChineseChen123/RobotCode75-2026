@@ -46,16 +46,34 @@ import java.util.Map;
  * Each word can contain one point and one action max
  *  - All points are strings of letters (case insensitive)
  *  - All actions are numbers
- * !!! The first word MUST be only one starting point (ST/SM/SB) without an action
- * Points are labeled according to position in Choreo/relative to processor
+ * !!! The first word MUST be only one starting point (SD/SM/SO) without an action
+ * Points are labeled according to whether they are closer to depot/outpost
  */
 
 /* ACTIONS
- *
+ * 1 - shoot while moving (no end condition)
+ * 2 - auto intake (including driving)
+ * 3 - intake from depot
+ * 4 - wait for outpost
+ * 5 - feed while intaking (including driving)
  */
 
 /* POINTS
- *
+ * SD - start depot (3.6044533252716064, 7.642, 180)
+ * SM - start middle ()
+ * SO - start outpost (3.6044533252716064, 0.42545, 180)
+ * 
+ * D - depot ()
+ * O - outpost ()
+ * ND - depot side neutral zone ()
+ * NO - outpost side neutral zone ()
+ * 
+ * A - shooting position 1 on depot side (2.1360738277435303, 6.745790481567383, 315)
+ * B - shooting position 2 on outpost side (2.1360738277435303, 1.32340952, 45)
+ * C-F - add shooting positions as needed
+ * 
+ * TD - depot side tower ()
+ * TO - outpost side tower ()
  */
 
 public class AutoSelector {
@@ -63,8 +81,8 @@ public class AutoSelector {
 	private Command m_autoCommand = Commands.runOnce(() -> {});
 	private Pose2d m_startPose;
 	private Field2d m_field;
-	private ActionFactory m_actionFactory;
-	private Swerve m_swerve;
+	private final ActionFactory m_actionFactory;
+	private final Swerve m_swerve;
 	private Map<String, Pose2d> m_startPositions;
 
 	private GenericEntry autoStringEntry;
@@ -72,7 +90,7 @@ public class AutoSelector {
 
 	private final SendableChooser<String> presetChooser;
 
-	private final AutoFactory factory;
+	private final AutoFactory choreoFactory;
 
 	public AutoSelector() {
 		NetworkTableInstance nt = NetworkTableInstance.getDefault();
@@ -90,7 +108,7 @@ public class AutoSelector {
 		presetChooser.setDefaultOption("Custom", "");
 
 		// define auto factory for autos
-		factory =
+		choreoFactory =
 				new AutoFactory(
 						m_swerve::getPose, m_swerve::setPose, m_swerve::followSwerveSample, true, m_swerve);
 	}
@@ -246,12 +264,11 @@ public class AutoSelector {
 			if (point != "" && lastPose != "") {
 				try {
 					// m_trajectories.add(
-					//     new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "-" + point).get()));
+					//     new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "_" + point).get()));
 
 					// reset pose and gyro if not done yet
 					if (!isOdometryReset) {
-						// TODO: Use start pose to set gyro
-						var trajectory = Choreo.loadTrajectory("" + lastPose + "-" + point);
+						var trajectory = Choreo.loadTrajectory("" + lastPose + "_" + point);
 						sequential.addCommands(
 								Commands.runOnce(
 										() ->
@@ -261,12 +278,12 @@ public class AutoSelector {
 																.getInitialPose(DriverStation.getAlliance().get() == Alliance.Red)
 																.get()
 																.getRotation())),
-								factory.resetOdometry("" + lastPose + "-" + point));
+								choreoFactory.resetOdometry("" + lastPose + "_" + point));
 						isOdometryReset = true;
 					}
 
 					// generate movement command and add to group
-					parallelGroup.addCommands(factory.trajectoryCmd("" + lastPose + "-" + point));
+					parallelGroup.addCommands(choreoFactory.trajectoryCmd("" + lastPose + "_" + point));
 					// if (DriverStation.getAlliance().get() == Alliance.Red) {
 					//   m_trajectories.set(
 					//       m_trajectories.size() - 1,
