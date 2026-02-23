@@ -87,28 +87,28 @@ public class ShooterPhysics {
 
 	private static final double phaseDelay = 0.03;
 
-	public static Time calculateTimeToScore(Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds, Pose2d targetHubPose) {
+	public static Time calculateTimeToScore(
+			Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds, Pose2d targetHubPose) {
 
-		ChassisSpeeds robotRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-			fieldRelativeSpeeds,
-			RobotStates.robotHeading.get()
-		);
-		robotPose = robotPose.exp(
-            new Twist2d(
-                robotRelativeSpeeds.vxMetersPerSecond * phaseDelay,
-                robotRelativeSpeeds.vyMetersPerSecond * phaseDelay,
-                robotRelativeSpeeds.omegaRadiansPerSecond * phaseDelay));
+		ChassisSpeeds robotRelativeSpeeds =
+				ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeSpeeds, RobotStates.robotHeading.get());
+		robotPose =
+				robotPose.exp(
+						new Twist2d(
+								robotRelativeSpeeds.vxMetersPerSecond * phaseDelay,
+								robotRelativeSpeeds.vyMetersPerSecond * phaseDelay,
+								robotRelativeSpeeds.omegaRadiansPerSecond * phaseDelay));
 
 		Translation2d turretPose =
-				robotPose.getTranslation()
+				robotPose
+						.getTranslation()
 						.plus(
 								new Translation2d(
 										turretPositionOffset.getNorm(),
 										RobotStates.robotHeading.get().plus(turretPositionOffset.getAngle())));
 
 		AngularVelocity shooterVelocity =
-				distanceToAngularVelocity(
-						turretPose.getDistance(targetHubPose.getTranslation()));
+				distanceToAngularVelocity(turretPose.getDistance(targetHubPose.getTranslation()));
 		LinearVelocity projectileSpeed = shooterAngularVelocityToLinearVelocity(shooterVelocity);
 
 		// gravity in inches/sec^2
@@ -137,15 +137,15 @@ public class ShooterPhysics {
 
 		Rotation2d robotAngle = robotPose.getRotation();
 		double turretVelocityX =
-        fieldRelativeSpeeds.vxMetersPerSecond
-            + fieldRelativeSpeeds.omegaRadiansPerSecond
-                * (turretPositionOffset.getY() * robotAngle.getCos()
-                    - turretPositionOffset.getX() * robotAngle.getSin());
-    double turretVelocityY =
-        fieldRelativeSpeeds.vyMetersPerSecond
-            + fieldRelativeSpeeds.omegaRadiansPerSecond
-                * (turretPositionOffset.getX() * robotAngle.getCos()
-                    - turretPositionOffset.getY() * robotAngle.getSin());
+				fieldRelativeSpeeds.vxMetersPerSecond
+						+ fieldRelativeSpeeds.omegaRadiansPerSecond
+								* (turretPositionOffset.getY() * robotAngle.getCos()
+										- turretPositionOffset.getX() * robotAngle.getSin());
+		double turretVelocityY =
+				fieldRelativeSpeeds.vyMetersPerSecond
+						+ fieldRelativeSpeeds.omegaRadiansPerSecond
+								* (turretPositionOffset.getX() * robotAngle.getCos()
+										- turretPositionOffset.getY() * robotAngle.getSin());
 
 		for (int i = 0; i < iterations; i++) {
 			Time tofEstimate = calculateTimeToScore(robotPose, fieldRelativeSpeeds, virtualTargetPose);

@@ -4,14 +4,12 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.Constants.IOConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.RaiderLog.RaiderLog;
@@ -22,11 +20,7 @@ import frc.robot.state.Operator;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Indexer;
 import frc.robot.subsystems.EndEffector.Intake;
-import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
 import frc.robot.subsystems.EndEffector.Shooter;
-import frc.robot.subsystems.EndEffector.Turret;
-import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
-import frc.robot.subsystems.EndEffector.Shooter.ShooterStates;
 import frc.robot.subsystems.Vision.Limelight;
 
 public class RobotContainer {

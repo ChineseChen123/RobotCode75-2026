@@ -204,8 +204,7 @@ public class IntakeIndexConstants {
 			public static final TalonFXConfiguration m_IndexerMotorConfig = new TalonFXConfiguration();
 			public static final TalonFXConfiguration m_HopperMotorConfig = new TalonFXConfiguration();
 
-			public static final InvertedValue indexerMotorInvert =
-					InvertedValue.Clockwise_Positive;
+			public static final InvertedValue indexerMotorInvert = InvertedValue.Clockwise_Positive;
 			public static final InvertedValue hopperMotorInvert = InvertedValue.CounterClockwise_Positive;
 
 			public static final NeutralModeValue indexerNeutralMode = NeutralModeValue.Brake;
