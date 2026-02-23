@@ -6,17 +6,20 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+import static frc.robot.Constants.ShooterTurretConstants.TurretConstants.turretPositionOffset;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterTurretConstants;
+import frc.robot.state.RobotStates;
 
 public class ShooterPhysics {
 
@@ -82,11 +85,30 @@ public class ShooterPhysics {
 		return RadiansPerSecond.of(angularVelocityRadPerSec);
 	}
 
-	public static Time calculateTimeToScore(Pose2d robotPose, Pose2d targetHubPose) {
+	private static final double phaseDelay = 0.03;
+
+	public static Time calculateTimeToScore(Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds, Pose2d targetHubPose) {
+
+		ChassisSpeeds robotRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+			fieldRelativeSpeeds,
+			RobotStates.robotHeading.get()
+		);
+		robotPose = robotPose.exp(
+            new Twist2d(
+                robotRelativeSpeeds.vxMetersPerSecond * phaseDelay,
+                robotRelativeSpeeds.vyMetersPerSecond * phaseDelay,
+                robotRelativeSpeeds.omegaRadiansPerSecond * phaseDelay));
+
+		Translation2d turretPose =
+				robotPose.getTranslation()
+						.plus(
+								new Translation2d(
+										turretPositionOffset.getNorm(),
+										RobotStates.robotHeading.get().plus(turretPositionOffset.getAngle())));
 
 		AngularVelocity shooterVelocity =
 				distanceToAngularVelocity(
-						robotPose.getTranslation().getDistance(targetHubPose.getTranslation()));
+						turretPose.getDistance(targetHubPose.getTranslation()));
 		LinearVelocity projectileSpeed = shooterAngularVelocityToLinearVelocity(shooterVelocity);
 
 		// gravity in inches/sec^2
@@ -113,13 +135,25 @@ public class ShooterPhysics {
 
 		Pose2d virtualTargetPose = PeddieBounds.getHubTarget();
 
+		Rotation2d robotAngle = robotPose.getRotation();
+		double turretVelocityX =
+        fieldRelativeSpeeds.vxMetersPerSecond
+            + fieldRelativeSpeeds.omegaRadiansPerSecond
+                * (turretPositionOffset.getY() * robotAngle.getCos()
+                    - turretPositionOffset.getX() * robotAngle.getSin());
+    double turretVelocityY =
+        fieldRelativeSpeeds.vyMetersPerSecond
+            + fieldRelativeSpeeds.omegaRadiansPerSecond
+                * (turretPositionOffset.getX() * robotAngle.getCos()
+                    - turretPositionOffset.getY() * robotAngle.getSin());
+
 		for (int i = 0; i < iterations; i++) {
-			Time tofEstimate = calculateTimeToScore(robotPose, virtualTargetPose);
+			Time tofEstimate = calculateTimeToScore(robotPose, fieldRelativeSpeeds, virtualTargetPose);
 
 			Translation2d targetTranslation =
 					new Translation2d(
-							MetersPerSecond.of(-fieldRelativeSpeeds.vxMetersPerSecond).times(tofEstimate),
-							MetersPerSecond.of(-fieldRelativeSpeeds.vyMetersPerSecond).times(tofEstimate));
+							MetersPerSecond.of(-turretVelocityX).times(tofEstimate),
+							MetersPerSecond.of(-turretVelocityY).times(tofEstimate));
 			virtualTargetPose =
 					virtualTargetPose.plus(new Transform2d(targetTranslation, Rotation2d.kZero));
 		}
