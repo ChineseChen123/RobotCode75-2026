@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 
 public class VisionConstants {
 	// Standard deviations of odometry/vision pose measurements to supply to Kalman filter
@@ -20,8 +21,31 @@ public class VisionConstants {
 	public static final String topLeftLLName = "bright";
 	public static final String topRightLLName = "tright";
 
-	public static final Pose3d topLeftLLPose = new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0));
-	public static final Pose3d topRightLLPose = new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0));
+	/*
+	 * x - forward positive
+	 * y - left positive
+	 * z - up positive
+	 * pitch - up positive
+	 * yaw - counterclockwise positive
+	 */
+
+	public static final Pose3d topLeftLLPose =
+			new Pose3d(
+					Units.inchesToMeters(12.22),
+					Units.inchesToMeters(11.9096),
+					Units.inchesToMeters(8.2893),
+					new Rotation3d(
+							Units.degreesToRadians(0), Units.degreesToRadians(18), Units.degreesToRadians(42.3)));
+
+	public static final Pose3d topRightLLPose =
+			new Pose3d(
+					Units.inchesToMeters(12.22),
+					Units.inchesToMeters(-11.9096),
+					Units.inchesToMeters(8.2893),
+					new Rotation3d(
+							Units.degreesToRadians(0),
+							Units.degreesToRadians(18),
+							Units.degreesToRadians(-42.3)));
 
 	public static final int[] validMT2Tags = {
 		2, 5, 7, 8, 9, 10, 12, 15, 16, 18, 21, 23, 24, 25, 26, 27, 28, 31, 32

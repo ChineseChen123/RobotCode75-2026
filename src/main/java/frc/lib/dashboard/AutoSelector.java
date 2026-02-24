@@ -62,16 +62,16 @@ import java.util.Map;
  * SD - start depot (3.6044533252716064, 7.642, 180)
  * SM - start middle ()
  * SO - start outpost (3.6044533252716064, 0.42545, 180)
- * 
+ *
  * D - depot ()
  * O - outpost ()
  * ND - depot side neutral zone ()
  * NO - outpost side neutral zone ()
- * 
+ *
  * A - shooting position 1 on depot side (2.1360738277435303, 6.745790481567383, 315)
  * B - shooting position 2 on outpost side (2.1360738277435303, 1.32340952, 45)
  * C-F - add shooting positions as needed
- * 
+ *
  * TD - depot side tower ()
  * TO - outpost side tower ()
  */
