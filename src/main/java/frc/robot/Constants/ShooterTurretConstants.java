@@ -146,6 +146,8 @@ public class ShooterTurretConstants {
 		public static final Translation2d turretPositionOffset =
 				new Translation2d(Inches.of(2.5), Inches.of(-5.945));
 		public static final double turretPositionToleranceDegrees = 1.5;
+		// stow angle and threshold
+		public static final Angle turretStowAngle = Degrees.of(-90);
 
 		// at CW limit
 		public static final Angle encoder1ZeroPoint = Degrees.of(91.6);
@@ -159,7 +161,7 @@ public class ShooterTurretConstants {
 		// abs for both
 		public static final Angle turretRange = Degrees.of(270);
 		public static final Angle turretSoftRange = Degrees.of(260);
-
+		
 		public static class MotorConfigs {
 			public static final Time closedLoopRamp = Seconds.of(0.25);
 

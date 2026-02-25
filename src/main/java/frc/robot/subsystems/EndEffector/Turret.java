@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
@@ -28,11 +29,21 @@ import frc.lib.util.RaiderLog.RaiderLog;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.lib.util.ShooterPhysics;
 import frc.robot.Constants.ShooterTurretConstants;
+import frc.robot.Constants.ShooterTurretConstants.TurretConstants;
 import frc.robot.Constants.ShooterTurretConstants.TurretConstants.MotorConfigs;
 import frc.robot.state.RobotStates;
+import frc.robot.subsystems.EndEffector.Shooter.ShooterStates;
+
 import java.util.Optional;
 
 public class Turret extends SubsystemBase {
+	public enum TurretStates {
+		STOWED,
+		SCORING,
+		FEEDING;
+	}
+
+	private TurretStates m_TurretState;
 
 	private final TalonFX m_TurretMotor;
 
@@ -56,6 +67,8 @@ public class Turret extends SubsystemBase {
 	/** Creates a new Turret. */
 	public Turret() {
 		m_TurretMotor = new TalonFX(turretMotorCanID, superstructureCANBusName);
+
+		m_TurretState = TurretStates.STOWED;
 
 		m_TurretEncoder1 = new DutyCycleEncoder(encoder1Port, 1, 0);
 		m_TurretEncoder2 = new DutyCycleEncoder(encoder2Port, 1, 0);
@@ -192,6 +205,19 @@ public class Turret extends SubsystemBase {
 		return turretTargetAngle;
 	}
 
+	public TurretStates getTurretState() {
+		return m_TurretState;
+	}
+
+	public void setState(TurretStates state) {
+		m_TurretState = state;
+	}
+
+	public boolean isStowed() {
+		return getTurretState() == TurretStates.STOWED && atTargetHeading();
+	}
+
+
 	@Logged(key = "Turret Pose", importance = Importance.CRITICAL)
 	public Pose2d getTurretPose() {
 		Pose2d pose = RobotStates.robotPose.get();
@@ -327,7 +353,17 @@ public class Turret extends SubsystemBase {
 
 		RaiderLog.logOutput("Turret Voltage", m_TurretMotor.getClosedLoopOutput().getValueAsDouble());
 
-		updateTurretTarget();
+		switch (m_TurretState) {
+			case STOWED:
+				turretTargetAngle = TurretConstants.turretStowAngle;
+				break;
+			case SCORING:
+				updateTurretTarget();
+				break;
+			case FEEDING: // TODO: implement probably with peddie bounds
+				break;
+		}
+
 
 		if (turretTarget.getNumber() != 0) {
 			m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngle));
