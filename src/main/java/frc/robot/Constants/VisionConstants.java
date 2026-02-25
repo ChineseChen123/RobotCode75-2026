@@ -18,8 +18,8 @@ public class VisionConstants {
 
 	public static final boolean useFomWeighting = false;
 
-	public static final String topLeftLLName = "bright";
-	public static final String topRightLLName = "tright";
+	public static final String topLeftLLName = "limelight-bright";
+	public static final String topRightLLName = "limelight-tright";
 
 	/*
 	 * x - forward positive
