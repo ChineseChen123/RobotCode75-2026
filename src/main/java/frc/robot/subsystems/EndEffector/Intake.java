@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
+import frc.robot.state.RobotStates;
 
 public class Intake extends SubsystemBase {
 
@@ -194,6 +195,12 @@ public class Intake extends SubsystemBase {
 			IntakeMotorPIDConfig.kS = intakeMotorKs.getNumber();
 
 			m_IntakeMotor.getConfigurator().apply(IntakeMotorPIDConfig);
+		}
+
+		if (m_IntakeState == IntakeStates.STOWED && !RobotStates.turretIsStowed.getAsBoolean()) {
+			// panic!
+			System.out.println("Attempting to stow intake before turret is stowed... reverting to DEFAULT");
+			m_IntakeState = IntakeStates.DEFAULT;
 		}
 
 		m_IntakeMotor.setControl(m_IntakeRequest.withVelocity(m_IntakeState.intakeSpeed));

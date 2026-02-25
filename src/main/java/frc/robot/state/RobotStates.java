@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.Turret;
+
 import java.util.function.Supplier;
 
 public class RobotStates {
@@ -22,7 +24,7 @@ public class RobotStates {
 	// public static final Intake m_Intake = RobotContainer.getIntake();
 	// public static final Indexer m_Indexer = RobotContainer.getIndexer();
 	// public static final Shooter m_Shooter = RobotContainer.getShooter();
-	// public static final Turret m_Turret = RobotContainer.getTurret();
+	public static final Turret m_Turret = RobotContainer.getTurret();
 
 	/** Game time triggers */
 	public static final Trigger sim = new Trigger(Robot::isSimulation);
@@ -64,9 +66,11 @@ public class RobotStates {
 	// public static final Trigger shooterAtSpeed = new Trigger(m_Shooter::atTargetVelocity);
 
 	/** Turret states */
-	// public static final Trigger turretReset = new Trigger(m_Turret::isReset);
+	public static final Trigger turretReset = new Trigger(m_Turret::isReset);
 
-	// public static final Trigger turretAtTarget = new Trigger(m_Turret::atTargetHeading);
+	public static final Trigger turretAtTarget = new Trigger(m_Turret::atTargetHeading);
+	public static final Trigger turretIsStowed = new Trigger(m_Turret::isStowed);
+
 
 	// ── Actions ──────────────────────────────────────────────────────────────────
 
