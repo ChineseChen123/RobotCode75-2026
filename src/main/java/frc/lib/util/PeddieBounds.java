@@ -35,6 +35,9 @@ public class PeddieBounds {
 
 	private static final AprilTagFields m_field = AprilTagFields.k2026RebuiltWelded;
 
+	private static boolean onBlueAlliance() { return DriverStation.getAlliance().isPresent()
+				&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue; }
+
 	/** returns field element associated with closest tag to current pose */
 	public static FieldElement nearestElement(Pose2d pose) {
 		List<AprilTag> tags = AprilTagFieldLayout.loadField(m_field).getTags();
@@ -96,9 +99,47 @@ public class PeddieBounds {
 				Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 180));
 	}
 
+	public static Pose2d getNearestBump(Pose2d currentPose) {
+		Pose2d bumpLeft = onBlueAlliance() ? FieldConstants.blueBumpLeft : FieldConstants.redBumpLeft;
+		Pose2d bumpRight = onBlueAlliance() ? FieldConstants.blueBumpRight : FieldConstants.redBumpRight;
+		double distToLeft = bumpLeft.getTranslation().getDistance(currentPose.getTranslation());
+		double distToRight = bumpRight.getTranslation().getDistance(currentPose.getTranslation());
+
+		if (distToLeft < distToRight) return bumpLeft;
+		if (distToLeft >= distToRight) return bumpRight; // readability
+		return bumpRight;
+	}
+
+	public static Pose2d getOptimalFeedPose(Pose2d currentPose) {
+		// TODO: this does NOT take into account the hub
+		// im just too lazy to do this rn but basically need to find where ball might clip corner of hub when feeding
+		// and move those poses to the left/right to get out of corner clipping range
+		// shouldn't really be an issue for further away cuz of ball height
+		// best way is probably to make a line of turret to hub corner and find where that intersects bump
+		// ofc if the line never intersects bump then its optimal to just create a line between the turret and bump and ignore corner
+		// same thing for trench but that should be less of an issue
+		// or we can ignore this by making the extremes more in LOL
+
+		Pose2d bumpCenter = getNearestBump(currentPose);
+
+		double metersAdjustment = 0.25; // idfk
+
+		if (currentPose.getY() > bumpCenter.getY() - (FieldConstants.bumpWidth.in(Meters) / 2.0 + metersAdjustment)
+				&& currentPose.getY() < bumpCenter.getY() + (FieldConstants.bumpWidth.in(Meters) / 2.0) - metersAdjustment) {
+			// TODO idfk it its + or -
+			return new Pose2d(new Translation2d(bumpCenter.getX() + (FieldConstants.bumpWidth.in(Meters) / 2.0), currentPose.getY()), Rotation2d.kZero);
+		}
+		else if (currentPose.getY() <= bumpCenter.getY() - (FieldConstants.bumpWidth.in(Meters) / 2.0)) {
+			return new Pose2d(new Translation2d(bumpCenter.getX() + (FieldConstants.bumpWidth.in(Meters) / 2.0), bumpCenter.getY() - (FieldConstants.bumpWidth.in(Meters) / 2.0) + metersAdjustment), Rotation2d.kZero);
+		}
+		else if (currentPose.getY() >= bumpCenter.getY() + (FieldConstants.bumpWidth.in(Meters) / 2.0)) {
+			return new Pose2d(new Translation2d(bumpCenter.getX() + (FieldConstants.bumpWidth.in(Meters) / 2.0), bumpCenter.getY() + (FieldConstants.bumpWidth.in(Meters) / 2.0) - metersAdjustment), Rotation2d.kZero);
+		}
+		return null; 
+	}
+
 	public static Pose2d getHubTarget() {
-		return DriverStation.getAlliance().isPresent()
-						&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+		return onBlueAlliance()
 				? FieldConstants.blueHub
 				: FieldConstants.redHub;
 	}
@@ -108,8 +149,7 @@ public class PeddieBounds {
 	}
 
 	public static boolean isInOwnZone(Pose2d pose) {
-		if (DriverStation.getAlliance().isPresent()
-				&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+		if (onBlueAlliance()) {
 			return pose.getX() < blueHub.getX();
 		} else {
 			return pose.getX() > redHub.getX();
