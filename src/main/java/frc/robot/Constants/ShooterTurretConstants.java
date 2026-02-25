@@ -144,7 +144,7 @@ public class ShooterTurretConstants {
 				10.0 / 54.0 * encoderPinion1Teeth / ringGearTeeth;
 		// translation from robot center to turret center, climber is forward
 		public static final Translation2d turretPositionOffset =
-				new Translation2d(Inches.of(2), Inches.of(10));
+				new Translation2d(Inches.of(2.5), Inches.of(-5.945));
 		public static final double turretPositionToleranceDegrees = 1.5;
 
 		// at CW limit

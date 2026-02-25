@@ -69,6 +69,11 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 					.withDriveRequestType(DriveRequestType.OpenLoopVoltage)
 					.withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
+	private final SwerveRequest.ApplyFieldSpeeds closedLoopRequest = 
+			new SwerveRequest.ApplyFieldSpeeds()
+					.withDriveRequestType(DriveRequestType.Velocity)
+					.withSteerRequestType(SteerRequestType.MotionMagicExpo);
+
 	private final SwerveRequest.ApplyRobotSpeeds robotRequest =
 			new SwerveRequest.ApplyRobotSpeeds()
 					.withDriveRequestType(DriveRequestType.OpenLoopVoltage)
@@ -252,6 +257,9 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
 	@Logged(key = "Pose Estimates", importance = Importance.DEBUG)
 	public Pose2d[] getEstimatedPosesFromCameras() {
+		if (estimatedPosesFromCameras == null) {
+			estimatedPosesFromCameras = new Pose2d[1];
+		}
 		return estimatedPosesFromCameras;
 	}
 
