@@ -99,13 +99,7 @@ public class ShooterPhysics {
 								robotRelativeSpeeds.vyMetersPerSecond * phaseDelay,
 								robotRelativeSpeeds.omegaRadiansPerSecond * phaseDelay));
 
-		Translation2d turretPose =
-				robotPose
-						.getTranslation()
-						.plus(
-								new Translation2d(
-										turretPositionOffset.getNorm(),
-										RobotStates.robotHeading.get().plus(turretPositionOffset.getAngle())));
+		Translation2d turretPose = robotPose.transformBy(turretPositionOffset).getTranslation();
 
 		AngularVelocity shooterVelocity =
 				distanceToAngularVelocity(turretPose.getDistance(targetHubPose.getTranslation()));

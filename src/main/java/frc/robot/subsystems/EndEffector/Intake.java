@@ -199,7 +199,8 @@ public class Intake extends SubsystemBase {
 
 		if (m_IntakeState == IntakeStates.STOWED && !RobotStates.turretIsStowed.getAsBoolean()) {
 			// panic!
-			System.out.println("Attempting to stow intake before turret is stowed... reverting to DEFAULT");
+			System.out.println(
+					"Attempting to stow intake before turret is stowed... reverting to DEFAULT");
 			m_IntakeState = IntakeStates.DEFAULT;
 		}
 

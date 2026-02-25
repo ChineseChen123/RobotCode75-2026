@@ -11,7 +11,6 @@ import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Turret;
-
 import java.util.function.Supplier;
 
 public class RobotStates {
@@ -70,7 +69,6 @@ public class RobotStates {
 
 	public static final Trigger turretAtTarget = new Trigger(m_Turret::atTargetHeading);
 	public static final Trigger turretIsStowed = new Trigger(m_Turret::isStowed);
-
 
 	// ── Actions ──────────────────────────────────────────────────────────────────
 

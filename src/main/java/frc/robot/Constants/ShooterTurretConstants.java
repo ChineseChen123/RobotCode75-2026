@@ -18,7 +18,8 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -143,8 +144,8 @@ public class ShooterTurretConstants {
 		public static final double motorToTurretRatio =
 				10.0 / 54.0 * encoderPinion1Teeth / ringGearTeeth;
 		// translation from robot center to turret center, climber is forward
-		public static final Translation2d turretPositionOffset =
-				new Translation2d(Inches.of(2.5), Inches.of(-5.945));
+		public static final Transform2d turretPositionOffset =
+				new Transform2d(Inches.of(2.5), Inches.of(-5.945), Rotation2d.kZero);
 		public static final double turretPositionToleranceDegrees = 1.5;
 		// stow angle and threshold
 		public static final Angle turretStowAngle = Degrees.of(-90);
@@ -154,14 +155,14 @@ public class ShooterTurretConstants {
 		public static final Angle encoder2ZeroPoint = Degrees.of(62.8);
 
 		// discrepancy threshold between encoders to accept solution
-		public static final Angle matchTolerance = Degrees.of(8);
+		public static final Angle matchTolerance = Degrees.of(10);
 		// minimum difference between two possible solutions to avoid ambiguity
 		public static final Angle ambiguityTolerance = Degrees.of(2);
 
 		// abs for both
 		public static final Angle turretRange = Degrees.of(270);
 		public static final Angle turretSoftRange = Degrees.of(260);
-		
+
 		public static class MotorConfigs {
 			public static final Time closedLoopRamp = Seconds.of(0.25);
 

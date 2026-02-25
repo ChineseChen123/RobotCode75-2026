@@ -7,7 +7,6 @@ package frc.robot;
 import static frc.robot.Constants.IOConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,8 +21,8 @@ import frc.robot.state.Operator;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Indexer;
 import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
-import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
 import frc.robot.subsystems.EndEffector.Intake;
+import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
 import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Shooter.ShooterStates;
 import frc.robot.subsystems.EndEffector.Turret;
@@ -92,24 +91,31 @@ public class RobotContainer {
 
 		// Ball path test
 		m_Operator.Y.whileTrue(
-			new InstantCommand(() -> {
-				m_Indexer.setState(IndexerStates.SHOOTING);
-				m_Shooter.setState(ShooterStates.SHOOTING);
-			}, m_Shooter, m_Indexer).repeatedly()
-			.finallyDo(() -> {
-				m_Indexer.setState(IndexerStates.DEFAULT);
-				m_Shooter.setState(ShooterStates.DEFAULT);
-			})
-		);
+				new InstantCommand(
+								() -> {
+									m_Indexer.setState(IndexerStates.SHOOTING);
+									m_Shooter.setState(ShooterStates.SHOOTING);
+								},
+								m_Shooter,
+								m_Indexer)
+						.repeatedly()
+						.finallyDo(
+								() -> {
+									m_Indexer.setState(IndexerStates.DEFAULT);
+									m_Shooter.setState(ShooterStates.DEFAULT);
+								}));
 
 		m_Operator.A.whileTrue(
-			new InstantCommand(() -> {
-				m_Intake.setState(IntakeStates.INTAKING);
-			}, m_Intake).repeatedly()
-			.finallyDo(() -> {
-				m_Intake.setState(IntakeStates.DEFAULT);
-			})
-		);
+				new InstantCommand(
+								() -> {
+									m_Intake.setState(IntakeStates.INTAKING);
+								},
+								m_Intake)
+						.repeatedly()
+						.finallyDo(
+								() -> {
+									m_Intake.setState(IntakeStates.DEFAULT);
+								}));
 
 		// Turret testing binds
 		// m_Operator.leftBumper.whileTrue(

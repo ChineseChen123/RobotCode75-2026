@@ -69,7 +69,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 					.withDriveRequestType(DriveRequestType.OpenLoopVoltage)
 					.withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
-	private final SwerveRequest.ApplyFieldSpeeds closedLoopRequest = 
+	private final SwerveRequest.ApplyFieldSpeeds closedLoopRequest =
 			new SwerveRequest.ApplyFieldSpeeds()
 					.withDriveRequestType(DriveRequestType.Velocity)
 					.withSteerRequestType(SteerRequestType.MotionMagicExpo);

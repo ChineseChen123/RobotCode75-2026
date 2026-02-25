@@ -25,20 +25,18 @@ public class FieldConstants {
 
 	public static final Distance hubEntranceHeight = Feet.of(6);
 
-
 	// TODO: fill values
-	public static final Pose2d blueBumpLeft = 
+	public static final Pose2d blueBumpLeft =
 			new Pose2d(Meters.of(0), Meters.of(0), Rotation2d.kZero);
-	public static final Pose2d blueBumpRight= 
-			new Pose2d(Meters.of(0), Meters.of(0), Rotation2d.kZero);
-
-	public static final Pose2d redBumpLeft = 
-			new Pose2d(Meters.of(0), Meters.of(0), Rotation2d.kZero);
-	public static final Pose2d redBumpRight = 
+	public static final Pose2d blueBumpRight =
 			new Pose2d(Meters.of(0), Meters.of(0), Rotation2d.kZero);
 
-	public static final Distance bumpWidth = Feet.of(0); // like not left to right but like forward and back
-	public static final Distance bumpLength = Feet.of(0); // like not left to right but like forward and back
+	public static final Pose2d redBumpLeft = new Pose2d(Meters.of(0), Meters.of(0), Rotation2d.kZero);
+	public static final Pose2d redBumpRight =
+			new Pose2d(Meters.of(0), Meters.of(0), Rotation2d.kZero);
 
-
+	public static final Distance bumpWidth =
+			Feet.of(0); // like not left to right but like forward and back
+	public static final Distance bumpLength =
+			Feet.of(0); // like not left to right but like forward and back
 }

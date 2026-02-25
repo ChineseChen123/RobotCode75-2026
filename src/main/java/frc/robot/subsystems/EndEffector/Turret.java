@@ -6,7 +6,6 @@ package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
-import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 import static frc.robot.Constants.ShooterTurretConstants.TurretConstants.*;
 
@@ -19,21 +18,17 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.PeddieBounds;
 import frc.lib.util.RaiderLog.Logged;
-import frc.lib.util.RaiderLog.RaiderLog;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.lib.util.ShooterPhysics;
 import frc.robot.Constants.ShooterTurretConstants;
 import frc.robot.Constants.ShooterTurretConstants.TurretConstants;
 import frc.robot.Constants.ShooterTurretConstants.TurretConstants.MotorConfigs;
 import frc.robot.state.RobotStates;
-import frc.robot.subsystems.EndEffector.Shooter.ShooterStates;
-
 import java.util.Optional;
 
 public class Turret extends SubsystemBase {
@@ -217,43 +212,18 @@ public class Turret extends SubsystemBase {
 		return getTurretState() == TurretStates.STOWED && atTargetHeading();
 	}
 
-
 	@Logged(key = "Turret Pose", importance = Importance.CRITICAL)
 	public Pose2d getTurretPose() {
 		Pose2d pose = RobotStates.robotPose.get();
 		if (!isReset) {
 			return pose;
 		}
-		// Rotation2d robotHeading = pose.getRotation();
-		Rotation2d robotHeading = new Rotation2d(heading);
+		Rotation2d robotHeading = pose.getRotation();
+		Angle turretHeading = getPositionFromMotor();
 
-		// Angle turretHeading = getPositionFromMotor();
-		Angle turretHeading = turretTargetAngle;
-		Translation2d translation =
-				pose.getTranslation()
-						.plus(
-								new Translation2d(
-										turretPositionOffset.getNorm(),
-										robotHeading.plus(turretPositionOffset.getAngle())));
+		Translation2d translation = pose.transformBy(turretPositionOffset).getTranslation();
 		Rotation2d rotation = robotHeading.plus(new Rotation2d(turretHeading));
 		return new Pose2d(translation, rotation);
-	}
-
-	private Angle heading = Degrees.of(0);
-
-	public void changeHeading(Angle amount) {
-		heading = heading.plus(amount);
-	}
-
-	@Logged(key = "Sim Robot Heading", importance = Importance.DEBUG)
-	public double headingDegrees() {
-		return heading.in(Degrees);
-	}
-
-	@Logged(key = "Sim Robot Pose", importance = Importance.DEBUG)
-	public Pose2d simRobotPose() {
-		Pose2d pose = RobotStates.robotPose.get();
-		return new Pose2d(pose.getTranslation(), pose.getRotation().plus(new Rotation2d(heading)));
 	}
 
 	@Logged(key = "Hub Pose", importance = Importance.DEBUG)
@@ -281,10 +251,9 @@ public class Turret extends SubsystemBase {
 				new Rotation2d(
 						targetHubPose.getTranslation().getX() - turretPose.getTranslation().getX(),
 						targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
-		// Angle turretTarget =
-		// 		fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
 
-		Angle turretTarget = fieldRelativeToHub.getMeasure().minus(heading);
+		Angle turretTarget =
+				fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
 
 		double angleDeg = turretTarget.in(Degrees);
 		// Wrap angle to [-180, 180)
@@ -304,9 +273,8 @@ public class Turret extends SubsystemBase {
 					new Rotation2d(
 							targetHubPose.getTranslation().getX() - turretPose.getTranslation().getX(),
 							targetHubPose.getTranslation().getY() - turretPose.getTranslation().getY());
-			// turretTarget =
-			// 		fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
-			turretTarget = fieldRelativeToHub.getMeasure().minus(heading);
+			turretTarget =
+					fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
 			angleDeg = turretTarget.in(Degrees); // (-180,180)
 			angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
 			angleDeg -= 180;
@@ -347,12 +315,6 @@ public class Turret extends SubsystemBase {
 			m_TurretMotor.getConfigurator().apply(turretConfigs);
 		}
 
-		// turretTargetAngle = Degrees.of(turretTarget.getNumber());
-		// m_TurretMotor.setControl(turretRequest.withPosition(Rotations.of(turretTarget.getNumber() /
-		// 360.0)));
-
-		RaiderLog.logOutput("Turret Voltage", m_TurretMotor.getClosedLoopOutput().getValueAsDouble());
-
 		switch (m_TurretState) {
 			case STOWED:
 				turretTargetAngle = TurretConstants.turretStowAngle;
@@ -363,7 +325,6 @@ public class Turret extends SubsystemBase {
 			case FEEDING: // TODO: implement probably with peddie bounds
 				break;
 		}
-
 
 		if (turretTarget.getNumber() != 0) {
 			m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngle));
