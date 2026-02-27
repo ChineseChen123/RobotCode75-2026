@@ -34,6 +34,7 @@ import java.util.Optional;
 public class Turret extends SubsystemBase {
 	public enum TurretStates {
 		STOWED,
+		IDLE,
 		SCORING,
 		FEEDING;
 	}
@@ -63,7 +64,8 @@ public class Turret extends SubsystemBase {
 	public Turret() {
 		m_TurretMotor = new TalonFX(turretMotorCanID, superstructureCANBusName);
 
-		m_TurretState = TurretStates.STOWED;
+		// m_TurretState = TurretStates.STOWED;
+		m_TurretState = TurretStates.IDLE;
 
 		m_TurretEncoder1 = new DutyCycleEncoder(encoder1Port, 1, 0);
 		m_TurretEncoder2 = new DutyCycleEncoder(encoder2Port, 1, 0);
@@ -228,7 +230,12 @@ public class Turret extends SubsystemBase {
 
 	@Logged(key = "Hub Pose", importance = Importance.DEBUG)
 	public Pose2d getHubPose() {
-		return PeddieBounds.getHubTarget();
+		return ShooterTurretConstants.useVirtualTarget
+				? ShooterPhysics.getVirtualTarget(
+						RobotStates.robotPose.get(),
+						RobotStates.fieldRelativeSpeeds.get(),
+						ShooterTurretConstants.virtualTargetSolveIterations)
+				: PeddieBounds.getHubTarget();
 	}
 
 	// virtual target
@@ -276,6 +283,7 @@ public class Turret extends SubsystemBase {
 			turretTarget =
 					fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
 			angleDeg = turretTarget.in(Degrees); // (-180,180)
+			angleDeg += 180;
 			angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
 			angleDeg -= 180;
 		}
@@ -317,19 +325,18 @@ public class Turret extends SubsystemBase {
 
 		switch (m_TurretState) {
 			case STOWED:
-				turretTargetAngle = TurretConstants.turretStowAngle;
+				m_TurretMotor.setControl(turretRequest.withPosition(TurretConstants.turretStowAngle));
+				break;
+			case IDLE:
+				updateTurretTarget();
+				m_TurretMotor.setControl(new CoastOut());
 				break;
 			case SCORING:
 				updateTurretTarget();
+				m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngle));
 				break;
 			case FEEDING: // TODO: implement probably with peddie bounds
 				break;
-		}
-
-		if (turretTarget.getNumber() != 0) {
-			m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngle));
-		} else {
-			m_TurretMotor.setControl(new CoastOut());
 		}
 	}
 }

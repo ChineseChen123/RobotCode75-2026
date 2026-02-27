@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.Vision;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.robot.Constants.VisionConstants.*;
@@ -15,7 +16,6 @@ import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.LimelightHelpers;
-import frc.robot.RobotContainer;
 import frc.robot.state.RobotStates;
 
 public class Limelight extends SubsystemBase {
@@ -40,24 +40,29 @@ public class Limelight extends SubsystemBase {
 				llPose.getX(),
 				llPose.getY(),
 				llPose.getZ(),
-				llPose.getRotation().getX(),
-				llPose.getRotation().getY(),
-				llPose.getRotation().getZ());
+				llPose.getRotation().getMeasureX().in(Degrees),
+				llPose.getRotation().getMeasureY().in(Degrees),
+				llPose.getRotation().getMeasureZ().in(Degrees));
 	}
 
 	public void resetInternalIMU() {
 		LimelightHelpers.SetIMUMode(llName, 1);
-		LimelightHelpers.SetRobotOrientation(
-				llName, RobotContainer.getSwerve().getHeading().getDegrees() + 180, 0, 0, 0, 0, 0);
-		LimelightHelpers.SetIMUMode(llName, 2);
+		updateIMU();
+		LimelightHelpers.SetIMUMode(llName, 4);
 		System.out.println("Limelight IMU reset");
 		isIMUReset = true;
+	}
+
+	public void updateIMU() {
+		LimelightHelpers.SetRobotOrientation(
+				llName, RobotStates.robotHeading.get().getDegrees(), 0, 0, 0, 0, 0);
 	}
 
 	public LimelightHelpers.PoseEstimate getEstimatedPose() {
 		if (!isIMUReset) {
 			resetInternalIMU();
 		}
+
 		LimelightHelpers.PoseEstimate mt2Estimate =
 				LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(llName);
 		if (mt2Estimate == null || mt2Estimate.tagCount == 0) {
@@ -117,5 +122,7 @@ public class Limelight extends SubsystemBase {
 	}
 
 	@Override
-	public void periodic() {}
+	public void periodic() {
+		updateIMU();
+	}
 }

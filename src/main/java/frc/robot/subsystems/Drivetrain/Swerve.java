@@ -314,6 +314,9 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 							setPose(
 									new Pose2d(
 											getPose().getX(), getPose().getY(), Rotation2d.fromDegrees(targetAngle)));
+							for (Limelight limelight : RobotContainer.getLimelights()) {
+								limelight.resetInternalIMU();
+							}
 						})
 				.repeatedly()
 				.until(() -> getPose().getRotation().getDegrees() == targetAngle)

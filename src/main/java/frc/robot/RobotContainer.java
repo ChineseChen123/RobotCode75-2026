@@ -26,6 +26,7 @@ import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
 import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Shooter.ShooterStates;
 import frc.robot.subsystems.EndEffector.Turret;
+import frc.robot.subsystems.EndEffector.Turret.TurretStates;
 import frc.robot.subsystems.Vision.Limelight;
 
 public class RobotContainer {
@@ -78,6 +79,7 @@ public class RobotContainer {
 		RaiderLog.register("Shooter", m_Shooter);
 		RaiderLog.register("Turret", m_Turret);
 		RaiderLog.register("Limelight TR", m_LimelightTR);
+		RaiderLog.register("Limelight TL", m_LimelightTL);
 		// RaiderLog.register("Indexer", m_Indexer);
 	}
 
@@ -116,6 +118,15 @@ public class RobotContainer {
 								() -> {
 									m_Intake.setState(IntakeStates.DEFAULT);
 								}));
+
+		m_Operator.B.whileTrue(
+				new InstantCommand(
+								() -> {
+									m_Turret.setState(TurretStates.SCORING);
+								},
+								m_Turret)
+						.repeatedly()
+						.finallyDo(() -> m_Turret.setState(TurretStates.IDLE)));
 
 		// Turret testing binds
 		// m_Operator.leftBumper.whileTrue(

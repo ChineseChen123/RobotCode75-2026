@@ -61,7 +61,7 @@ public class ShooterTurretConstants {
 						* (shooterWheelRadius.in(Inches)
 								* shooterWheelRadius.in(Inches)); // in^2 / lbs, 1/2mr^2 approx.
 		public static final double ballWeight = .474; // lbs
-		public static final Angle shooterAngleWithHorizontal = Degrees.of(12);
+		public static final Angle shooterAngleWithVertical = Degrees.of(12);
 		public static final Distance shooterHeight = Inches.of(19.5);
 
 		public static final class MotorConfigs {
@@ -151,8 +151,8 @@ public class ShooterTurretConstants {
 		public static final Angle turretStowAngle = Degrees.of(-90);
 
 		// at CW limit
-		public static final Angle encoder1ZeroPoint = Degrees.of(91.6);
-		public static final Angle encoder2ZeroPoint = Degrees.of(62.8);
+		public static final Angle encoder1ZeroPoint = Degrees.of(268.0);
+		public static final Angle encoder2ZeroPoint = Degrees.of(61.2);
 
 		// discrepancy threshold between encoders to accept solution
 		public static final Angle matchTolerance = Degrees.of(10);

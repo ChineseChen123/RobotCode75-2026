@@ -37,7 +37,7 @@ public class IntakeIndexConstants {
 		public static final double pivotToleranceAbsolute = 0.05; // rotations // TODO figure out
 
 		// TODO figure out
-		public static final Angle pivotDownAngle = Rotations.of(-0.005);
+		public static final Angle pivotDownAngle = Rotations.of(-0.04);
 		public static final Angle pivotHalfwayAngle = Rotations.of(0.21);
 		public static final Angle pivotUpAngle = Rotations.of(0.4);
 

@@ -101,16 +101,21 @@ public class ShooterPhysics {
 
 		Translation2d turretPose = robotPose.transformBy(turretPositionOffset).getTranslation();
 
-		AngularVelocity shooterVelocity =
-				distanceToAngularVelocity(turretPose.getDistance(targetHubPose.getTranslation()));
-		LinearVelocity projectileSpeed = shooterAngularVelocityToLinearVelocity(shooterVelocity);
+		// AngularVelocity shooterVelocity =
+		// 		distanceToAngularVelocity(turretPose.getDistance(targetHubPose.getTranslation()));
+		// LinearVelocity projectileSpeed = shooterAngularVelocityToLinearVelocity(shooterVelocity);
+
+		double distToHub = turretPose.getDistance(targetHubPose.getTranslation());
+		double maxDistToHub = 6;
+		LinearVelocity maxLinearVelocity = MetersPerSecond.of(10);
+
+		LinearVelocity projectileSpeed = maxLinearVelocity.times(distToHub / maxDistToHub);
 
 		// gravity in inches/sec^2
 		double g = 386.09;
 		LinearVelocity yComponent =
 				projectileSpeed.times(
-						Math.sin(
-								ShooterTurretConstants.ShooterConstants.shooterAngleWithHorizontal.in(Radians)));
+						Math.sin(ShooterTurretConstants.ShooterConstants.shooterAngleWithVertical.in(Radians)));
 		double yComponentInches = yComponent.in(InchesPerSecond);
 		double heightDiffInches =
 				FieldConstants.hubEntranceHeight.in(Inches)

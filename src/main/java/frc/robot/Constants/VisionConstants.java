@@ -23,7 +23,7 @@ public class VisionConstants {
 
 	/*
 	 * x - forward positive
-	 * y - left positive
+	 * y - right positive
 	 * z - up positive
 	 * pitch - up positive
 	 * yaw - counterclockwise positive
@@ -32,7 +32,7 @@ public class VisionConstants {
 	public static final Pose3d topLeftLLPose =
 			new Pose3d(
 					Units.inchesToMeters(12.1761),
-					Units.inchesToMeters(11.8696),
+					Units.inchesToMeters(-11.8696),
 					Units.inchesToMeters(8.27),
 					new Rotation3d(
 							Units.degreesToRadians(0), Units.degreesToRadians(18), Units.degreesToRadians(42.3)));
@@ -40,7 +40,7 @@ public class VisionConstants {
 	public static final Pose3d topRightLLPose =
 			new Pose3d(
 					Units.inchesToMeters(12.1761),
-					Units.inchesToMeters(-11.8696),
+					Units.inchesToMeters(11.8696),
 					Units.inchesToMeters(8.27),
 					new Rotation3d(
 							Units.degreesToRadians(0),
