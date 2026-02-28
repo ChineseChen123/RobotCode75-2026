@@ -7,11 +7,15 @@ package frc.robot;
 import static frc.robot.Constants.IOConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.RaiderLog.RaiderLog;
 import frc.robot.Constants.DrivetrainConstants;
@@ -91,54 +95,52 @@ public class RobotContainer {
 			m_Bindings.bind2Driver();
 		}
 
-		// Ball path test
-		m_Operator.Y.whileTrue(
-				new InstantCommand(
-								() -> {
-									m_Indexer.setState(IndexerStates.SHOOTING);
-									m_Shooter.setState(ShooterStates.SHOOTING);
-								},
-								m_Shooter,
-								m_Indexer)
-						.repeatedly()
-						.finallyDo(
-								() -> {
-									m_Indexer.setState(IndexerStates.DEFAULT);
-									m_Shooter.setState(ShooterStates.DEFAULT);
-								}));
+		m_Operator.leftBumper.onTrue(Commands.runOnce(SignalLogger::start));
+		m_Operator.rightBumper.onTrue(Commands.runOnce(SignalLogger::stop));
 
-		m_Operator.A.whileTrue(
-				new InstantCommand(
-								() -> {
-									m_Intake.setState(IntakeStates.INTAKING);
-								},
-								m_Intake)
-						.repeatedly()
-						.finallyDo(
-								() -> {
-									m_Intake.setState(IntakeStates.DEFAULT);
-								}));
+		m_Operator.Y.whileTrue(m_Shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+		m_Operator.A.whileTrue(m_Shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+		m_Operator.B.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
+		m_Operator.X.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-		m_Operator.B.whileTrue(
-				new InstantCommand(
-								() -> {
-									m_Turret.setState(TurretStates.SCORING);
-								},
-								m_Turret)
-						.repeatedly()
-						.finallyDo(() -> m_Turret.setState(TurretStates.IDLE)));
-
-		// Turret testing binds
-		// m_Operator.leftBumper.whileTrue(
-		// 		new InstantCommand(() -> m_Turret.changeHeading(Degrees.of(-1)), m_Turret).repeatedly());
-		// m_Operator.rightBumper.whileTrue(
-		// 		new InstantCommand(() -> m_Turret.changeHeading(Degrees.of(1)), m_Turret).repeatedly());
-
-		// Shooter testing binds
+		// // shoot
 		// m_Operator.Y.whileTrue(
-		// 	new InstantCommand(() -> m_Shooter.setState(ShooterStates.SHOOTING), m_Shooter).repeatedly()
-		// 			.finallyDo(() -> m_Shooter.setState(ShooterStates.DEFAULT))
-		// );
+		// 		new InstantCommand(
+		// 						() -> {
+		// 							m_Indexer.setState(IndexerStates.SHOOTING);
+		// 							m_Shooter.setState(ShooterStates.SHOOTING);
+		// 						},
+		// 						m_Shooter,
+		// 						m_Indexer)
+		// 				.repeatedly()
+		// 				.finallyDo(
+		// 						() -> {
+		// 							m_Indexer.setState(IndexerStates.DEFAULT);
+		// 							m_Shooter.setState(ShooterStates.DEFAULT);
+		// 						}));
+
+		// // intake
+		// m_Operator.A.whileTrue(
+		// 		new InstantCommand(
+		// 						() -> {
+		// 							m_Intake.setState(IntakeStates.INTAKING);
+		// 						},
+		// 						m_Intake)
+		// 				.repeatedly()
+		// 				.finallyDo(
+		// 						() -> {
+		// 							m_Intake.setState(IntakeStates.DEFAULT);
+		// 						}));
+
+		// // aim turret
+		// m_Operator.B.whileTrue(
+		// 		new InstantCommand(
+		// 						() -> {
+		// 							m_Turret.setState(TurretStates.SCORING);
+		// 						},
+		// 						m_Turret)
+		// 				.repeatedly()
+		// 				.finallyDo(() -> m_Turret.setState(TurretStates.IDLE)));
 	}
 
 	// Configure auto selector
@@ -176,7 +178,6 @@ public class RobotContainer {
 
 	public static Limelight[] getLimelights() {
 		return new Limelight[] {m_LimelightTL, m_LimelightTR};
-		// return new Limelight[] {};
 	}
 
 	public static Driver getDriver() {

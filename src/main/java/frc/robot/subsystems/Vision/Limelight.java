@@ -72,19 +72,13 @@ public class Limelight extends SubsystemBase {
 		minAmbiguity = Double.MAX_VALUE;
 		LimelightHelpers.RawFiducial[] detectedTags = mt2Estimate.rawFiducials;
 		for (LimelightHelpers.RawFiducial tag : detectedTags) {
-			// // discard result if tag is too far or too small
-			// if (tag.distToRobot > maxTagDistanceThreshold || tag.ta < minTagAreaThreshold) {
-			// 	return null;
-			// }
-			// // discard result if too ambiguous
-			// if (mt2Estimate.tagCount == 1 && tag.ambiguity > ambiguityThreshold) {
-			// 	return null;
-			// }
-			// if (mt2Estimate.tagCount > 1 && tag.ambiguity > multiTagAmbiguityThreshold) {
-			// 	return null;
-			// }
 			minAmbiguity = Math.min(minAmbiguity, tag.ambiguity);
 		}
+
+		// if (minAmbiguity > minAmbiguityThreshold) {
+		// 	return null;
+		// }
+
 		return mt2Estimate;
 	}
 
@@ -95,6 +89,11 @@ public class Limelight extends SubsystemBase {
 			return pose.pose;
 		}
 		return new Pose2d();
+	}
+
+	@Logged(key = "Min Ambiguity", importance = Importance.DEBUG)
+	public double minAmbiguity() {
+		return minAmbiguity;
 	}
 
 	public double getFOM(LimelightHelpers.PoseEstimate pose) {

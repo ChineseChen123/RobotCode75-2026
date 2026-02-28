@@ -5,15 +5,20 @@
 package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.IntakeIndexConstants.IndexerConstants.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
@@ -46,6 +51,8 @@ public class Indexer extends SubsystemBase {
 	private final VelocityTorqueCurrentFOC m_IndexerRequest = new VelocityTorqueCurrentFOC(0);
 	private final VelocityTorqueCurrentFOC m_HopperRequest = new VelocityTorqueCurrentFOC(0);
 
+	private final VoltageOut m_sysIdRequest = new VoltageOut(0.0);
+
 	private final Slot0Configs indexerConfigs = new Slot0Configs();
 	private final TunableNumber indexerKp =
 			new TunableNumber("Indexer/Kp", MotorConfigs.indexerVelocityKP);
@@ -66,6 +73,8 @@ public class Indexer extends SubsystemBase {
 			new TunableNumber("Indexer/IndexerSpeed", defaultIndexerSpeed.in(RotationsPerSecond));
 	private final TunableNumber hopperSpeed =
 			new TunableNumber("Hopper/HopperSpeed", defaultHopperSpeed.in(RotationsPerSecond));
+
+	private final SysIdRoutine m_sysIdRoutine;
 
 	public Indexer() {
 		m_IndexerMotor = new TalonFX(indexerMotorCanID, superstructureCANBusName);
@@ -91,6 +100,31 @@ public class Indexer extends SubsystemBase {
 				.withKP(MotorConfigs.hopperVelocityKP)
 				.withKD(MotorConfigs.hopperVelocityKD)
 				.withKS(MotorConfigs.hopperVelocityKS);
+
+		m_sysIdRoutine = new SysIdRoutine(
+			new SysIdRoutine.Config(
+				null,        // Use default ramp rate (1 V/s)
+				Volts.of(4), // Reduce dynamic step voltage to 4 to prevent brownout
+				null,        // Use default timeout (10 s)
+							// Log state with Phoenix SignalLogger class
+				(state) -> SignalLogger.writeString("state", state.toString())
+			),
+			new SysIdRoutine.Mechanism(
+				(volts) -> {
+					m_IndexerMotor.setControl(m_sysIdRequest.withOutput(volts.in(Volts)));
+				},
+				null,
+				this
+			)
+		);
+	}
+
+	public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+		return m_sysIdRoutine.quasistatic(direction);
+	}
+
+	public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+		return m_sysIdRoutine.dynamic(direction);
 	}
 
 	public boolean hasFuel() {

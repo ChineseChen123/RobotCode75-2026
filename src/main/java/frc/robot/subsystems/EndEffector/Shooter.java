@@ -5,9 +5,11 @@
 package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 import static frc.robot.Constants.ShooterTurretConstants.ShooterConstants.*;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.Follower;
@@ -16,7 +18,9 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
@@ -44,7 +48,7 @@ public class Shooter extends SubsystemBase {
 	private final VelocityTorqueCurrentFOC m_VelocityRequest;
 	private final Follower m_FollowerRequest;
 
-	private final VoltageOut m_voltReq = new VoltageOut(0.0);
+	private final VoltageOut m_sysIdRequest = new VoltageOut(0.0);
 
 	private final Slot0Configs shooterPIDConfigs = new Slot0Configs();
 	private final TunableNumber shooterKp;
@@ -53,6 +57,8 @@ public class Shooter extends SubsystemBase {
 	private final TunableNumber shooterKs;
 
 	private final TunableNumber targetSpeed;
+
+	private final SysIdRoutine m_sysIdRoutine;
 
 	public Shooter() {
 		m_ShooterMotor1 = new TalonFX(shooterMotor1CanID, superstructureCANBusName);
@@ -80,6 +86,32 @@ public class Shooter extends SubsystemBase {
 
 		m_VelocityRequest.UpdateFreqHz = 0;
 		m_VelocityRequest.UseTimesync = true;
+
+		m_sysIdRoutine = new SysIdRoutine(
+			new SysIdRoutine.Config(
+				null,        // Use default ramp rate (1 V/s)
+				Volts.of(4), // Reduce dynamic step voltage to 4 to prevent brownout
+				null,        // Use default timeout (10 s)
+							// Log state with Phoenix SignalLogger class
+				(state) -> SignalLogger.writeString("state", state.toString())
+			),
+			new SysIdRoutine.Mechanism(
+				(volts) -> {
+					m_ShooterMotor1.setControl(m_sysIdRequest.withOutput(volts.in(Volts)));
+					m_ShooterMotor2.setControl(m_FollowerRequest);
+				},
+				null,
+				this
+			)
+		);
+	}
+
+	public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+		return m_sysIdRoutine.quasistatic(direction);
+	}
+
+	public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+		return m_sysIdRoutine.dynamic(direction);
 	}
 
 	@Logged(key = "Shooter Velocity RPM", importance = Importance.CRITICAL)
@@ -111,15 +143,15 @@ public class Shooter extends SubsystemBase {
 	@Override
 	public void periodic() {
 
-		if (m_ShooterState == ShooterStates.SHOOTING) {
-			m_ShooterMotor1.setControl(
-					m_VelocityRequest.withVelocity(RotationsPerSecond.of(targetSpeed.getNumber() / 60)));
-			m_ShooterMotor2.setControl(m_FollowerRequest);
-			shooterTargetVelocity = RotationsPerSecond.of(targetSpeed.getNumber() / 60);
-		} else {
-			m_ShooterMotor1.setControl(new CoastOut());
-			m_ShooterMotor2.setControl(m_FollowerRequest);
-		}
+		// if (m_ShooterState == ShooterStates.SHOOTING) {
+		// 	m_ShooterMotor1.setControl(
+		// 			m_VelocityRequest.withVelocity(RotationsPerSecond.of(targetSpeed.getNumber() / 60)));
+		// 	m_ShooterMotor2.setControl(m_FollowerRequest);
+		// 	shooterTargetVelocity = RotationsPerSecond.of(targetSpeed.getNumber() / 60);
+		// } else {
+		// 	m_ShooterMotor1.setControl(new CoastOut());
+		// 	m_ShooterMotor2.setControl(m_FollowerRequest);
+		// }
 
 		if (shooterKp.getNumber() != shooterPIDConfigs.kP
 				|| shooterKi.getNumber() != shooterPIDConfigs.kI

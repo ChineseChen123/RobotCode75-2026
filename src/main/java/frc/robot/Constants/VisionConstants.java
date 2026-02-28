@@ -52,9 +52,6 @@ public class VisionConstants {
 	};
 
 	// Thresholds for filtering out vision odometry estimates
-	public static final double minTagAreaThreshold = 0.15;
 	public static final double maxTagDistanceThreshold = 1.5;
-	public static final double ambiguityThreshold = 0.15;
-	public static final double multiTagAmbiguityThreshold = 0.3;
-	public static final double reprojectionErrorThreshold = 0.5;
+	public static final double minAmbiguityThreshold = 0.15;
 }
