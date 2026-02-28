@@ -51,11 +51,10 @@ import java.util.Map;
  */
 
 /* ACTIONS
- * 1 - shoot while moving (no end condition)
- * 2 - auto intake (including driving)
- * 3 - intake from depot
- * 4 - wait for outpost
- * 5 - feed while intaking (including driving)
+ * 1 - start shooting/turret aligning
+ * 2 - end shooting/turret aligning
+ * 3 - run intake (including driving)
+ * 4 - intake from depot
  */
 
 /* POINTS
