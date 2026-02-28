@@ -95,52 +95,60 @@ public class RobotContainer {
 			m_Bindings.bind2Driver();
 		}
 
-		m_Operator.leftBumper.onTrue(Commands.runOnce(SignalLogger::start));
-		m_Operator.rightBumper.onTrue(Commands.runOnce(SignalLogger::stop));
+		// m_Operator.leftBumper.onTrue(Commands.runOnce(SignalLogger::start));
+		// m_Operator.rightBumper.onTrue(Commands.runOnce(SignalLogger::stop));
 
-		m_Operator.Y.whileTrue(m_Shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-		m_Operator.A.whileTrue(m_Shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-		m_Operator.B.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
-		m_Operator.X.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+		// m_Operator.Y.whileTrue(m_Shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+		// m_Operator.A.whileTrue(m_Shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+		// m_Operator.B.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
+		// m_Operator.X.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-		// // shoot
-		// m_Operator.Y.whileTrue(
-		// 		new InstantCommand(
-		// 						() -> {
-		// 							m_Indexer.setState(IndexerStates.SHOOTING);
-		// 							m_Shooter.setState(ShooterStates.SHOOTING);
-		// 						},
-		// 						m_Shooter,
-		// 						m_Indexer)
-		// 				.repeatedly()
-		// 				.finallyDo(
-		// 						() -> {
-		// 							m_Indexer.setState(IndexerStates.DEFAULT);
-		// 							m_Shooter.setState(ShooterStates.DEFAULT);
-		// 						}));
+		m_Operator.rightTriggerGreater(0.15).whileTrue(new InstantCommand(
+								() -> {
+									m_Shooter.setState(ShooterStates.SHOOTING);
+								},
+								m_Shooter)
+						.repeatedly()
+						.finallyDo(
+								() -> {
+									m_Shooter.setState(ShooterStates.DEFAULT);
+								}));
+		
+		// shoot
+		m_Operator.Y.whileTrue(
+				new InstantCommand(
+								() -> {
+									m_Indexer.setState(IndexerStates.SHOOTING);
+								},
+								m_Indexer)
+						.repeatedly()
+						.finallyDo(
+								() -> {
+									m_Indexer.setState(IndexerStates.DEFAULT);
+								}));
 
-		// // intake
-		// m_Operator.A.whileTrue(
-		// 		new InstantCommand(
-		// 						() -> {
-		// 							m_Intake.setState(IntakeStates.INTAKING);
-		// 						},
-		// 						m_Intake)
-		// 				.repeatedly()
-		// 				.finallyDo(
-		// 						() -> {
-		// 							m_Intake.setState(IntakeStates.DEFAULT);
-		// 						}));
+		// intake
+		m_Operator.A.whileTrue(
+				new InstantCommand(
+								() -> {
+									m_Intake.setState(IntakeStates.INTAKING);
+								},
+								m_Intake)
+						.repeatedly()
+						.finallyDo(
+								() -> {
+									m_Intake.setState(IntakeStates.DEFAULT);
+								}));
 
-		// // aim turret
-		// m_Operator.B.whileTrue(
-		// 		new InstantCommand(
-		// 						() -> {
-		// 							m_Turret.setState(TurretStates.SCORING);
-		// 						},
-		// 						m_Turret)
-		// 				.repeatedly()
-		// 				.finallyDo(() -> m_Turret.setState(TurretStates.IDLE)));
+		// aim turret
+		m_Operator.B.whileTrue(
+				new InstantCommand(
+								() -> {
+									m_Turret.setState(TurretStates.SCORING);
+								},
+								m_Turret)
+						.repeatedly()
+						.finallyDo(() -> m_Turret.setState(TurretStates.IDLE)));
 	}
 
 	// Configure auto selector

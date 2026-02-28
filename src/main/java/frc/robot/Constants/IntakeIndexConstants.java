@@ -38,11 +38,11 @@ public class IntakeIndexConstants {
 
 		// TODO figure out
 		public static final Angle pivotDownAngle = Rotations.of(-0.04);
-		public static final Angle pivotHalfwayAngle = Rotations.of(0.21);
+		public static final Angle pivotHalfwayAngle = Rotations.of(0.12);
 		public static final Angle pivotUpAngle = Rotations.of(0.4);
 
 		public static final AngularVelocity defaultIntakeSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(30);
+		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(40);
 		public static final AngularVelocity intakeReversingSpeed = RotationsPerSecond.of(-30);
 
 		public static final class MotorConfigs {

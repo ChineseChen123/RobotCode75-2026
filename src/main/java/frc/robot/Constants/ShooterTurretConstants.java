@@ -39,7 +39,7 @@ public class ShooterTurretConstants {
 		public static final int shooterMotor1CanID = 41;
 		public static final int shooterMotor2CanID = 42;
 
-		public static final double shooterGearRatio = 1.0; // 1.5 / 1.0
+		public static final double shooterGearRatio = 1.5;
 
 		public static final Distance shooterWheelDiameter = Inches.of(4);
 
@@ -61,8 +61,13 @@ public class ShooterTurretConstants {
 						* (shooterWheelRadius.in(Inches)
 								* shooterWheelRadius.in(Inches)); // in^2 / lbs, 1/2mr^2 approx.
 		public static final double ballWeight = .474; // lbs
-		public static final Angle shooterAngleWithVertical = Degrees.of(12);
+		public static final Angle shooterAngleWithVertical = Degrees.of(25);
 		public static final Distance shooterHeight = Inches.of(19.5);
+
+		// A*sqrt(x - C) + B
+		public static final double shooterRegressionA = 689.82535;
+		public static final double shooterRegressionB = 2331.78032;
+		public static final double shooterRegressionC = 2.1;
 
 		public static final class MotorConfigs {
 
@@ -86,10 +91,12 @@ public class ShooterTurretConstants {
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double shooterMotorVelocityKP = 25;
+			public static final double shooterMotorVelocityKP = 35;
 			public static final double shooterMotorVelocityKI = 0.0;
 			public static final double shooterMotorVelocityKD = 0.0;
-			public static final double shooterMotorVelocityKS = 0.3;
+			public static final double shooterMotorVelocityKS = 0.45181;
+			public static final double shooterMotorVelocityKV = 0.25;
+			public static final double shooterMotorVelocityKA = 0.011491;
 
 			public static TalonFXConfiguration getShooterMotorConfiguration() {
 
@@ -151,8 +158,8 @@ public class ShooterTurretConstants {
 		public static final Angle turretStowAngle = Degrees.of(-90);
 
 		// at CW limit
-		public static final Angle encoder1ZeroPoint = Degrees.of(268.0);
-		public static final Angle encoder2ZeroPoint = Degrees.of(61.2);
+		public static final Angle encoder1ZeroPoint = Degrees.of(191.0);
+		public static final Angle encoder2ZeroPoint = Degrees.of(166.2);
 
 		// discrepancy threshold between encoders to accept solution
 		public static final Angle matchTolerance = Degrees.of(10);

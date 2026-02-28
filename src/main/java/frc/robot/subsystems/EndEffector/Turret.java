@@ -12,6 +12,7 @@ import static frc.robot.Constants.ShooterTurretConstants.TurretConstants.*;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -329,7 +330,7 @@ public class Turret extends SubsystemBase {
 				break;
 			case IDLE:
 				updateTurretTarget();
-				m_TurretMotor.setControl(new CoastOut());
+				m_TurretMotor.setControl(new VoltageOut(0));
 				break;
 			case SCORING:
 				updateTurretTarget();

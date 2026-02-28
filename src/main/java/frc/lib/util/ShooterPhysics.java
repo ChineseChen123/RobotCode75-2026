@@ -5,7 +5,9 @@ import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+import static frc.robot.Constants.ShooterTurretConstants.ShooterConstants.*;
 import static frc.robot.Constants.ShooterTurretConstants.TurretConstants.turretPositionOffset;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,17 +26,21 @@ import frc.robot.state.RobotStates;
 public class ShooterPhysics {
 
 	public static AngularVelocity distanceToAngularVelocity(double distanceToHub) {
-		// calculate from best fit line
-		// will probably be A * sqrt(d) + B
-		// we should measure RPM -> Distance FIRST, get the quadratic relation (d = A(RPM - B)^2) and
-		// then invert
-		// we could also linearly interpolate over a lookup table
-		return null;
+		if (distanceToHub < 2.1082) {
+			return RotationsPerSecond.of(2650 / 60);
+		}
+		if (distanceToHub > 5.09905) {
+			return RotationsPerSecond.of(3515 / 60);
+		}
+		return RotationsPerSecond.of((shooterRegressionA
+				* Math.sqrt(distanceToHub - shooterRegressionC)
+				+ shooterRegressionB) / 60.0);
 	}
 
 	public static AngularVelocity calculateShooterSpeed(Pose2d robotPose, Pose2d targetHubPose) {
+		Translation2d turretPose = robotPose.transformBy(turretPositionOffset).getTranslation();
 		return distanceToAngularVelocity(
-				robotPose.getTranslation().getDistance(targetHubPose.getTranslation()));
+				turretPose.getDistance(targetHubPose.getTranslation()));
 	}
 
 	public static LinearVelocity shooterAngularVelocityToLinearVelocity(
@@ -101,15 +107,9 @@ public class ShooterPhysics {
 
 		Translation2d turretPose = robotPose.transformBy(turretPositionOffset).getTranslation();
 
-		// AngularVelocity shooterVelocity =
-		// 		distanceToAngularVelocity(turretPose.getDistance(targetHubPose.getTranslation()));
-		// LinearVelocity projectileSpeed = shooterAngularVelocityToLinearVelocity(shooterVelocity);
-
-		double distToHub = turretPose.getDistance(targetHubPose.getTranslation());
-		double maxDistToHub = 6;
-		LinearVelocity maxLinearVelocity = MetersPerSecond.of(10);
-
-		LinearVelocity projectileSpeed = maxLinearVelocity.times(distToHub / maxDistToHub);
+		AngularVelocity shooterVelocity =
+				distanceToAngularVelocity(turretPose.getDistance(targetHubPose.getTranslation()));
+		LinearVelocity projectileSpeed = shooterAngularVelocityToLinearVelocity(shooterVelocity);
 
 		// gravity in inches/sec^2
 		double g = 386.09;

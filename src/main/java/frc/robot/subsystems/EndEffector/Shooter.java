@@ -17,14 +17,20 @@ import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.dashboard.TunableNumber;
+import frc.lib.util.PeddieBounds;
+import frc.lib.util.ShooterPhysics;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
+import frc.robot.Constants.ShooterTurretConstants;
 import frc.robot.Constants.ShooterTurretConstants.ShooterConstants.MotorConfigs;
+import frc.robot.state.RobotStates;
 
 public class Shooter extends SubsystemBase {
 	/** Creates a new Shooter. */
@@ -48,17 +54,12 @@ public class Shooter extends SubsystemBase {
 	private final VelocityTorqueCurrentFOC m_VelocityRequest;
 	private final Follower m_FollowerRequest;
 
-	private final VoltageOut m_sysIdRequest = new VoltageOut(0.0);
-
 	private final Slot0Configs shooterPIDConfigs = new Slot0Configs();
 	private final TunableNumber shooterKp;
-	private final TunableNumber shooterKi;
 	private final TunableNumber shooterKd;
-	private final TunableNumber shooterKs;
+	private final TunableNumber shooterKv;
 
 	private final TunableNumber targetSpeed;
-
-	private final SysIdRoutine m_sysIdRoutine;
 
 	public Shooter() {
 		m_ShooterMotor1 = new TalonFX(shooterMotor1CanID, superstructureCANBusName);
@@ -76,47 +77,27 @@ public class Shooter extends SubsystemBase {
 				.withKP(MotorConfigs.shooterMotorVelocityKP)
 				.withKI(MotorConfigs.shooterMotorVelocityKI)
 				.withKD(MotorConfigs.shooterMotorVelocityKD)
-				.withKS(MotorConfigs.shooterMotorVelocityKS);
+				.withKS(MotorConfigs.shooterMotorVelocityKS)
+				.withKV(MotorConfigs.shooterMotorVelocityKV)
+				.withKA(MotorConfigs.shooterMotorVelocityKA);
 
 		shooterKp = new TunableNumber("Shooter/Kp", MotorConfigs.shooterMotorVelocityKP);
-		shooterKi = new TunableNumber("Shooter/Ki", MotorConfigs.shooterMotorVelocityKI);
 		shooterKd = new TunableNumber("Shooter/Kd", MotorConfigs.shooterMotorVelocityKD);
-		shooterKs = new TunableNumber("Shooter/Ks", MotorConfigs.shooterMotorVelocityKS);
+		shooterKv = new TunableNumber("Shooter/Kv", MotorConfigs.shooterMotorVelocityKV);
 		targetSpeed = new TunableNumber("Shooter/Target Speed RPM", 0);
 
 		m_VelocityRequest.UpdateFreqHz = 0;
 		m_VelocityRequest.UseTimesync = true;
-
-		m_sysIdRoutine = new SysIdRoutine(
-			new SysIdRoutine.Config(
-				null,        // Use default ramp rate (1 V/s)
-				Volts.of(4), // Reduce dynamic step voltage to 4 to prevent brownout
-				null,        // Use default timeout (10 s)
-							// Log state with Phoenix SignalLogger class
-				(state) -> SignalLogger.writeString("state", state.toString())
-			),
-			new SysIdRoutine.Mechanism(
-				(volts) -> {
-					m_ShooterMotor1.setControl(m_sysIdRequest.withOutput(volts.in(Volts)));
-					m_ShooterMotor2.setControl(m_FollowerRequest);
-				},
-				null,
-				this
-			)
-		);
 	}
 
-	public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-		return m_sysIdRoutine.quasistatic(direction);
-	}
-
-	public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-		return m_sysIdRoutine.dynamic(direction);
-	}
-
-	@Logged(key = "Shooter Velocity RPM", importance = Importance.CRITICAL)
-	public double getVelocityRPM() {
+	@Logged(key = "Shooter Motor Velocity RPM", importance = Importance.CRITICAL)
+	public double getMotorVelocityRPM() {
 		return getVelocity().in(RotationsPerSecond) * 60;
+	}
+
+	@Logged(key = "Shooter Wheel Velocity RPM", importance = Importance.CRITICAL)
+	public double getWheelVelocityRPM() {
+		return getMotorVelocityRPM() * shooterGearRatio;
 	}
 
 	public AngularVelocity getVelocity() {
@@ -125,6 +106,11 @@ public class Shooter extends SubsystemBase {
 				.getValue()
 				.plus(m_ShooterMotor2.getVelocity(true).getValue())
 				.div(2);
+	}
+
+	@Logged(key = "Shooter Target Velocity RPM", importance = Importance.CRITICAL)
+	public double targetVelocityRPM() {
+		return shooterTargetVelocity.in(RotationsPerSecond) * 60;
 	}
 
 	public boolean atTargetVelocity() {
@@ -154,44 +140,41 @@ public class Shooter extends SubsystemBase {
 		// }
 
 		if (shooterKp.getNumber() != shooterPIDConfigs.kP
-				|| shooterKi.getNumber() != shooterPIDConfigs.kI
 				|| shooterKd.getNumber() != shooterPIDConfigs.kD
-				|| shooterKs.getNumber() != shooterPIDConfigs.kS) {
+				|| shooterKv.getNumber() != shooterPIDConfigs.kV) {
 			shooterPIDConfigs.kP = shooterKp.getNumber();
-			shooterPIDConfigs.kI = shooterKi.getNumber();
 			shooterPIDConfigs.kD = shooterKd.getNumber();
-			shooterPIDConfigs.kS = shooterKs.getNumber();
+			shooterPIDConfigs.kV = shooterKv.getNumber();
 			m_ShooterMotor1.getConfigurator().apply(shooterPIDConfigs);
 			m_ShooterMotor2.getConfigurator().apply(shooterPIDConfigs);
 		}
 
-		// if (m_ShooterState == ShooterStates.SHOOTING) {
-		// 	// // lookup table stuff
-		// 	// Pose2d targetHubPose = PeddieBounds.getHubTarget();
+		// lookup table stuff
+		Pose2d targetHubPose = PeddieBounds.getHubTarget();
 
-		// 	// // variable speeds
-		// 	// if (ShooterTurretConstants.useVirtualTarget) {
-		// 	// 	targetHubPose =
-		// 	// 			ShooterPhysics.getVirtualTarget(
-		// 	// 					RobotStates.robotPose.get(),
-		// 	// 					RobotStates.fieldRelativeSpeeds.get(),
-		// 	// 					ShooterTurretConstants.virtualTargetSolveIterations);
-		// 	// }
-		// 	// AngularVelocity velocity =
-		// 	// 		ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);
+		// variable speeds
+		if (ShooterTurretConstants.useVirtualTarget) {
+			targetHubPose =
+					ShooterPhysics.getVirtualTarget(
+							RobotStates.robotPose.get(),
+							RobotStates.fieldRelativeSpeeds.get(),
+							ShooterTurretConstants.virtualTargetSolveIterations);
+		}
+		AngularVelocity velocity =
+				ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);
+		shooterTargetVelocity = velocity;
 
-		// 	AngularVelocity velocity = RotationsPerSecond.of(3000 / 60);
+		if (m_ShooterState == ShooterStates.SHOOTING) {
 
-		// 	m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(velocity));
-		// 	m_ShooterMotor2.setControl(m_FollowerRequest);
-		// 	shooterTargetVelocity = velocity;
-		// } else if (m_ShooterState == ShooterStates.DEFAULT) {
-		// 	m_ShooterMotor1.setControl(new CoastOut());
-		// 	m_ShooterMotor2.setControl(m_FollowerRequest);
-		// } else {
-		// 	m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
-		// 	m_ShooterMotor2.setControl(m_FollowerRequest);
-		// 	shooterTargetVelocity = m_ShooterState.shooterSpeed;
-		// }
+			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(velocity));
+			m_ShooterMotor2.setControl(m_FollowerRequest);
+		} else if (m_ShooterState == ShooterStates.DEFAULT) {
+			m_ShooterMotor1.setControl(new CoastOut());
+			m_ShooterMotor2.setControl(m_FollowerRequest);
+		} else {
+			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
+			m_ShooterMotor2.setControl(m_FollowerRequest);
+			shooterTargetVelocity = m_ShooterState.shooterSpeed;
+		}
 	}
 }
