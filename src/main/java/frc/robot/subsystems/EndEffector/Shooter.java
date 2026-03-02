@@ -52,6 +52,7 @@ public class Shooter extends SubsystemBase {
 	private final TunableNumber shooterKp;
 	private final TunableNumber shooterKd;
 	private final TunableNumber shooterKv;
+	private final TunableNumber shooterKa;
 
 	private final TunableNumber targetSpeed;
 
@@ -78,6 +79,7 @@ public class Shooter extends SubsystemBase {
 		shooterKp = new TunableNumber("Shooter/Kp", MotorConfigs.shooterMotorVelocityKP);
 		shooterKd = new TunableNumber("Shooter/Kd", MotorConfigs.shooterMotorVelocityKD);
 		shooterKv = new TunableNumber("Shooter/Kv", MotorConfigs.shooterMotorVelocityKV);
+		shooterKa = new TunableNumber("Shooter/Ka", MotorConfigs.shooterMotorVelocityKA);
 		targetSpeed = new TunableNumber("Shooter/Target Speed RPM", 0);
 
 		m_VelocityRequest.UpdateFreqHz = 0;
@@ -135,10 +137,12 @@ public class Shooter extends SubsystemBase {
 
 		if (shooterKp.getNumber() != shooterPIDConfigs.kP
 				|| shooterKd.getNumber() != shooterPIDConfigs.kD
-				|| shooterKv.getNumber() != shooterPIDConfigs.kV) {
+				|| shooterKv.getNumber() != shooterPIDConfigs.kV
+				|| shooterKa.getNumber() != shooterPIDConfigs.kA) {
 			shooterPIDConfigs.kP = shooterKp.getNumber();
 			shooterPIDConfigs.kD = shooterKd.getNumber();
 			shooterPIDConfigs.kV = shooterKv.getNumber();
+			shooterPIDConfigs.kA = shooterKa.getNumber();
 			m_ShooterMotor1.getConfigurator().apply(shooterPIDConfigs);
 			m_ShooterMotor2.getConfigurator().apply(shooterPIDConfigs);
 		}
