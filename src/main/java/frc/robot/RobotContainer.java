@@ -7,15 +7,11 @@ package frc.robot;
 import static frc.robot.Constants.IOConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
-import com.ctre.phoenix6.SignalLogger;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.RaiderLog.RaiderLog;
 import frc.robot.Constants.DrivetrainConstants;
@@ -103,17 +99,20 @@ public class RobotContainer {
 		// m_Operator.B.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
 		// m_Operator.X.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-		m_Operator.rightTriggerGreater(0.15).whileTrue(new InstantCommand(
-								() -> {
-									m_Shooter.setState(ShooterStates.SHOOTING);
-								},
-								m_Shooter)
-						.repeatedly()
-						.finallyDo(
-								() -> {
-									m_Shooter.setState(ShooterStates.DEFAULT);
-								}));
-		
+		m_Operator
+				.rightTriggerGreater(0.15)
+				.whileTrue(
+						new InstantCommand(
+										() -> {
+											m_Shooter.setState(ShooterStates.SHOOTING);
+										},
+										m_Shooter)
+								.repeatedly()
+								.finallyDo(
+										() -> {
+											m_Shooter.setState(ShooterStates.DEFAULT);
+										}));
+
 		// shoot
 		m_Operator.Y.whileTrue(
 				new InstantCommand(
