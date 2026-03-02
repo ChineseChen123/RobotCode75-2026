@@ -163,16 +163,13 @@ public class Shooter extends SubsystemBase {
 		shooterTargetVelocity = velocity;
 
 		if (m_ShooterState == ShooterStates.SHOOTING) {
-
 			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(velocity));
-			m_ShooterMotor2.setControl(m_FollowerRequest);
 		} else if (m_ShooterState == ShooterStates.DEFAULT) {
 			m_ShooterMotor1.setControl(new CoastOut());
-			m_ShooterMotor2.setControl(m_FollowerRequest);
 		} else {
 			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
-			m_ShooterMotor2.setControl(m_FollowerRequest);
 			shooterTargetVelocity = m_ShooterState.shooterSpeed;
 		}
+		m_ShooterMotor2.setControl(m_FollowerRequest);
 	}
 }

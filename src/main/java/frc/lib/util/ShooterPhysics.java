@@ -24,7 +24,7 @@ import frc.robot.state.RobotStates;
 
 public class ShooterPhysics {
 
-	public static AngularVelocity distanceToMotorVelocity(double distanceToHub) {
+	public static AngularVelocity distanceToWheelAngularVelocity(double distanceToHub) {
 		if (distanceToHub < 2.1082) {
 			return RotationsPerSecond.of(2650 / 60);
 		}
@@ -38,15 +38,15 @@ public class ShooterPhysics {
 
 	public static AngularVelocity calculateShooterSpeed(Pose2d robotPose, Pose2d targetHubPose) {
 		Translation2d turretPose = robotPose.transformBy(turretPositionOffset).getTranslation();
-		return distanceToMotorVelocity(turretPose.getDistance(targetHubPose.getTranslation()));
+		return distanceToWheelAngularVelocity(turretPose.getDistance(targetHubPose.getTranslation()));
 	}
 
-	public static LinearVelocity motorVelocityToLinearVelocity(AngularVelocity shooterVelocity) {
+	public static LinearVelocity wheelAngularVelocityToLinearVelocity(AngularVelocity shooterVelocity) {
 		double totalMOI = flywheelMOI + shooterWheelMOI; // in^2 / lbs
 		double shooterWheelRadiusInches = (shooterWheelDiameter.in(Inches) / 2);
 		LinearVelocity surfaceWheelSpeed =
 				InchesPerSecond.of(
-						shooterVelocity.in(RadiansPerSecond) * shooterGearRatio * shooterWheelRadiusInches);
+						shooterVelocity.in(RadiansPerSecond) * shooterWheelRadiusInches);
 
 		// https://www.reca.lc/flywheel
 		double speedTransferPercentage =
@@ -57,7 +57,7 @@ public class ShooterPhysics {
 		return projectileSpeed;
 	}
 
-	public static AngularVelocity linearVelocityToMotorVelocity(LinearVelocity projectileSpeed) {
+	public static AngularVelocity linearVelocityToWheelAngularVelocity(LinearVelocity projectileSpeed) {
 
 		double totalMOI = flywheelMOI + shooterWheelMOI; // in^2 / lbs
 		double shooterWheelRadiusInches = (shooterWheelDiameter.in(Inches) / 2);
@@ -71,7 +71,7 @@ public class ShooterPhysics {
 
 		double angularVelocityRadPerSec = surfaceSpeedInchesPerSecond / shooterWheelRadiusInches;
 
-		return RadiansPerSecond.of(angularVelocityRadPerSec / shooterGearRatio);
+		return RadiansPerSecond.of(angularVelocityRadPerSec);
 	}
 
 	private static final double phaseDelay = 0.03;
@@ -91,8 +91,8 @@ public class ShooterPhysics {
 		Translation2d turretPose = robotPose.transformBy(turretPositionOffset).getTranslation();
 
 		AngularVelocity shooterVelocity =
-				distanceToMotorVelocity(turretPose.getDistance(targetHubPose.getTranslation()));
-		LinearVelocity projectileSpeed = motorVelocityToLinearVelocity(shooterVelocity);
+				distanceToWheelAngularVelocity(turretPose.getDistance(targetHubPose.getTranslation()));
+		LinearVelocity projectileSpeed = wheelAngularVelocityToLinearVelocity(shooterVelocity);
 
 		// gravity in inches/sec^2
 		double g = 386.09;

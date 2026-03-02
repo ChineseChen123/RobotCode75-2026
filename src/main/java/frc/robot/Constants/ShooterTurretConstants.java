@@ -46,7 +46,7 @@ public class ShooterTurretConstants {
 		public static final AngularVelocity defaultShooterSpeed = RotationsPerSecond.of(0);
 		public static final AngularVelocity reverseShooterSpeed = RotationsPerSecond.of(-10);
 
-		public static final double shooterVelocityTolerance = 50.0 / 60.0; // rotations per second
+		public static final double shooterVelocityTolerance = 100.0 / 60.0; // rotations per second
 
 		// Note that the flywheel MOI effective to the motors is multiplied by the gear ratio squared.
 		// <-- from recalc
@@ -71,7 +71,7 @@ public class ShooterTurretConstants {
 
 		public static final class MotorConfigs {
 
-			public static final TalonFXConfiguration m_shooterMotor1Config = new TalonFXConfiguration();
+			public static final TalonFXConfiguration m_shooterMotorConfig = new TalonFXConfiguration();
 			public static final TalonFXConfiguration m_shooterMotor2Config = new TalonFXConfiguration();
 
 			// Neutral modes and inverts
@@ -100,40 +100,42 @@ public class ShooterTurretConstants {
 
 			public static TalonFXConfiguration getShooterMotorConfiguration() {
 
-				m_shooterMotor1Config.MotorOutput.Inverted = shooterMotorInverted;
-				m_shooterMotor1Config.MotorOutput.NeutralMode = shooterMotorNeutralMode;
+				m_shooterMotorConfig.MotorOutput.Inverted = shooterMotorInverted;
+				m_shooterMotorConfig.MotorOutput.NeutralMode = shooterMotorNeutralMode;
 
-				m_shooterMotor1Config.Feedback.SensorToMechanismRatio = 1 / shooterGearRatio;
+				m_shooterMotorConfig.Feedback.SensorToMechanismRatio = 1 / shooterGearRatio;
 
 				// Current Limiting
-				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLimitEnable = true;
-				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLimit =
+				m_shooterMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+				m_shooterMotorConfig.CurrentLimits.SupplyCurrentLimit =
 						shooterMotorSupplyCurrentLimit.in(Amps);
-				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLowerTime =
+				m_shooterMotorConfig.CurrentLimits.SupplyCurrentLowerTime =
 						shooterMotorCurrentThresholdTime.in(Seconds);
-				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLowerLimit =
+				m_shooterMotorConfig.CurrentLimits.SupplyCurrentLowerLimit =
 						shooterMotorCurrentLowerThreshold.in(Amps);
-				m_shooterMotor1Config.CurrentLimits.StatorCurrentLimitEnable = true;
-				m_shooterMotor1Config.CurrentLimits.StatorCurrentLimit =
+				m_shooterMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+				m_shooterMotorConfig.CurrentLimits.StatorCurrentLimit =
 						shooterMotorStatorCurrentLimit.in(Amps);
 
 				// PID Config
-				m_shooterMotor1Config.Slot0.kP = shooterMotorVelocityKP;
-				m_shooterMotor1Config.Slot0.kI = shooterMotorVelocityKI;
-				m_shooterMotor1Config.Slot0.kD = shooterMotorVelocityKD;
-				m_shooterMotor1Config.Slot0.kS = shooterMotorVelocityKS;
+				m_shooterMotorConfig.Slot0.kP = shooterMotorVelocityKP;
+				m_shooterMotorConfig.Slot0.kI = shooterMotorVelocityKI;
+				m_shooterMotorConfig.Slot0.kD = shooterMotorVelocityKD;
+				m_shooterMotorConfig.Slot0.kS = shooterMotorVelocityKS;
+				m_shooterMotorConfig.Slot0.kV = shooterMotorVelocityKV;
+				m_shooterMotorConfig.Slot0.kA = shooterMotorVelocityKA;
 
 				// Open and Closed Loop Ramping
-				m_shooterMotor1Config.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = openLoopRamp;
-				m_shooterMotor1Config.OpenLoopRamps.VoltageOpenLoopRampPeriod = openLoopRamp;
+				m_shooterMotorConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = openLoopRamp;
+				m_shooterMotorConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = openLoopRamp;
 
-				m_shooterMotor1Config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = closedLoopRamp;
-				m_shooterMotor1Config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = closedLoopRamp;
+				m_shooterMotorConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = closedLoopRamp;
+				m_shooterMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = closedLoopRamp;
 
-				m_shooterMotor1Config.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp;
-				m_shooterMotor1Config.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
+				m_shooterMotorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp;
+				m_shooterMotorConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
 
-				return m_shooterMotor1Config;
+				return m_shooterMotorConfig;
 			}
 		}
 	}
