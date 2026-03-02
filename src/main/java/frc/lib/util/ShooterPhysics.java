@@ -25,7 +25,7 @@ import frc.robot.state.RobotStates;
 public class ShooterPhysics {
 
 	public static AngularVelocity distanceToWheelAngularVelocity(double distanceToHub) {
-		if (distanceToHub < 2.1082) {
+		if (distanceToHub < 2.31280203) { // min speed to pass top of hub
 			return RotationsPerSecond.of(2650 / 60);
 		}
 		return RotationsPerSecond.of(
