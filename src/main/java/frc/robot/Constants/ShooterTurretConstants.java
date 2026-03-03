@@ -137,6 +137,18 @@ public class ShooterTurretConstants {
 
 				return m_shooterMotorConfig;
 			}
+
+			public static TalonFXConfiguration getShooterBangBangConfiguration() {
+				TalonFXConfiguration config = getShooterMotorConfiguration();
+
+				config.Slot0.kP = 999999.0;
+				config.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
+				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
+				config.MotorOutput.PeakForwardDutyCycle = 1.0;
+				config.MotorOutput.PeakReverseDutyCycle = 0.0;
+
+				return config;
+			}
 		}
 	}
 
@@ -164,7 +176,8 @@ public class ShooterTurretConstants {
 		public static final Angle encoder2ZeroPoint = Degrees.of(166.2);
 
 		// discrepancy threshold between encoders to accept solution
-		public static final Angle matchTolerance = Degrees.of(10);
+		public static final Angle goodMatchTolerance = Degrees.of(10);
+		public static final Angle acceptableMatchTolerance = Degrees.of(25);
 		// minimum difference between two possible solutions to avoid ambiguity
 		public static final Angle ambiguityTolerance = Degrees.of(2);
 

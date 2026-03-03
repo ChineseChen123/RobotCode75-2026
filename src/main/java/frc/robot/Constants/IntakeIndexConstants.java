@@ -237,7 +237,6 @@ public class IntakeIndexConstants {
 			public static final double hopperVelocityKI = 0.0;
 			public static final double hopperVelocityKD = 0.0;
 			public static final double hopperVelocityKS = 1.5;
-			
 
 			public static TalonFXConfiguration getIndexerMotorConfig() {
 				m_IndexerMotorConfig.MotorOutput.Inverted = indexerMotorInvert;

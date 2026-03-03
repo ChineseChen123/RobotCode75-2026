@@ -1,5 +1,7 @@
 package frc.lib.util;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
@@ -8,23 +10,40 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+import static frc.robot.Constants.RobotConstants.loopTimeSecs;
 import static frc.robot.Constants.ShooterTurretConstants.ShooterConstants.*;
 import static frc.robot.Constants.ShooterTurretConstants.TurretConstants.turretPositionOffset;
+import static frc.robot.Constants.ShooterTurretConstants.TurretConstants.turretSoftRange;
+import static frc.robot.Constants.ShooterTurretConstants.useVirtualTarget;
+import static frc.robot.Constants.ShooterTurretConstants.virtualTargetSolveIterations;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.ShooterTurretConstants;
 import frc.robot.state.RobotStates;
 
 public class ShooterPhysics {
+
+	public static class TurretSetpoint {
+		public Angle turretAngle;
+		public AngularVelocity turretVelocity;
+
+		public TurretSetpoint(Angle turretAngle, AngularVelocity turretVelocity) {
+			this.turretAngle = turretAngle;
+			this.turretVelocity = turretVelocity;
+		}
+	}
 
 	public static AngularVelocity distanceToWheelAngularVelocity(double distanceToHub) {
 		if (distanceToHub < 2.31280203) { // min speed to pass top of hub
@@ -33,8 +52,7 @@ public class ShooterPhysics {
 		return RotationsPerSecond.of(
 				Math.min(
 								(shooterRegressionA * Math.sqrt(distanceToHub - shooterRegressionC)
-												+ shooterRegressionB)
-										, // TODO; wtf
+										+ shooterRegressionB), // TODO; wtf
 								4000)
 						/ 60.0);
 	}
@@ -102,26 +120,14 @@ public class ShooterPhysics {
 		return MetersPerSecond.of(velocity);
 	}
 
-
 	private static final double phaseDelay = 0.03;
 
-	public static Time calculateTimeToScore(
-			Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds, Pose2d targetHubPose) {
-
-		ChassisSpeeds robotRelativeSpeeds =
-				ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeSpeeds, RobotStates.robotHeading.get());
-		robotPose =
-				robotPose.exp(
-						new Twist2d(
-								robotRelativeSpeeds.vxMetersPerSecond * phaseDelay,
-								robotRelativeSpeeds.vyMetersPerSecond * phaseDelay,
-								robotRelativeSpeeds.omegaRadiansPerSecond * phaseDelay));
-
-		Translation2d turretPose = robotPose.transformBy(turretPositionOffset).getTranslation();
+	public static Time calculateTimeToScore(Pose2d turretPose, Pose2d targetHubPose) {
 
 		AngularVelocity shooterVelocity =
-				distanceToWheelAngularVelocity(turretPose.getDistance(targetHubPose.getTranslation()));
-			
+				distanceToWheelAngularVelocity(
+						turretPose.getTranslation().getDistance(targetHubPose.getTranslation()));
+
 		// TODO: Test both RPMBased and DistanceBased and see which is better
 		LinearVelocity projectileSpeed = wheelAngularVelocityToLinearVelocityRPMBased(shooterVelocity);
 
@@ -146,6 +152,22 @@ public class ShooterPhysics {
 
 		Pose2d virtualTargetPose = PeddieBounds.getHubTarget();
 
+		ChassisSpeeds robotRelativeSpeeds =
+				ChassisSpeeds.fromFieldRelativeSpeeds(
+						fieldRelativeSpeeds.vxMetersPerSecond,
+						fieldRelativeSpeeds.vyMetersPerSecond,
+						fieldRelativeSpeeds.omegaRadiansPerSecond,
+						robotPose.getRotation());
+
+		robotPose =
+				robotPose.exp(
+						new Twist2d(
+								robotRelativeSpeeds.vxMetersPerSecond * phaseDelay,
+								robotRelativeSpeeds.vyMetersPerSecond * phaseDelay,
+								robotRelativeSpeeds.omegaRadiansPerSecond * phaseDelay));
+
+		Pose2d turretPose = robotPose.transformBy(turretPositionOffset);
+
 		Rotation2d robotAngle = robotPose.getRotation();
 		double turretVelocityX =
 				fieldRelativeSpeeds.vxMetersPerSecond
@@ -159,7 +181,7 @@ public class ShooterPhysics {
 										- turretPositionOffset.getY() * robotAngle.getSin());
 
 		for (int i = 0; i < iterations; i++) {
-			Time tofEstimate = calculateTimeToScore(robotPose, fieldRelativeSpeeds, virtualTargetPose);
+			Time tofEstimate = calculateTimeToScore(turretPose, virtualTargetPose);
 
 			Translation2d targetTranslation =
 					new Translation2d(
@@ -169,5 +191,81 @@ public class ShooterPhysics {
 					virtualTargetPose.plus(new Transform2d(targetTranslation, Rotation2d.kZero));
 		}
 		return virtualTargetPose;
+	}
+
+	private static LinearFilter turretAngleFilter =
+			LinearFilter.movingAverage((int) (0.1 / loopTimeSecs));
+	private static Angle lastTurretAngle = null;
+
+	public static TurretSetpoint calculateTurretSetpoint(
+			Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds) {
+		Translation2d turretPose = robotPose.transformBy(turretPositionOffset).getTranslation();
+		Pose2d targetHubPose =
+				useVirtualTarget
+						? getVirtualTarget(robotPose, fieldRelativeSpeeds, virtualTargetSolveIterations)
+						: PeddieBounds.getHubTarget();
+
+		Rotation2d fieldRelativeToHub =
+				new Rotation2d(
+						targetHubPose.getTranslation().getX() - turretPose.getX(),
+						targetHubPose.getTranslation().getY() - turretPose.getY());
+
+		// robot relative
+		Angle turretAngle =
+				fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
+
+		double angleDeg = turretAngle.in(Degrees);
+		// Wrap angle to [-180, 180)
+		angleDeg += 180;
+		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
+		angleDeg -= 180;
+
+		if (Math.abs(angleDeg) > turretSoftRange.in(Degrees) / 2.0
+				&& ShooterTurretConstants.useVirtualTarget) {
+			// Basically, if the virtual target is OUTSIDE of range DO NOT do wrap around
+			// instead fall back to normal targeting. Hopefully driver isnt stupid
+			// hopefully this prevents super fast turret movements
+
+			// bad coding prob should use more dry
+			targetHubPose = PeddieBounds.getHubTarget();
+			fieldRelativeToHub =
+					new Rotation2d(
+							targetHubPose.getTranslation().getX() - turretPose.getX(),
+							targetHubPose.getTranslation().getY() - turretPose.getY());
+			turretAngle =
+					fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
+			angleDeg = turretAngle.in(Degrees); // (-180,180)
+			angleDeg += 180;
+			angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
+			angleDeg -= 180;
+		}
+
+		// Interpolate blind spot in opposite direction by factor of 3
+		if (Math.abs(angleDeg) > turretSoftRange.in(Degrees) / 2.0) {
+			double turnLimit = turretSoftRange.in(Degrees) / 2.0;
+			// Map [135, 180] -> [135, 0] linearly
+			if (angleDeg > turnLimit) { // (135, 180]
+				double t = (angleDeg - turnLimit) / (180 - turnLimit); // 0..1
+				angleDeg = turnLimit * (1.0 - t); // 135..0
+			} else {
+				// Map [-180, -135] -> [0, -135] linearly
+				// angleDeg in [-180, -135)
+				double t = (angleDeg + 180.0) / (180 - turnLimit); // 0..1
+				angleDeg = -turnLimit * t;
+			}
+		}
+
+		turretAngle = Degrees.of(angleDeg);
+
+		if (lastTurretAngle == null) lastTurretAngle = turretAngle;
+
+		AngularVelocity turretVelocity =
+				DegreesPerSecond.of(
+						turretAngleFilter.calculate(
+								turretAngle.minus(lastTurretAngle).in(Degrees) / loopTimeSecs));
+
+		lastTurretAngle = turretAngle;
+
+		return new TurretSetpoint(turretAngle, turretVelocity);
 	}
 }

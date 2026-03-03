@@ -11,9 +11,12 @@ import static frc.robot.Constants.ShooterTurretConstants.ShooterConstants.*;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -42,11 +45,16 @@ public class Shooter extends SubsystemBase {
 
 	private ShooterStates m_ShooterState;
 	private AngularVelocity shooterTargetVelocity = RotationsPerSecond.of(0);
+	private final Debouncer atSetpointDebouncer = new Debouncer(0.025, DebounceType.kFalling);
+	private boolean lastAtSetpoint = false;
 
 	private final TalonFX m_ShooterMotor1;
 	private final TalonFX m_ShooterMotor2;
 	private final VelocityTorqueCurrentFOC m_VelocityRequest;
 	private final Follower m_FollowerRequest;
+
+	private final VelocityDutyCycle m_DutyCycleBangBang;
+	private final VelocityTorqueCurrentFOC m_TorqueCurrentBangBang;
 
 	private final Slot0Configs shooterPIDConfigs = new Slot0Configs();
 	private final TunableNumber shooterKp;
@@ -55,6 +63,8 @@ public class Shooter extends SubsystemBase {
 	private final TunableNumber shooterKa;
 
 	private final TunableNumber targetSpeed;
+
+	private int shotsFired = 0;
 
 	public Shooter() {
 		m_ShooterMotor1 = new TalonFX(shooterMotor1CanID, superstructureCANBusName);
@@ -65,6 +75,9 @@ public class Shooter extends SubsystemBase {
 
 		m_VelocityRequest = new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
 		m_FollowerRequest = new Follower(m_ShooterMotor1.getDeviceID(), MotorAlignmentValue.Opposed);
+
+		m_DutyCycleBangBang = new VelocityDutyCycle(RotationsPerSecond.of(0));
+		m_TorqueCurrentBangBang = new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
 
 		m_ShooterState = ShooterStates.DEFAULT;
 
@@ -162,14 +175,33 @@ public class Shooter extends SubsystemBase {
 				ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);
 		shooterTargetVelocity = velocity;
 
+		boolean debouncedAtSetpoint = atSetpointDebouncer.calculate(atTargetVelocity());
+
 		if (m_ShooterState == ShooterStates.SHOOTING) {
-			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(velocity));
+			// m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(velocity));
+			if (debouncedAtSetpoint) {
+				m_ShooterMotor1.setControl(m_TorqueCurrentBangBang.withVelocity(shooterTargetVelocity));
+			} else {
+				m_ShooterMotor1.setControl(m_DutyCycleBangBang.withVelocity(shooterTargetVelocity));
+			}
+
 		} else if (m_ShooterState == ShooterStates.DEFAULT) {
 			m_ShooterMotor1.setControl(new CoastOut());
 		} else {
 			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
 			shooterTargetVelocity = m_ShooterState.shooterSpeed;
 		}
+
+		// fuel counting
+		if (m_ShooterState == ShooterStates.SHOOTING) {
+			if (!debouncedAtSetpoint && lastAtSetpoint) {
+				shotsFired++;
+			}
+			lastAtSetpoint = debouncedAtSetpoint;
+		} else {
+			lastAtSetpoint = false;
+		}
+
 		m_ShooterMotor2.setControl(m_FollowerRequest);
 	}
 }
