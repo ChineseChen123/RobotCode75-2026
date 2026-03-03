@@ -2,6 +2,7 @@ package frc.lib.util;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -17,6 +18,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import frc.robot.Constants.FieldConstants;
@@ -31,9 +33,25 @@ public class ShooterPhysics {
 		return RotationsPerSecond.of(
 				Math.min(
 								(shooterRegressionA * Math.sqrt(distanceToHub - shooterRegressionC)
-										+ shooterRegressionB),
+												+ shooterRegressionB)
+										, // TODO; wtf
 								4000)
 						/ 60.0);
+	}
+
+	public static Distance wheelAngularVelocityToDistance(AngularVelocity velocity) {
+		double rpm = velocity.in(RotationsPerSecond) * 60.0;
+
+		// Handle capped minimum case
+		if (rpm <= 2650) {
+			return Meters.of(2.31280203);
+		}
+
+		// Handle 4000 RPM cap
+		rpm = Math.min(rpm, 4000);
+
+		return Meters.of(
+				Math.pow((rpm - shooterRegressionB) / shooterRegressionA, 2) + shooterRegressionC);
 	}
 
 	public static AngularVelocity calculateShooterSpeed(Pose2d robotPose, Pose2d targetHubPose) {
@@ -41,12 +59,13 @@ public class ShooterPhysics {
 		return distanceToWheelAngularVelocity(turretPose.getDistance(targetHubPose.getTranslation()));
 	}
 
-	public static LinearVelocity wheelAngularVelocityToLinearVelocity(AngularVelocity shooterVelocity) {
+	public static LinearVelocity wheelAngularVelocityToLinearVelocityRPMBased(
+			AngularVelocity shooterVelocity) {
+		/* Recalc RPM --> Angular Velocity based on shooter geometry. NOT based on empirical data */
 		double totalMOI = flywheelMOI + shooterWheelMOI; // in^2 / lbs
 		double shooterWheelRadiusInches = (shooterWheelDiameter.in(Inches) / 2);
 		LinearVelocity surfaceWheelSpeed =
-				InchesPerSecond.of(
-						shooterVelocity.in(RadiansPerSecond) * shooterWheelRadiusInches);
+				InchesPerSecond.of(shooterVelocity.in(RadiansPerSecond) * shooterWheelRadiusInches);
 
 		// https://www.reca.lc/flywheel
 		double speedTransferPercentage =
@@ -57,22 +76,32 @@ public class ShooterPhysics {
 		return projectileSpeed;
 	}
 
-	public static AngularVelocity linearVelocityToWheelAngularVelocity(LinearVelocity projectileSpeed) {
+	public static LinearVelocity wheelAngularVelocityToLinearVelocityDistanceBased(
+			AngularVelocity shooterVelocity) {
+		/* Recalc RPM --> Angular Velocity based on measured RPM --> Distance data. */
 
-		double totalMOI = flywheelMOI + shooterWheelMOI; // in^2 / lbs
-		double shooterWheelRadiusInches = (shooterWheelDiameter.in(Inches) / 2);
-		double speedTransferPercentage =
-				(20 * totalMOI)
-						/ (7 * ballWeight * shooterWheelRadiusInches * shooterWheelRadiusInches / 2
-								+ 40 * totalMOI);
+		// SQRT(9.8*B2*B2/(2*SIN(F$18)*SIN(F$18)*(B2*COT(F$18)-F$19)))
 
-		double surfaceSpeedInchesPerSecond =
-				projectileSpeed.in(InchesPerSecond) / speedTransferPercentage;
+		double meters = wheelAngularVelocityToDistance(shooterVelocity).in(Meters);
 
-		double angularVelocityRadPerSec = surfaceSpeedInchesPerSecond / shooterWheelRadiusInches;
+		double heightDiffMeters =
+				FieldConstants.hubEntranceHeight.in(Meters) - shooterHeight.in(Meters);
 
-		return RadiansPerSecond.of(angularVelocityRadPerSec);
+		double velocity =
+				Math.sqrt(
+						9.8
+								* meters
+								* meters
+								/ (2
+										* Math.sin(
+												shooterAngleWithVertical.in(Radians)
+														* Math.sin(shooterAngleWithVertical.in(Radians))
+														* (meters * (1 / Math.tan(shooterAngleWithVertical.in(Radians)))
+																- heightDiffMeters))));
+
+		return MetersPerSecond.of(velocity);
 	}
+
 
 	private static final double phaseDelay = 0.03;
 
@@ -92,7 +121,9 @@ public class ShooterPhysics {
 
 		AngularVelocity shooterVelocity =
 				distanceToWheelAngularVelocity(turretPose.getDistance(targetHubPose.getTranslation()));
-		LinearVelocity projectileSpeed = wheelAngularVelocityToLinearVelocity(shooterVelocity);
+			
+		// TODO: Test both RPMBased and DistanceBased and see which is better
+		LinearVelocity projectileSpeed = wheelAngularVelocityToLinearVelocityRPMBased(shooterVelocity);
 
 		// gravity in inches/sec^2
 		double g = 386.09;

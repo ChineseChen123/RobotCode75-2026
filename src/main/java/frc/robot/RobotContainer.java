@@ -80,7 +80,7 @@ public class RobotContainer {
 		RaiderLog.register("Turret", m_Turret);
 		RaiderLog.register("Limelight TR", m_LimelightTR);
 		RaiderLog.register("Limelight TL", m_LimelightTL);
-		// RaiderLog.register("Indexer", m_Indexer);
+		RaiderLog.register("Indexer", m_Indexer);
 	}
 
 	// Configure button bindings based on driving mode

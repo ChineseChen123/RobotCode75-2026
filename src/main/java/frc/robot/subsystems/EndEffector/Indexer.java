@@ -60,6 +60,8 @@ public class Indexer extends SubsystemBase {
 			new TunableNumber("Indexer/Kd", MotorConfigs.indexerVelocityKD);
 	private final TunableNumber indexerKs =
 			new TunableNumber("Indexer/Ks", MotorConfigs.indexerVelocityKS);
+	private final TunableNumber indexerKv =
+			new TunableNumber("Indexer/Kv", MotorConfigs.indexerVelocityKV);
 
 	private final Slot0Configs hopperConfigs = new Slot0Configs();
 	private final TunableNumber hopperKp =
@@ -153,11 +155,13 @@ public class Indexer extends SubsystemBase {
 
 		if (indexerKp.getNumber() != indexerConfigs.kP
 				|| indexerKd.getNumber() != indexerConfigs.kD
-				|| indexerKs.getNumber() != indexerConfigs.kS) {
+				|| indexerKs.getNumber() != indexerConfigs.kS
+				|| indexerKv.getNumber() != indexerConfigs.kV) {
 			indexerConfigs
 					.withKP(indexerKp.getNumber())
 					.withKD(indexerKd.getNumber())
-					.withKS(indexerKs.getNumber());
+					.withKS(indexerKs.getNumber())
+					.withKV(indexerKv.getNumber());
 			m_IndexerMotor.getConfigurator().apply(indexerConfigs);
 		}
 

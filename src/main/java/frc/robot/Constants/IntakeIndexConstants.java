@@ -38,11 +38,11 @@ public class IntakeIndexConstants {
 
 		// TODO figure out
 		public static final Angle pivotDownAngle = Rotations.of(-0.04);
-		public static final Angle pivotHalfwayAngle = Rotations.of(0.12);
+		public static final Angle pivotHalfwayAngle = Rotations.of(0.20);
 		public static final Angle pivotUpAngle = Rotations.of(0.4);
 
 		public static final AngularVelocity defaultIntakeSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(40);
+		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(50);
 		public static final AngularVelocity intakeReversingSpeed = RotationsPerSecond.of(-30);
 
 		public static final class MotorConfigs {
@@ -227,19 +227,17 @@ public class IntakeIndexConstants {
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double indexerVelocityKP = 15;
+			public static final double indexerVelocityKP = 9;
 			public static final double indexerVelocityKI = 0.0;
 			public static final double indexerVelocityKD = 0.0;
-			public static final double indexerVelocityKS = 5;
-
-			public static final double indexerPositionKP = 0.75;
-			public static final double indexerPositionKI = 0.0;
-			public static final double indexerPositionKD = 0.0;
+			public static final double indexerVelocityKS = 25;
+			public static final double indexerVelocityKV = .3;
 
 			public static final double hopperVelocityKP = 10;
 			public static final double hopperVelocityKI = 0.0;
 			public static final double hopperVelocityKD = 0.0;
 			public static final double hopperVelocityKS = 1.5;
+			
 
 			public static TalonFXConfiguration getIndexerMotorConfig() {
 				m_IndexerMotorConfig.MotorOutput.Inverted = indexerMotorInvert;
@@ -261,10 +259,8 @@ public class IntakeIndexConstants {
 				m_IndexerMotorConfig.Slot0.kI = indexerVelocityKI;
 				m_IndexerMotorConfig.Slot0.kD = indexerVelocityKD;
 				m_IndexerMotorConfig.Slot0.kS = indexerVelocityKS;
+				m_IndexerMotorConfig.Slot0.kV = indexerVelocityKV;
 
-				m_IndexerMotorConfig.Slot1.kP = indexerPositionKP;
-				m_IndexerMotorConfig.Slot1.kI = indexerPositionKI;
-				m_IndexerMotorConfig.Slot1.kD = indexerPositionKD;
 				// Open and Closed Loop Ramping
 				m_IndexerMotorConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = openLoopRamp;
 				m_IndexerMotorConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = openLoopRamp;

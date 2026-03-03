@@ -96,7 +96,7 @@ public class ShooterTurretConstants {
 			public static final double shooterMotorVelocityKD = 0.0;
 			public static final double shooterMotorVelocityKS = 0.45181;
 			public static final double shooterMotorVelocityKV = 0.25;
-			public static final double shooterMotorVelocityKA = 0.011491;
+			public static final double shooterMotorVelocityKA = 0.025;
 
 			public static TalonFXConfiguration getShooterMotorConfiguration() {
 
