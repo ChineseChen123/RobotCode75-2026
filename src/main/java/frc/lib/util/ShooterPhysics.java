@@ -188,7 +188,7 @@ public class ShooterPhysics {
 							MetersPerSecond.of(-turretVelocityX).times(tofEstimate),
 							MetersPerSecond.of(-turretVelocityY).times(tofEstimate));
 			virtualTargetPose =
-					virtualTargetPose.plus(new Transform2d(targetTranslation, Rotation2d.kZero));
+					PeddieBounds.getHubTarget().plus(new Transform2d(targetTranslation, Rotation2d.kZero));
 		}
 		return virtualTargetPose;
 	}
