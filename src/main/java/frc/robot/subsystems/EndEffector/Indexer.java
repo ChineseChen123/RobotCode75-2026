@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.EndEffector;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.IntakeIndexConstants.IndexerConstants.*;
@@ -140,6 +141,11 @@ public class Indexer extends SubsystemBase {
 	@Logged(key = "Hopper Velocity", importance = Importance.DEBUG)
 	public double getHopperVelocityRPS() {
 		return m_HopperMotor.getVelocity(true).getValue().in(RotationsPerSecond);
+	}
+
+	@Logged(key = "Indexer Current", importance = Importance.DEBUG)
+	public double getIndexerCurrent() {
+		return m_IndexerMotor.getStatorCurrent(true).getValue().in(Amps);
 	}
 
 	public IndexerStates getIndexerState() {

@@ -32,7 +32,7 @@ import edu.wpi.first.units.measure.Time;
 public class ShooterTurretConstants {
 
 	public static final boolean useVirtualTarget = false;
-	public static final int virtualTargetSolveIterations = 6;
+	public static final int virtualTargetSolveIterations = 12;
 
 	public class ShooterConstants {
 		// Kraken X60s
@@ -46,7 +46,7 @@ public class ShooterTurretConstants {
 		public static final AngularVelocity defaultShooterSpeed = RotationsPerSecond.of(0);
 		public static final AngularVelocity reverseShooterSpeed = RotationsPerSecond.of(-10);
 
-		public static final double shooterVelocityTolerance = 100.0 / 60.0; // rotations per second
+		public static final double shooterVelocityTolerance = 150.0 / 60.0; // rotations per second
 
 		// Note that the flywheel MOI effective to the motors is multiplied by the gear ratio squared.
 		// <-- from recalc
@@ -65,8 +65,8 @@ public class ShooterTurretConstants {
 		public static final Distance shooterHeight = Inches.of(19.5);
 
 		// A*sqrt(x - C) + B
-		public static final double shooterRegressionA = 689.82535;
-		public static final double shooterRegressionB = 2331.78032;
+		public static final double shooterRegressionA = 650.82535;
+		public static final double shooterRegressionB = 2361.78032;
 		public static final double shooterRegressionC = 2.1;
 
 		public static final class MotorConfigs {
@@ -141,7 +141,7 @@ public class ShooterTurretConstants {
 			public static TalonFXConfiguration getShooterBangBangConfiguration() {
 				TalonFXConfiguration config = getShooterMotorConfiguration();
 
-				config.Slot0.kP = 999999.0;
+				config.Slot0.kP = 100;
 				config.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
 				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
 				config.MotorOutput.PeakForwardDutyCycle = 1.0;

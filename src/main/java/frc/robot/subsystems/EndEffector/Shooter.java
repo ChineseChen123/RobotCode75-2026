@@ -70,8 +70,8 @@ public class Shooter extends SubsystemBase {
 		m_ShooterMotor1 = new TalonFX(shooterMotor1CanID, superstructureCANBusName);
 		m_ShooterMotor2 = new TalonFX(shooterMotor2CanID, superstructureCANBusName);
 
-		m_ShooterMotor1.getConfigurator().apply(MotorConfigs.getShooterMotorConfiguration());
-		m_ShooterMotor2.getConfigurator().apply(MotorConfigs.getShooterMotorConfiguration());
+		m_ShooterMotor1.getConfigurator().apply(MotorConfigs.getShooterBangBangConfiguration());
+		m_ShooterMotor2.getConfigurator().apply(MotorConfigs.getShooterBangBangConfiguration());
 
 		m_VelocityRequest = new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
 		m_FollowerRequest = new Follower(m_ShooterMotor1.getDeviceID(), MotorAlignmentValue.Opposed);
@@ -89,7 +89,7 @@ public class Shooter extends SubsystemBase {
 				.withKV(MotorConfigs.shooterMotorVelocityKV)
 				.withKA(MotorConfigs.shooterMotorVelocityKA);
 
-		shooterKp = new TunableNumber("Shooter/Kp", MotorConfigs.shooterMotorVelocityKP);
+		shooterKp = new TunableNumber("Shooter/Kp", 100);
 		shooterKd = new TunableNumber("Shooter/Kd", MotorConfigs.shooterMotorVelocityKD);
 		shooterKv = new TunableNumber("Shooter/Kv", MotorConfigs.shooterMotorVelocityKV);
 		shooterKa = new TunableNumber("Shooter/Ka", MotorConfigs.shooterMotorVelocityKA);
@@ -153,9 +153,9 @@ public class Shooter extends SubsystemBase {
 				|| shooterKv.getNumber() != shooterPIDConfigs.kV
 				|| shooterKa.getNumber() != shooterPIDConfigs.kA) {
 			shooterPIDConfigs.kP = shooterKp.getNumber();
-			shooterPIDConfigs.kD = shooterKd.getNumber();
-			shooterPIDConfigs.kV = shooterKv.getNumber();
-			shooterPIDConfigs.kA = shooterKa.getNumber();
+			// shooterPIDConfigs.kD = shooterKd.getNumber();
+			// shooterPIDConfigs.kV = shooterKv.getNumber();
+			// shooterPIDConfigs.kA = shooterKa.getNumber();
 			m_ShooterMotor1.getConfigurator().apply(shooterPIDConfigs);
 			m_ShooterMotor2.getConfigurator().apply(shooterPIDConfigs);
 		}

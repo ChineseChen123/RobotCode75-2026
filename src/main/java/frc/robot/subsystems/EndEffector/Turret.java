@@ -7,6 +7,7 @@ package frc.robot.subsystems.EndEffector;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 import static frc.robot.Constants.ShooterTurretConstants.TurretConstants.*;
 
@@ -116,6 +117,10 @@ public class Turret extends SubsystemBase {
 		return m_TurretMotor.getPosition(true).getValue();
 	}
 
+	public AngularVelocity getTurretVelocity() {
+		return m_TurretMotor.getVelocity(true).getValue();
+	}
+
 	@Logged(key = "Encoder 1 Position Deg No Offset", importance = Importance.DEBUG)
 	public double getEncoder1PositionDegrees() {
 		return m_TurretEncoder1.get() * 360.0;
@@ -215,6 +220,11 @@ public class Turret extends SubsystemBase {
 		return turretTargetAngle.in(Degrees);
 	}
 
+	@Logged(key = "Turret Target Velocity DPS", importance = Importance.DEBUG)
+	public double getTurretTargetVelocityDPS() {
+		return turretTargetVelocity.in(DegreesPerSecond);
+	}
+
 	public Angle getTurretTargetAbsolute() {
 		return turretTargetAngle;
 	}
@@ -272,7 +282,7 @@ public class Turret extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// This method will be called once per scheduler run
-		if (resetState != 2) {
+		if (resetState != 2 && getTurretVelocity().abs(RotationsPerSecond) < 0.005) {
 			resetMotorPosition();
 			if (resetState == 0) {
 				return;
@@ -301,7 +311,7 @@ public class Turret extends SubsystemBase {
 			case SCORING:
 				updateTurretTarget();
 				m_TurretMotor.setControl(
-						turretRequest.withPosition(turretTargetAngle).withVelocity(turretTargetVelocity));
+						turretRequest.withPosition(turretTargetAngle)/*.withVelocity(turretTargetVelocity)*/);
 				break;
 			case FEEDING: // TODO: implement probably with peddie bounds
 				break;

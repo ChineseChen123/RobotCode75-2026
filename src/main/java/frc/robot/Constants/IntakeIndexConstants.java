@@ -42,7 +42,7 @@ public class IntakeIndexConstants {
 		public static final Angle pivotUpAngle = Rotations.of(0.4);
 
 		public static final AngularVelocity defaultIntakeSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(50);
+		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(40);
 		public static final AngularVelocity intakeReversingSpeed = RotationsPerSecond.of(-30);
 
 		public static final class MotorConfigs {
@@ -62,7 +62,7 @@ public class IntakeIndexConstants {
 			public static final Current intakeSupplyCurrentLimit = Amps.of(40);
 			public static final Current intakeCurrentLowerThreshold = Amps.of(30);
 
-			public static final Current intakeStatorCurrentLimit = Amps.of(60);
+			public static final Current intakeStatorCurrentLimit = Amps.of(80);
 
 			public static final Time intakeCurrentThresholdTime = Seconds.of(0.50);
 
@@ -114,7 +114,7 @@ public class IntakeIndexConstants {
 				m_IntakeMotorConfig.CurrentLimits.SupplyCurrentLowerLimit =
 						intakeCurrentLowerThreshold.in(Amps);
 
-				m_IntakeMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+				m_IntakeMotorConfig.CurrentLimits.StatorCurrentLimitEnable = false;
 				m_IntakeMotorConfig.CurrentLimits.StatorCurrentLimit = intakeStatorCurrentLimit.in(Amps);
 
 				// PID Config
@@ -193,7 +193,7 @@ public class IntakeIndexConstants {
 
 		public static final AngularVelocity defaultIndexerSpeed = RotationsPerSecond.of(0);
 		public static final AngularVelocity runningIndexerSpeed = RotationsPerSecond.of(15);
-		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(45);
+		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(60);
 		public static final AngularVelocity reverseIndexerSpeed = RotationsPerSecond.of(-15);
 
 		public static final AngularVelocity defaultHopperSpeed = RotationsPerSecond.of(0);
@@ -227,11 +227,11 @@ public class IntakeIndexConstants {
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double indexerVelocityKP = 9;
+			public static final double indexerVelocityKP = 2;
 			public static final double indexerVelocityKI = 0.0;
 			public static final double indexerVelocityKD = 0.0;
 			public static final double indexerVelocityKS = 25;
-			public static final double indexerVelocityKV = .3;
+			public static final double indexerVelocityKV = 1.25;
 
 			public static final double hopperVelocityKP = 10;
 			public static final double hopperVelocityKI = 0.0;
@@ -250,7 +250,7 @@ public class IntakeIndexConstants {
 				m_IndexerMotorConfig.CurrentLimits.SupplyCurrentLowerLimit =
 						indexerCurrentLowerThreshold.in(Amps);
 
-				m_IndexerMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+				m_IndexerMotorConfig.CurrentLimits.StatorCurrentLimitEnable = false;
 				m_IndexerMotorConfig.CurrentLimits.StatorCurrentLimit = indexerStatorCurrentLimit.in(Amps);
 
 				// PID Config
