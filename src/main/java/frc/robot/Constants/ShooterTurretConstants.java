@@ -141,7 +141,7 @@ public class ShooterTurretConstants {
 			public static TalonFXConfiguration getShooterBangBangConfiguration() {
 				TalonFXConfiguration config = getShooterMotorConfiguration();
 
-				config.Slot0.kP = 100;
+				config.Slot0.kP = 10000;
 				config.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
 				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
 				config.MotorOutput.PeakForwardDutyCycle = 1.0;
