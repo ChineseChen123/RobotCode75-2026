@@ -100,7 +100,7 @@ public class RobotContainer {
 		// m_Operator.X.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
 		m_Operator
-				.rightTriggerGreater(0.15)
+				.leftTriggerGreater(0.15)
 				.whileTrue(
 						new InstantCommand(
 										() -> {
@@ -114,7 +114,7 @@ public class RobotContainer {
 										}));
 
 		// shoot
-		m_Operator.Y.whileTrue(
+		m_Operator.rightTriggerGreater(.15).whileTrue(
 				new InstantCommand(
 								() -> {
 									m_Indexer.setState(IndexerStates.SHOOTING);
@@ -139,7 +139,7 @@ public class RobotContainer {
 									m_Intake.setState(IntakeStates.DEFAULT);
 								}));
 
-		// aim turret
+		// aim turret (hold)
 		m_Operator.B.whileTrue(
 				new InstantCommand(
 								() -> {
@@ -148,6 +148,14 @@ public class RobotContainer {
 								m_Turret)
 						.repeatedly()
 						.finallyDo(() -> m_Turret.setState(TurretStates.IDLE)));
+		
+		// aim turret (toggle)
+		m_Operator.Y.whileTrue(
+				new InstantCommand(
+								() -> {
+									m_Turret.setState(TurretStates.SCORING ? m_Turret.getState() != TurretStates.SCORING : TurretStates.IDLE);
+								},
+								m_Turret);
 	}
 
 	// Configure auto selector
