@@ -171,9 +171,9 @@ public class ShooterPhysics {
 		Rotation2d robotAngle = robotPose.getRotation();
 		double turretVelocityX =
 				fieldRelativeSpeeds.vxMetersPerSecond
-						+ fieldRelativeSpeeds.omegaRadiansPerSecond
+						- fieldRelativeSpeeds.omegaRadiansPerSecond
 								* (turretPositionOffset.getY() * robotAngle.getCos()
-										- turretPositionOffset.getX() * robotAngle.getSin());
+										+ turretPositionOffset.getX() * robotAngle.getSin());
 		double turretVelocityY =
 				fieldRelativeSpeeds.vyMetersPerSecond
 						+ fieldRelativeSpeeds.omegaRadiansPerSecond
@@ -267,5 +267,30 @@ public class ShooterPhysics {
 		lastTurretAngle = turretAngle;
 
 		return new TurretSetpoint(turretAngle, turretVelocity);
+	}
+
+	public static boolean isTurretInDeadzone(Pose2d robotPose){
+		Translation2d turretPose = robotPose.transformBy(turretPositionOffset).getTranslation();
+		Pose2d targetHubPose =
+				useVirtualTarget
+						? getVirtualTarget(robotPose, fieldRelativeSpeeds, virtualTargetSolveIterations)
+						: PeddieBounds.getHubTarget();
+
+		Rotation2d fieldRelativeToHub =
+				new Rotation2d(
+						targetHubPose.getTranslation().getX() - turretPose.getX(),
+						targetHubPose.getTranslation().getY() - turretPose.getY());
+
+		// robot relative
+		Angle turretAngle =
+				fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
+
+		double angleDeg = turretAngle.in(Degrees);
+		// Wrap angle to [-180, 180)
+		angleDeg += 180;
+		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
+		angleDeg -= 180;
+
+		return (Math.abs(angleDeg) > turretSoftRange.in(Degrees) / 2.0)
 	}
 }
