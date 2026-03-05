@@ -113,6 +113,11 @@ public class Turret extends SubsystemBase {
 		return getPositionFromMotor().in(Degrees);
 	}
 
+	@Logged(key = "Turret In Deadzone", importance = Importance.DEBUG)
+	public boolean inDeadzone() {
+		return ShooterPhysics.isTurretInDeadzone(RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get());
+	}
+
 	public Angle getPositionFromMotor() {
 		return m_TurretMotor.getPosition(true).getValue();
 	}

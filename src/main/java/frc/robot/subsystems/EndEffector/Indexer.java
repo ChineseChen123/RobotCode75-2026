@@ -12,6 +12,7 @@ import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -28,18 +29,19 @@ import frc.robot.Constants.IntakeIndexConstants.IndexerConstants.MotorConfigs;
 public class Indexer extends SubsystemBase {
 	/** Creates a new Shooter. */
 	public enum IndexerStates {
-		DEFAULT(defaultIndexerSpeed, defaultHopperSpeed),
-		INDEXING(runningIndexerSpeed, runningHopperSpeed),
-		READYTOSHOOT(defaultIndexerSpeed, runningHopperSpeed),
-		SHOOTING(shootingIndexerSpeed, runningHopperSpeed),
-		REVERSING(reverseIndexerSpeed, reverseHopperSpeed);
+		DEFAULT(defaultIndexerSpeed, defaultHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
+		READYTOSHOOT(defaultIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerBangBangConfiguration()),
+		SHOOTING(shootingIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerBangBangConfiguration()),
+		REVERSING(reverseIndexerSpeed, reverseHopperSpeed, MotorConfigs.getIndexerMotorConfig());
 
 		AngularVelocity indexerSpeed;
 		AngularVelocity hopperSpeed;
+		TalonFXConfiguration indexerConfig;
 
-		private IndexerStates(AngularVelocity indexerSpeed, AngularVelocity hopperSpeed) {
+		private IndexerStates(AngularVelocity indexerSpeed, AngularVelocity hopperSpeed, TalonFXConfiguration indexerConfig) {
 			this.indexerSpeed = indexerSpeed;
 			this.hopperSpeed = hopperSpeed;
+			this.indexerConfig = indexerConfig;
 		}
 	}
 
@@ -86,7 +88,7 @@ public class Indexer extends SubsystemBase {
 		m_IndexerState = IndexerStates.DEFAULT;
 		// m_BeamBreak = new DigitalInput(beamBreakPort);
 
-		m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerMotorConfig());
+		m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerBangBangConfiguration());
 		m_HopperMotor.getConfigurator().apply(MotorConfigs.getHopperMotorConfig());
 
 		m_IndexerRequest.UpdateFreqHz = 0;

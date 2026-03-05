@@ -269,7 +269,7 @@ public class ShooterPhysics {
 		return new TurretSetpoint(turretAngle, turretVelocity);
 	}
 
-	public static boolean isTurretInDeadzone(Pose2d robotPose){
+	public static boolean isTurretInDeadzone(Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds) {
 		Translation2d turretPose = robotPose.transformBy(turretPositionOffset).getTranslation();
 		Pose2d targetHubPose =
 				useVirtualTarget
@@ -291,6 +291,6 @@ public class ShooterPhysics {
 		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
 		angleDeg -= 180;
 
-		return (Math.abs(angleDeg) > turretSoftRange.in(Degrees) / 2.0)
+		return (Math.abs(angleDeg) > turretSoftRange.in(Degrees) / 2.0);
 	}
 }

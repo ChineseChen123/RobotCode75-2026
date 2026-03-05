@@ -90,7 +90,7 @@ public class IntakeIndexConstants {
 			public static final double intakeVelocityKS = 20;
 
 			// good enough for now
-			public static final double pivotKP = 70;
+			public static final double pivotKP = 1000;
 			public static final double pivotKI = 0.0;
 			public static final double pivotKD = 7;
 			public static final double pivotKS = 20;
@@ -181,6 +181,21 @@ public class IntakeIndexConstants {
 
 				return m_PivotConfig;
 			}
+
+			public static TalonFXConfiguration getIntakeBangBangConfiguration() {
+				TalonFXConfiguration config = getIntakeMotorConfiguration();
+
+				config.Slot0.kP = 10000;
+				config.Slot0.kD = 0.0;
+				config.Slot0.kV = 0.0;
+				config.Slot0.kA = 0.0;
+				config.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
+				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
+				config.MotorOutput.PeakForwardDutyCycle = 1.0;
+				config.MotorOutput.PeakReverseDutyCycle = 0.0;
+
+				return config;
+			}
 		}
 	}
 
@@ -227,7 +242,7 @@ public class IntakeIndexConstants {
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double indexerVelocityKP = 2;
+			public static final double indexerVelocityKP = 1000;
 			public static final double indexerVelocityKI = 0.0;
 			public static final double indexerVelocityKD = 0.0;
 			public static final double indexerVelocityKS = 25;
@@ -305,6 +320,21 @@ public class IntakeIndexConstants {
 				m_HopperMotorConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
 
 				return m_HopperMotorConfig;
+			}
+
+			public static TalonFXConfiguration getIndexerBangBangConfiguration() {
+				TalonFXConfiguration config = getIndexerMotorConfig();
+
+				config.Slot0.kP = 10000;
+				config.Slot0.kD = 0.0;
+				config.Slot0.kV = 0.0;
+				config.Slot0.kA = 0.0;
+				config.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
+				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
+				config.MotorOutput.PeakForwardDutyCycle = 1.0;
+				config.MotorOutput.PeakReverseDutyCycle = 0.0;
+
+				return config;
 			}
 		}
 	}

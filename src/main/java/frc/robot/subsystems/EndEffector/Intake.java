@@ -80,7 +80,7 @@ public class Intake extends SubsystemBase {
 		m_IntakeMotor = new TalonFX(intakeMotorCanID, superstructureCANBusName);
 		m_PivotMotor = new TalonFX(pivotCanID, superstructureCANBusName);
 		m_PivotMotor.getConfigurator().apply(getPivotConfiguration());
-		m_IntakeMotor.getConfigurator().apply(getIntakeMotorConfiguration());
+		m_IntakeMotor.getConfigurator().apply(getIntakeBangBangConfiguration());
 
 		m_IntakeState = IntakeStates.DEFAULT;
 

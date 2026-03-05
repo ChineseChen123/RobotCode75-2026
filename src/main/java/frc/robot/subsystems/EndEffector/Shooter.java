@@ -89,7 +89,7 @@ public class Shooter extends SubsystemBase {
 				.withKV(MotorConfigs.shooterMotorVelocityKV)
 				.withKA(MotorConfigs.shooterMotorVelocityKA);
 
-		shooterKp = new TunableNumber("Shooter/Kp", 100);
+		shooterKp = new TunableNumber("Shooter/Kp", 10000);
 		shooterKd = new TunableNumber("Shooter/Kd", MotorConfigs.shooterMotorVelocityKD);
 		shooterKv = new TunableNumber("Shooter/Kv", MotorConfigs.shooterMotorVelocityKV);
 		shooterKa = new TunableNumber("Shooter/Ka", MotorConfigs.shooterMotorVelocityKA);

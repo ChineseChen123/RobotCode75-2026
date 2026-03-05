@@ -18,6 +18,7 @@ import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.state.Bindings;
 import frc.robot.state.Driver;
 import frc.robot.state.Operator;
+import frc.robot.state.RobotStates;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Indexer;
 import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
@@ -117,7 +118,7 @@ public class RobotContainer {
 		m_Operator.rightTriggerGreater(.15).whileTrue(
 				new InstantCommand(
 								() -> {
-									m_Indexer.setState(IndexerStates.SHOOTING);
+									m_Indexer.setState(RobotStates.turretIsInDeadzone.getAsBoolean() ? IndexerStates.SHOOTING : IndexerStates.DEFAULT);
 								},
 								m_Indexer)
 						.repeatedly()
@@ -153,9 +154,9 @@ public class RobotContainer {
 		m_Operator.Y.whileTrue(
 				new InstantCommand(
 								() -> {
-									m_Turret.setState(TurretStates.SCORING ? m_Turret.getState() != TurretStates.SCORING : TurretStates.IDLE);
+									m_Turret.setState(m_Turret.getTurretState() != TurretStates.SCORING ? TurretStates.SCORING : TurretStates.IDLE);
 								},
-								m_Turret);
+								m_Turret));
 	}
 
 	// Configure auto selector

@@ -142,6 +142,9 @@ public class ShooterTurretConstants {
 				TalonFXConfiguration config = getShooterMotorConfiguration();
 
 				config.Slot0.kP = 10000;
+				config.Slot0.kD = 0.0;
+				config.Slot0.kV = 0.0;
+				config.Slot0.kA = 0.0;
 				config.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
 				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
 				config.MotorOutput.PeakForwardDutyCycle = 1.0;
