@@ -90,7 +90,7 @@ public class IntakeIndexConstants {
 			public static final double intakeVelocityKS = 20;
 
 			// good enough for now
-			public static final double pivotKP = 1000;
+			public static final double pivotKP = 70;
 			public static final double pivotKI = 0.0;
 			public static final double pivotKD = 7;
 			public static final double pivotKS = 20;
@@ -242,11 +242,11 @@ public class IntakeIndexConstants {
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double indexerVelocityKP = 1000;
+			public static final double indexerVelocityKP = 1;
 			public static final double indexerVelocityKI = 0.0;
 			public static final double indexerVelocityKD = 0.0;
 			public static final double indexerVelocityKS = 25;
-			public static final double indexerVelocityKV = 1.25;
+			public static final double indexerVelocityKV = 2.5;
 
 			public static final double hopperVelocityKP = 10;
 			public static final double hopperVelocityKI = 0.0;
@@ -325,7 +325,7 @@ public class IntakeIndexConstants {
 			public static TalonFXConfiguration getIndexerBangBangConfiguration() {
 				TalonFXConfiguration config = getIndexerMotorConfig();
 
-				config.Slot0.kP = 10000;
+				config.Slot0.kP = 1000000;
 				config.Slot0.kD = 0.0;
 				config.Slot0.kV = 0.0;
 				config.Slot0.kA = 0.0;

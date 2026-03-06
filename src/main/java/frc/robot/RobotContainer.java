@@ -122,8 +122,8 @@ public class RobotContainer {
 										() -> {
 											m_Indexer.setState(
 													RobotStates.turretIsInDeadzone.getAsBoolean()
-															? IndexerStates.SHOOTING
-															: IndexerStates.DEFAULT);
+															? IndexerStates.DEFAULT
+															: IndexerStates.SHOOTING);
 										},
 										m_Indexer)
 								.repeatedly()
