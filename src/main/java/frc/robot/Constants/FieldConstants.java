@@ -39,4 +39,13 @@ public class FieldConstants {
 			Feet.of(0); // like not left to right but like forward and back
 	public static final Distance bumpLength =
 			Feet.of(0); // like not left to right but like forward and back
+
+	public static final Pose2d blueTrenchLeft =
+			new Pose2d(blueHub.getMeasureX(), Meters.of(4.633649826049805), Rotation2d.kZero);
+	public static final Pose2d blueTrenchRight =
+			new Pose2d(blueHub.getMeasureX(), Meters.of(3.38635017), Rotation2d.kZero);
+	public static final Pose2d redTrenchLeft =
+			new Pose2d(redHub.getMeasureX(), Meters.of(3.38635017), Rotation2d.kZero);
+	public static final Pose2d redTrenchRight =
+			new Pose2d(redHub.getMeasureX(), Meters.of(4.633649826049805), Rotation2d.kZero);
 }

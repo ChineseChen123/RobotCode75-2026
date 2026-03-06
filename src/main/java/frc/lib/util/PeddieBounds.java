@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.state.RobotStates;
 import java.util.List;
 
 class IDVectorPair {
@@ -155,6 +156,37 @@ public class PeddieBounds {
 					Rotation2d.kZero);
 		}
 		return null;
+	}
+
+	private static final double trenchThreshold = 0.5;
+
+	public static Pose2d getNearestTrench(Pose2d currentPose) {
+		if (DriverStation.getAlliance().isEmpty()
+				|| DriverStation.getAlliance().get() == Alliance.Blue) {
+			double distL = currentPose.getTranslation().getDistance(blueTrenchLeft.getTranslation());
+			double distR = currentPose.getTranslation().getDistance(blueTrenchRight.getTranslation());
+			if (distL > distR + trenchThreshold) {
+				return blueTrenchRight;
+			} else if (distR > distL + trenchThreshold) {
+				return blueTrenchLeft;
+			} else {
+				return RobotStates.fieldRelativeSpeeds.get().vyMetersPerSecond < 0
+						? blueTrenchRight
+						: blueTrenchLeft;
+			}
+		} else {
+			double distL = currentPose.getTranslation().getDistance(redTrenchLeft.getTranslation());
+			double distR = currentPose.getTranslation().getDistance(redTrenchRight.getTranslation());
+			if (distL > distR + trenchThreshold) {
+				return redTrenchRight;
+			} else if (distR > distL + trenchThreshold) {
+				return redTrenchLeft;
+			} else {
+				return RobotStates.fieldRelativeSpeeds.get().vyMetersPerSecond < 0
+						? redTrenchLeft
+						: redTrenchRight;
+			}
+		}
 	}
 
 	public static Pose2d getHubTarget() {

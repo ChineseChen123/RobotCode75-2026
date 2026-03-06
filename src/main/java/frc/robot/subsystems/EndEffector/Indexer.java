@@ -30,15 +30,20 @@ public class Indexer extends SubsystemBase {
 	/** Creates a new Shooter. */
 	public enum IndexerStates {
 		DEFAULT(defaultIndexerSpeed, defaultHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
-		READYTOSHOOT(defaultIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerBangBangConfiguration()),
-		SHOOTING(shootingIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerBangBangConfiguration()),
+		READYTOSHOOT(
+				defaultIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerBangBangConfiguration()),
+		SHOOTING(
+				shootingIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerBangBangConfiguration()),
 		REVERSING(reverseIndexerSpeed, reverseHopperSpeed, MotorConfigs.getIndexerMotorConfig());
 
 		AngularVelocity indexerSpeed;
 		AngularVelocity hopperSpeed;
 		TalonFXConfiguration indexerConfig;
 
-		private IndexerStates(AngularVelocity indexerSpeed, AngularVelocity hopperSpeed, TalonFXConfiguration indexerConfig) {
+		private IndexerStates(
+				AngularVelocity indexerSpeed,
+				AngularVelocity hopperSpeed,
+				TalonFXConfiguration indexerConfig) {
 			this.indexerSpeed = indexerSpeed;
 			this.hopperSpeed = hopperSpeed;
 			this.indexerConfig = indexerConfig;

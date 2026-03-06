@@ -5,9 +5,9 @@
 package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 import static frc.robot.Constants.ShooterTurretConstants.TurretConstants.*;
 
@@ -115,7 +115,8 @@ public class Turret extends SubsystemBase {
 
 	@Logged(key = "Turret In Deadzone", importance = Importance.DEBUG)
 	public boolean inDeadzone() {
-		return ShooterPhysics.isTurretInDeadzone(RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get());
+		return ShooterPhysics.isTurretInDeadzone(
+				RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get());
 	}
 
 	public Angle getPositionFromMotor() {
@@ -316,7 +317,7 @@ public class Turret extends SubsystemBase {
 			case SCORING:
 				updateTurretTarget();
 				m_TurretMotor.setControl(
-						turretRequest.withPosition(turretTargetAngle)/*.withVelocity(turretTargetVelocity)*/);
+						turretRequest.withPosition(turretTargetAngle) /*.withVelocity(turretTargetVelocity)*/);
 				break;
 			case FEEDING: // TODO: implement probably with peddie bounds
 				break;

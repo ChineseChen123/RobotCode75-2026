@@ -115,17 +115,22 @@ public class RobotContainer {
 										}));
 
 		// shoot
-		m_Operator.rightTriggerGreater(.15).whileTrue(
-				new InstantCommand(
-								() -> {
-									m_Indexer.setState(RobotStates.turretIsInDeadzone.getAsBoolean() ? IndexerStates.SHOOTING : IndexerStates.DEFAULT);
-								},
-								m_Indexer)
-						.repeatedly()
-						.finallyDo(
-								() -> {
-									m_Indexer.setState(IndexerStates.DEFAULT);
-								}));
+		m_Operator
+				.rightTriggerGreater(.15)
+				.whileTrue(
+						new InstantCommand(
+										() -> {
+											m_Indexer.setState(
+													RobotStates.turretIsInDeadzone.getAsBoolean()
+															? IndexerStates.SHOOTING
+															: IndexerStates.DEFAULT);
+										},
+										m_Indexer)
+								.repeatedly()
+								.finallyDo(
+										() -> {
+											m_Indexer.setState(IndexerStates.DEFAULT);
+										}));
 
 		// intake
 		m_Operator.A.whileTrue(
@@ -149,14 +154,17 @@ public class RobotContainer {
 								m_Turret)
 						.repeatedly()
 						.finallyDo(() -> m_Turret.setState(TurretStates.IDLE)));
-		
+
 		// aim turret (toggle)
 		m_Operator.Y.whileTrue(
 				new InstantCommand(
-								() -> {
-									m_Turret.setState(m_Turret.getTurretState() != TurretStates.SCORING ? TurretStates.SCORING : TurretStates.IDLE);
-								},
-								m_Turret));
+						() -> {
+							m_Turret.setState(
+									m_Turret.getTurretState() != TurretStates.SCORING
+											? TurretStates.SCORING
+											: TurretStates.IDLE);
+						},
+						m_Turret));
 	}
 
 	// Configure auto selector
