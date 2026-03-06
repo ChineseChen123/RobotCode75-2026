@@ -5,9 +5,9 @@
 package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 import static frc.robot.Constants.ShooterTurretConstants.TurretConstants.*;
 
@@ -36,6 +36,8 @@ import frc.robot.state.RobotStates;
 
 public class Turret extends SubsystemBase {
 
+	// ── State enums / result containers ──────────────────────────────────────────
+
 	public enum TurretStates {
 		STOWED,
 		IDLE,
@@ -53,26 +55,31 @@ public class Turret extends SubsystemBase {
 		}
 	}
 
-	private TurretStates m_TurretState;
+	// ── Hardware ─────────────────────────────────────────────────────────────────
 
 	private final TalonFX m_TurretMotor;
-
 	private final DutyCycleEncoder m_TurretEncoder1;
 	private final DutyCycleEncoder m_TurretEncoder2;
 
+	// ── Control requests / configs ───────────────────────────────────────────────
+
 	private final PositionVoltage turretRequest = new PositionVoltage(Rotations.of(0));
-
-	private int resetState = 0; // 0 = not reset, 1 = acceptable, 2 = good
-
-	private Angle turretTargetAngle = Degrees.of(0);
-	private AngularVelocity turretTargetVelocity = RotationsPerSecond.of(0);
-
 	private final Slot0Configs turretConfigs = new Slot0Configs();
+
+	// ── Tunables ─────────────────────────────────────────────────────────────────
 
 	private final TunableNumber turretP = new TunableNumber("Turret/kP", MotorConfigs.kP);
 	private final TunableNumber turretD = new TunableNumber("Turret/kD", MotorConfigs.kD);
 	private final TunableNumber turretS = new TunableNumber("Turret/kS", MotorConfigs.kS);
 	private final TunableNumber turretV = new TunableNumber("Turret/kV", MotorConfigs.kV);
+
+	// ── Internal state ───────────────────────────────────────────────────────────
+
+	private TurretStates m_TurretState;
+	private int resetState = 0; // 0 = not reset, 1 = acceptable, 2 = good
+
+	private Angle turretTargetAngle = Degrees.of(0);
+	private AngularVelocity turretTargetVelocity = RotationsPerSecond.of(0);
 
 	/** Creates a new Turret. */
 	public Turret() {
@@ -92,21 +99,26 @@ public class Turret extends SubsystemBase {
 		turretRequest.UseTimesync = true;
 	}
 
+	// ── Reset / initialization helpers ───────────────────────────────────────────
+
 	@Logged(key = "Turret Reset State", importance = Importance.DEBUG)
 	public int resetState() {
 		return resetState;
 	}
 
-	// given mechanism rotation, reset motor encoder to match
+	/** Given mechanism rotation from CRT, reset motor encoder to match. */
 	public void resetMotorPosition() {
 		CRTResult result = getTurretHeadingCRT();
 		if (result.quality == 0) {
 			return;
 		}
+
 		m_TurretMotor.setPosition(result.turretAngle);
 		System.out.println("Turret reset to " + result.turretAngle.in(Degrees) + " deg");
 		resetState = result.quality;
 	}
+
+	// ── Motor / encoder accessors ────────────────────────────────────────────────
 
 	@Logged(key = "Turret Position Deg", importance = Importance.DEBUG)
 	public double getPositionFromMotorDegrees() {
@@ -141,8 +153,15 @@ public class Turret extends SubsystemBase {
 				getEncoder2PositionDegrees() - encoder2ZeroPoint.in(Degrees), 0, 360);
 	}
 
-	// -135 deg = CW limit, 135 deg = CCW limit (CCW positive)
-	// robot relative heading
+	// ── CRT solve ────────────────────────────────────────────────────────────────
+
+	/**
+	 * Solves turret heading from the two absolute encoders.
+	 *
+	 * <p>Range convention: -135 deg = CW limit, +135 deg = CCW limit.
+	 *
+	 * <p>Returns robot-relative heading.
+	 */
 	public CRTResult getTurretHeadingCRT() {
 		Angle encoder1Position = Degrees.of(getEncoder1PositionDegreesWithOffset());
 		Angle encoder2Position = Degrees.of(getEncoder2PositionDegreesWithOffset());
@@ -153,16 +172,16 @@ public class Turret extends SubsystemBase {
 		Angle possibleMechRot =
 				Rotations.of(encoder1Position.in(Rotations) * encoderPinion1Teeth / ringGearTeeth);
 
-		// calculate minimum possible solution for encoder 1 (closest to 0/CW limit)
+		// Minimum possible solution for encoder 1 (closest to 0 / CW limit)
 		possibleMechRot =
 				Rotations.of(
 						MathUtil.inputModulus(
 								possibleMechRot.in(Rotations), 0, encoderPinion1Teeth / ringGearTeeth));
 
-		// iterate through possible encoder 2 solutions
 		Angle bestErr = Rotations.of(Double.MAX_VALUE);
 		Angle secondErr = Rotations.of(Double.MAX_VALUE);
 		Angle bestRot = Rotations.of(0);
+
 		while (possibleMechRot.lte(turretRange)) {
 			Angle encoder2Solution =
 					Rotations.of(
@@ -173,6 +192,7 @@ public class Turret extends SubsystemBase {
 			if (err.gt(Rotations.of(0.5))) {
 				err = Rotations.of(1.0).minus(err);
 			}
+
 			if (err.lt(bestErr)) {
 				secondErr = bestErr;
 				bestErr = err;
@@ -185,26 +205,29 @@ public class Turret extends SubsystemBase {
 					possibleMechRot.plus(Rotations.of(encoderPinion1Teeth * 1.0 / ringGearTeeth));
 		}
 
-		// no solution found
+		// No solution found
 		if (!Double.isFinite(bestErr.in(Rotations)) || bestErr.gt(acceptableMatchTolerance)) {
 			System.out.println("Best error:" + bestErr.in(Degrees));
 			return new CRTResult(null, 0);
 		}
 
+		// Acceptable but not good
 		if (bestErr.gt(goodMatchTolerance)) {
 			return new CRTResult(bestRot.minus(turretRange.div(2)), 1);
 		}
 
-		// ambiguous solutions
+		// Ambiguous solutions
 		if (secondErr.lte(goodMatchTolerance)
 				&& Math.abs(secondErr.in(Rotations) - bestErr.in(Rotations))
 						< ambiguityTolerance.in(Rotations)) {
 			return new CRTResult(bestRot.minus(turretRange.div(2)), 1);
 		}
 
-		// convert range from [0, 270] to [-135, 135]
+		// Convert range from [0, turretRange] to [-turretRange/2, +turretRange/2]
 		return new CRTResult(bestRot.minus(turretRange.div(2)), 2);
 	}
+
+	// ── Target / state API ───────────────────────────────────────────────────────
 
 	@Logged(key = "Turret Position Error Deg", importance = Importance.DEBUG)
 	public double getTurretPositionErrorDegrees() {
@@ -241,17 +264,21 @@ public class Turret extends SubsystemBase {
 		return getTurretState() == TurretStates.STOWED && atTargetHeading();
 	}
 
+	// ── Pose / targeting ─────────────────────────────────────────────────────────
+
 	@Logged(key = "Turret Pose", importance = Importance.CRITICAL)
 	public Pose2d getTurretPose() {
 		Pose2d pose = RobotStates.robotPose.get();
 		if (resetState == 0) {
 			return pose;
 		}
+
 		Rotation2d robotHeading = pose.getRotation();
 		Angle turretHeading = getPositionFromMotor();
 
 		Translation2d translation = pose.transformBy(turretPositionOffset).getTranslation();
 		Rotation2d rotation = robotHeading.plus(new Rotation2d(turretHeading));
+
 		return new Pose2d(translation, rotation);
 	}
 
@@ -265,7 +292,7 @@ public class Turret extends SubsystemBase {
 				: PeddieBounds.getHubTarget();
 	}
 
-	// virtual target
+	/** Updates turret target angle/velocity from shooter physics. */
 	public void updateTurretTarget() {
 		if (resetState == 0) {
 			return;
@@ -279,16 +306,9 @@ public class Turret extends SubsystemBase {
 		turretTargetVelocity = setpoint.turretVelocity;
 	}
 
-	@Override
-	public void periodic() {
-		// This method will be called once per scheduler run
-		if (resetState != 2 && getTurretVelocity().abs(RotationsPerSecond) < 0.005) {
-			resetMotorPosition();
-			if (resetState == 0) {
-				return;
-			}
-		}
+	// ── Tunable config updates ───────────────────────────────────────────────────
 
+	private void updateTunables() {
 		if (turretP.getNumber() != turretConfigs.kP
 				|| turretD.getNumber() != turretConfigs.kD
 				|| turretS.getNumber() != turretConfigs.kS
@@ -299,6 +319,20 @@ public class Turret extends SubsystemBase {
 			turretConfigs.kV = turretV.getNumber();
 			m_TurretMotor.getConfigurator().apply(turretConfigs);
 		}
+	}
+
+	// ── WPILib lifecycle ─────────────────────────────────────────────────────────
+
+	@Override
+	public void periodic() {
+		if (resetState != 2 && getTurretVelocity().abs(RotationsPerSecond) < 0.005) {
+			resetMotorPosition();
+			if (resetState == 0) {
+				return;
+			}
+		}
+
+		updateTunables();
 
 		switch (m_TurretState) {
 			case STOWED:
@@ -313,7 +347,7 @@ public class Turret extends SubsystemBase {
 				m_TurretMotor.setControl(
 						turretRequest.withPosition(turretTargetAngle)/*.withVelocity(turretTargetVelocity)*/);
 				break;
-			case FEEDING: // TODO: implement probably with peddie bounds
+			case FEEDING: // TODO: get rid of or implement
 				break;
 		}
 	}
