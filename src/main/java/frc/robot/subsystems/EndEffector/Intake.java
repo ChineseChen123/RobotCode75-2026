@@ -31,6 +31,8 @@ import frc.robot.state.RobotStates;
 
 public class Intake extends SubsystemBase {
 
+	// ── State enum ───────────────────────────────────────────────────────────────
+
 	public static enum IntakeStates {
 		STOWED(pivotUpAngle, defaultIntakeSpeed),
 		DEFAULT(pivotHalfwayAngle, defaultIntakeSpeed),
@@ -46,31 +48,43 @@ public class Intake extends SubsystemBase {
 		}
 	}
 
+	// ── Hardware ─────────────────────────────────────────────────────────────────
+
 	private final TalonFX m_IntakeMotor;
 	private final TalonFX m_PivotMotor;
-
 	private final DutyCycleEncoder m_absoluteEncoder;
+
+	// ── Control requests ─────────────────────────────────────────────────────────
 
 	private final VelocityTorqueCurrentFOC m_IntakeRequest = new VelocityTorqueCurrentFOC(0);
 	private final MotionMagicExpoTorqueCurrentFOC m_PivotRequest =
 			new MotionMagicExpoTorqueCurrentFOC(0);
 
+	// ── Internal state ───────────────────────────────────────────────────────────
+
 	private IntakeStates m_IntakeState;
 
+	// ── Pivot tunables / configs ────────────────────────────────────────────────
+
 	private Slot0Configs PivotPIDConfig = new Slot0Configs();
+
 	private final TunableNumber intakePivotKp;
 	private final TunableNumber intakePivotKd;
 	private final TunableNumber intakePivotKs;
 	private final TunableNumber intakePivotKg;
 
 	private MotionMagicConfigs PivotMMConfigs = new MotionMagicConfigs();
+
 	private final TunableNumber intakePivotMMAcc;
 	private final TunableNumber intakePivotMMVel;
 	private final TunableNumber intakePivotMMJerk;
 	private final TunableNumber intakePivotMMKa;
 	private final TunableNumber intakePivotMMKv;
 
+	// ── Intake motor tunables / configs ─────────────────────────────────────────
+
 	private Slot0Configs IntakeMotorPIDConfig = new Slot0Configs();
+
 	private final TunableNumber intakeMotorKp;
 	private final TunableNumber intakeMotorKi;
 	private final TunableNumber intakeMotorKd;
@@ -80,6 +94,7 @@ public class Intake extends SubsystemBase {
 	public Intake() {
 		m_IntakeMotor = new TalonFX(intakeMotorCanID, superstructureCANBusName);
 		m_PivotMotor = new TalonFX(pivotCanID, superstructureCANBusName);
+
 		m_PivotMotor.getConfigurator().apply(getPivotConfiguration());
 		m_IntakeMotor.getConfigurator().apply(getIntakeBangBangConfiguration());
 
@@ -96,6 +111,7 @@ public class Intake extends SubsystemBase {
 		intakePivotMMJerk = new TunableNumber("Intake Pivot/MMJerk", pivotMMJerk);
 		intakePivotMMKa = new TunableNumber("Intake Pivot/MMKa", pivotMMKa);
 		intakePivotMMKv = new TunableNumber("Intake Pivot/MMKv", pivotMMKv);
+
 		PivotPIDConfig.withKS(pivotKS)
 				.withKG(pivotKG)
 				.withKP(pivotKP)
@@ -111,19 +127,22 @@ public class Intake extends SubsystemBase {
 				.withKI(intakeVelocityKI)
 				.withKD(intakeVelocityKD)
 				.withKS(intakeVelocityKS);
+
 		intakeMotorKp = new TunableNumber("Intake Motor/kP", intakeVelocityKP);
 		intakeMotorKi = new TunableNumber("Intake Motor/kI", intakeVelocityKI);
 		intakeMotorKd = new TunableNumber("Intake Motor/kD", intakeVelocityKD);
 		intakeMotorKs = new TunableNumber("Intake Motor/kS", intakeVelocityKS);
 
 		m_absoluteEncoder = new DutyCycleEncoder(pivotEncoderPort, 1, pivotZeroPoint.in(Rotations));
-		// reset position after a short delay
 
+		// Reset position after a short delay
 		Timer.delay(5);
 		m_PivotMotor.setPosition((pivotEncoderOffset.in(Rotations) - getThroughborePosition()));
 	}
 
-	/** return through-bore encoder position */
+	// ── Sensor / state accessors ────────────────────────────────────────────────
+
+	/** Return through-bore encoder position. */
 	@Logged(key = "Abs Encoder Position", importance = Importance.CRITICAL)
 	public double getThroughborePosition() {
 		return m_absoluteEncoder.get();
@@ -159,8 +178,9 @@ public class Intake extends SubsystemBase {
 				.finallyDo(() -> setState(IntakeStates.DEFAULT));
 	}
 
-	@Override
-	public void periodic() {
+	// ── Tunable updates ──────────────────────────────────────────────────────────
+
+	private void updatePivotPIDTunables() {
 		if (intakePivotKp.getNumber() != PivotPIDConfig.kP
 				|| intakePivotKd.getNumber() != PivotPIDConfig.kD
 				|| intakePivotKs.getNumber() != PivotPIDConfig.kS
@@ -172,7 +192,9 @@ public class Intake extends SubsystemBase {
 
 			m_PivotMotor.getConfigurator().apply(PivotPIDConfig);
 		}
+	}
 
+	private void updatePivotMMTunables() {
 		if (intakePivotMMAcc.getNumber() != PivotMMConfigs.MotionMagicAcceleration
 				|| intakePivotMMVel.getNumber() != PivotMMConfigs.MotionMagicCruiseVelocity
 				|| intakePivotMMJerk.getNumber() != PivotMMConfigs.MotionMagicJerk
@@ -183,9 +205,12 @@ public class Intake extends SubsystemBase {
 			PivotMMConfigs.MotionMagicJerk = intakePivotMMJerk.getNumber();
 			PivotMMConfigs.MotionMagicExpo_kV = intakePivotMMKv.getNumber();
 			PivotMMConfigs.MotionMagicExpo_kA = intakePivotMMKa.getNumber();
+
 			m_PivotMotor.getConfigurator().apply(PivotMMConfigs);
 		}
+	}
 
+	private void updateIntakePIDTunables() {
 		if (intakeMotorKp.getNumber() != IntakeMotorPIDConfig.kP
 				|| intakeMotorKi.getNumber() != IntakeMotorPIDConfig.kI
 				|| intakeMotorKd.getNumber() != IntakeMotorPIDConfig.kD
@@ -197,20 +222,31 @@ public class Intake extends SubsystemBase {
 
 			m_IntakeMotor.getConfigurator().apply(IntakeMotorPIDConfig);
 		}
+	}
+
+
+	// ── WPILib lifecycle ─────────────────────────────────────────────────────────
+
+	@Override
+	public void periodic() {
+		updatePivotPIDTunables();
+		updatePivotMMTunables();
+		updateIntakePIDTunables();
+
 
 		if (m_IntakeState == IntakeStates.STOWED && !RobotStates.turretIsStowed.getAsBoolean()) {
-			// panic!
 			System.out.println(
 					"Attempting to stow intake before turret is stowed... reverting to DEFAULT");
 			m_IntakeState = IntakeStates.DEFAULT;
 		}
-
+		
 		if (m_IntakeState.intakeSpeed.abs(RotationsPerSecond) > 0) {
-			
 			m_IntakeMotor.setControl(m_IntakeRequest.withVelocity(m_IntakeState.intakeSpeed));
 		} else {
 			m_IntakeMotor.setControl(new CoastOut());
 		}
+
 		m_PivotMotor.setControl(m_PivotRequest.withPosition(m_IntakeState.pivotPosition));
+
 	}
 }
