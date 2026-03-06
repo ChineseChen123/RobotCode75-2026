@@ -18,6 +18,7 @@ import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.state.Bindings;
 import frc.robot.state.Driver;
 import frc.robot.state.Operator;
+import frc.robot.state.RobotStates;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Indexer;
 import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
@@ -114,17 +115,22 @@ public class RobotContainer {
 										}));
 
 		// shoot
-		m_Operator.rightTriggerGreater(.15).whileTrue(
-				new InstantCommand(
-								() -> {
-									m_Indexer.setState(IndexerStates.SHOOTING);
-								},
-								m_Indexer)
-						.repeatedly()
-						.finallyDo(
-								() -> {
-									m_Indexer.setState(IndexerStates.DEFAULT);
-								}));
+		m_Operator
+				.rightTriggerGreater(.15)
+				.whileTrue(
+						new InstantCommand(
+										() -> {
+											m_Indexer.setState(
+													RobotStates.turretIsInDeadzone.getAsBoolean()
+															? IndexerStates.DEFAULT
+															: IndexerStates.SHOOTING);
+										},
+										m_Indexer)
+								.repeatedly()
+								.finallyDo(
+										() -> {
+											m_Indexer.setState(IndexerStates.DEFAULT);
+										}));
 
 		// intake
 		m_Operator.A.whileTrue(
@@ -148,14 +154,17 @@ public class RobotContainer {
 								m_Turret)
 						.repeatedly()
 						.finallyDo(() -> m_Turret.setState(TurretStates.IDLE)));
-		
+
 		// aim turret (toggle)
 		m_Operator.Y.whileTrue(
 				new InstantCommand(
-								() -> {
-									m_Turret.setState(TurretStates.SCORING ? m_Turret.getState() != TurretStates.SCORING : TurretStates.IDLE);
-								},
-								m_Turret);
+						() -> {
+							m_Turret.setState(
+									m_Turret.getTurretState() != TurretStates.SCORING
+											? TurretStates.SCORING
+											: TurretStates.IDLE);
+						},
+						m_Turret));
 	}
 
 	// Configure auto selector

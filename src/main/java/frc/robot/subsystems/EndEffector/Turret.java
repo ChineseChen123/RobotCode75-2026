@@ -125,6 +125,12 @@ public class Turret extends SubsystemBase {
 		return getPositionFromMotor().in(Degrees);
 	}
 
+	@Logged(key = "Turret In Deadzone", importance = Importance.DEBUG)
+	public boolean inDeadzone() {
+		return ShooterPhysics.isTurretInDeadzone(
+				RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get());
+	}
+
 	public Angle getPositionFromMotor() {
 		return m_TurretMotor.getPosition(true).getValue();
 	}
@@ -345,7 +351,7 @@ public class Turret extends SubsystemBase {
 			case SCORING:
 				updateTurretTarget();
 				m_TurretMotor.setControl(
-						turretRequest.withPosition(turretTargetAngle)/*.withVelocity(turretTargetVelocity)*/);
+						turretRequest.withPosition(turretTargetAngle) /*.withVelocity(turretTargetVelocity)*/);
 				break;
 			case FEEDING: // TODO: get rid of or implement
 				break;

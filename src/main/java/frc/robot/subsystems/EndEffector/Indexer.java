@@ -12,7 +12,9 @@ import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -28,18 +30,24 @@ import frc.robot.Constants.IntakeIndexConstants.IndexerConstants.MotorConfigs;
 public class Indexer extends SubsystemBase {
 	/** Creates a new Shooter. */
 	public enum IndexerStates {
-		DEFAULT(defaultIndexerSpeed, defaultHopperSpeed),
-		INDEXING(runningIndexerSpeed, runningHopperSpeed),
-		READYTOSHOOT(defaultIndexerSpeed, runningHopperSpeed),
-		SHOOTING(shootingIndexerSpeed, runningHopperSpeed),
-		REVERSING(reverseIndexerSpeed, reverseHopperSpeed);
+		DEFAULT(defaultIndexerSpeed, defaultHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
+		READYTOSHOOT(
+				defaultIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
+		SHOOTING(
+				shootingIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
+		REVERSING(reverseIndexerSpeed, reverseHopperSpeed, MotorConfigs.getIndexerMotorConfig());
 
 		AngularVelocity indexerSpeed;
 		AngularVelocity hopperSpeed;
+		TalonFXConfiguration indexerConfig;
 
-		private IndexerStates(AngularVelocity indexerSpeed, AngularVelocity hopperSpeed) {
+		private IndexerStates(
+				AngularVelocity indexerSpeed,
+				AngularVelocity hopperSpeed,
+				TalonFXConfiguration indexerConfig) {
 			this.indexerSpeed = indexerSpeed;
 			this.hopperSpeed = hopperSpeed;
+			this.indexerConfig = indexerConfig;
 		}
 	}
 
@@ -49,7 +57,8 @@ public class Indexer extends SubsystemBase {
 
 	private final TalonFX m_IndexerMotor;
 	private final TalonFX m_HopperMotor;
-	private final VelocityTorqueCurrentFOC m_IndexerRequest = new VelocityTorqueCurrentFOC(0);
+	private final VelocityDutyCycle m_IndexerDutyCycle = new VelocityDutyCycle(0);
+	private final VelocityTorqueCurrentFOC m_IndexerTorqueCurrent = new VelocityTorqueCurrentFOC(0);
 	private final VelocityTorqueCurrentFOC m_HopperRequest = new VelocityTorqueCurrentFOC(0);
 
 	private final VoltageOut m_sysIdRequest = new VoltageOut(0.0);
@@ -89,8 +98,8 @@ public class Indexer extends SubsystemBase {
 		m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerMotorConfig());
 		m_HopperMotor.getConfigurator().apply(MotorConfigs.getHopperMotorConfig());
 
-		m_IndexerRequest.UpdateFreqHz = 0;
-		m_IndexerRequest.UseTimesync = true;
+		m_IndexerTorqueCurrent.UpdateFreqHz = 0;
+		m_IndexerTorqueCurrent.UseTimesync = true;
 		m_HopperRequest.UpdateFreqHz = 0;
 		m_HopperRequest.UseTimesync = true;
 
@@ -148,6 +157,11 @@ public class Indexer extends SubsystemBase {
 		return m_IndexerMotor.getStatorCurrent(true).getValue().in(Amps);
 	}
 
+	@Logged(key = "Indexer Supply Current", importance = Importance.DEBUG)
+	public double getIndexerSupplyCurrent() {
+		return m_IndexerMotor.getSupplyCurrent(true).getValue().in(Amps);
+	}
+
 	public IndexerStates getIndexerState() {
 		return m_IndexerState;
 	}
@@ -184,7 +198,12 @@ public class Indexer extends SubsystemBase {
 		if (m_IndexerState.indexerSpeed.baseUnitMagnitude() == 0) {
 			m_IndexerMotor.setControl(new CoastOut());
 		} else {
-			m_IndexerMotor.setControl(m_IndexerRequest.withVelocity(m_IndexerState.indexerSpeed));
+			m_IndexerMotor.setControl(m_IndexerTorqueCurrent.withVelocity(m_IndexerState.indexerSpeed));
+			// if (Math.abs(m_IndexerState.indexerSpeed.in(RotationsPerSecond) - getIndexerVelocityRPS()) < 150 / 60) {
+			// 	m_IndexerMotor.setControl(m_IndexerTorqueCurrent.withVelocity(m_IndexerState.indexerSpeed));
+			// } else {
+			// 	m_IndexerMotor.setControl(m_IndexerDutyCycle.withVelocity(m_IndexerState.indexerSpeed));
+			// }
 		}
 
 		if (m_IndexerState.hopperSpeed.baseUnitMagnitude() == 0) {

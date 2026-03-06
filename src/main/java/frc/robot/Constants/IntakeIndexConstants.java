@@ -181,6 +181,21 @@ public class IntakeIndexConstants {
 
 				return m_PivotConfig;
 			}
+
+			public static TalonFXConfiguration getIntakeBangBangConfiguration() {
+				TalonFXConfiguration config = getIntakeMotorConfiguration();
+
+				config.Slot0.kP = 10000;
+				config.Slot0.kD = 0.0;
+				config.Slot0.kV = 0.0;
+				config.Slot0.kA = 0.0;
+				config.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
+				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
+				config.MotorOutput.PeakForwardDutyCycle = 1.0;
+				config.MotorOutput.PeakReverseDutyCycle = 0.0;
+
+				return config;
+			}
 		}
 	}
 
@@ -227,11 +242,11 @@ public class IntakeIndexConstants {
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double indexerVelocityKP = 2;
+			public static final double indexerVelocityKP = 1;
 			public static final double indexerVelocityKI = 0.0;
 			public static final double indexerVelocityKD = 0.0;
 			public static final double indexerVelocityKS = 25;
-			public static final double indexerVelocityKV = 1.25;
+			public static final double indexerVelocityKV = 2.5;
 
 			public static final double hopperVelocityKP = 10;
 			public static final double hopperVelocityKI = 0.0;
@@ -305,6 +320,21 @@ public class IntakeIndexConstants {
 				m_HopperMotorConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
 
 				return m_HopperMotorConfig;
+			}
+
+			public static TalonFXConfiguration getIndexerBangBangConfiguration() {
+				TalonFXConfiguration config = getIndexerMotorConfig();
+
+				config.Slot0.kP = 1000000;
+				config.Slot0.kD = 0.0;
+				config.Slot0.kV = 0.0;
+				config.Slot0.kA = 0.0;
+				config.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
+				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
+				config.MotorOutput.PeakForwardDutyCycle = 1.0;
+				config.MotorOutput.PeakReverseDutyCycle = 0.0;
+
+				return config;
 			}
 		}
 	}

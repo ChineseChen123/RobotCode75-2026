@@ -38,6 +38,7 @@ import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.Drivetrain.controllers.AutoAlign;
 import frc.robot.subsystems.Drivetrain.controllers.ChezyController;
 import frc.robot.subsystems.Drivetrain.controllers.RotationController;
 import frc.robot.subsystems.Vision.Limelight;
@@ -155,6 +156,16 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		setRobotRelative(speeds); // Apply robot request for consistent open-loop behavior
 	}
 
+	public void driveClosedLoop(Translation2d translation, double omega) {
+		final ChassisSpeeds speeds =
+				fieldRelative
+						? ChassisSpeeds.fromFieldRelativeSpeeds(
+								translation.getX(), translation.getY(), omega, getHeading())
+						: new ChassisSpeeds(translation.getX(), translation.getY(), omega);
+
+		setRobotRelativeClosedLoop(speeds);
+	}
+
 	public void setFieldRelative(ChassisSpeeds speeds) {
 		setpointSpeeds = speeds;
 		setControl(fieldRequest.withSpeeds(speeds));
@@ -163,6 +174,11 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	public void setRobotRelative(ChassisSpeeds speeds) {
 		setpointSpeeds = speeds;
 		setControl(robotRequest.withSpeeds(speeds));
+	}
+
+	public void setRobotRelativeClosedLoop(ChassisSpeeds speeds) {
+		setpointSpeeds = speeds;
+		setControl(closedLoopRequest.withSpeeds(speeds));
 	}
 
 	/** Convenience for toggling frame. */
@@ -304,6 +320,28 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 						},
 						this)
 				.repeatedly();
+	}
+
+	public Command trenchAlignTeleopSwerveCommand() {
+		return new InstantCommand(
+						() -> {
+							AutoAlign.TrenchAlign.init();
+						},
+						this)
+				.andThen(
+						new InstantCommand(
+										() -> {
+											double[] output =
+													oneDriver
+															? RobotContainer.getOperator().processedJoystickValues()
+															: RobotContainer.getDriver().processedJoystickValues();
+											if (!AutoAlign.TrenchAlign.isFinished()) {
+												output[1] = AutoAlign.TrenchAlign.execute().vyMetersPerSecond;
+											}
+											driveClosedLoop(new Translation2d(output[0], output[1]), output[2]);
+										},
+										this)
+								.repeatedly());
 	}
 
 	public Command resetHeadingCommand() {

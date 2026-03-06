@@ -12,6 +12,7 @@ import static frc.robot.Constants.RobotConstants.*;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -80,7 +81,7 @@ public class Intake extends SubsystemBase {
 		m_IntakeMotor = new TalonFX(intakeMotorCanID, superstructureCANBusName);
 		m_PivotMotor = new TalonFX(pivotCanID, superstructureCANBusName);
 		m_PivotMotor.getConfigurator().apply(getPivotConfiguration());
-		m_IntakeMotor.getConfigurator().apply(getIntakeMotorConfiguration());
+		m_IntakeMotor.getConfigurator().apply(getIntakeBangBangConfiguration());
 
 		m_IntakeState = IntakeStates.DEFAULT;
 
@@ -204,7 +205,12 @@ public class Intake extends SubsystemBase {
 			m_IntakeState = IntakeStates.DEFAULT;
 		}
 
-		m_IntakeMotor.setControl(m_IntakeRequest.withVelocity(m_IntakeState.intakeSpeed));
+		if (m_IntakeState.intakeSpeed.abs(RotationsPerSecond) > 0) {
+			
+			m_IntakeMotor.setControl(m_IntakeRequest.withVelocity(m_IntakeState.intakeSpeed));
+		} else {
+			m_IntakeMotor.setControl(new CoastOut());
+		}
 		m_PivotMotor.setControl(m_PivotRequest.withPosition(m_IntakeState.pivotPosition));
 	}
 }
