@@ -31,7 +31,9 @@ import frc.robot.Constants.ShooterTurretConstants.ShooterConstants.MotorConfigs;
 import frc.robot.state.RobotStates;
 
 public class Shooter extends SubsystemBase {
-	/** Creates a new Shooter. */
+
+	// ── State enum ───────────────────────────────────────────────────────────────
+
 	public enum ShooterStates {
 		DEFAULT(defaultShooterSpeed),
 		SHOOTING(null),
@@ -44,29 +46,40 @@ public class Shooter extends SubsystemBase {
 		}
 	}
 
-	private ShooterStates m_ShooterState;
-	private AngularVelocity shooterTargetVelocity = RotationsPerSecond.of(0);
-	private final Debouncer atSetpointDebouncer = new Debouncer(0.025, DebounceType.kFalling);
-	private boolean lastAtSetpoint = false;
+	// ── Hardware ─────────────────────────────────────────────────────────────────
 
 	private final TalonFX m_ShooterMotor1;
 	private final TalonFX m_ShooterMotor2;
+
+	// ── Control requests ─────────────────────────────────────────────────────────
+
 	private final VelocityTorqueCurrentFOC m_VelocityRequest;
 	private final Follower m_FollowerRequest;
 
 	private final VelocityDutyCycle m_DutyCycleBangBang;
 	private final VelocityTorqueCurrentFOC m_TorqueCurrentBangBang;
 
+	// ── Tunables / configs ───────────────────────────────────────────────────────
+
 	private final Slot0Configs shooterPIDConfigs = new Slot0Configs();
+
 	private final TunableNumber shooterKp;
 	private final TunableNumber shooterKd;
 	private final TunableNumber shooterKv;
 	private final TunableNumber shooterKa;
-
 	private final TunableNumber targetSpeed;
+
+	// ── Internal state ───────────────────────────────────────────────────────────
+
+	private ShooterStates m_ShooterState;
+	private AngularVelocity shooterTargetVelocity = RotationsPerSecond.of(0);
+
+	private final Debouncer atSetpointDebouncer = new Debouncer(0.025, DebounceType.kFalling);
+	private boolean lastAtSetpoint = false;
 
 	private int shotsFired = 0;
 
+	/** Creates a new Shooter. */
 	public Shooter() {
 		m_ShooterMotor1 = new TalonFX(shooterMotor1CanID, superstructureCANBusName);
 		m_ShooterMotor2 = new TalonFX(shooterMotor2CanID, superstructureCANBusName);
@@ -99,6 +112,8 @@ public class Shooter extends SubsystemBase {
 		m_VelocityRequest.UpdateFreqHz = 0;
 		m_VelocityRequest.UseTimesync = true;
 	}
+
+	// ── Velocity / state accessors ───────────────────────────────────────────────
 
 	@Logged(key = "Shooter Motor Velocity RPM", importance = Importance.CRITICAL)
 	public double getMotorVelocityRPM() {
@@ -208,7 +223,5 @@ public class Shooter extends SubsystemBase {
 		} else {
 			lastAtSetpoint = false;
 		}
-
-		m_ShooterMotor2.setControl(m_FollowerRequest);
 	}
 }
