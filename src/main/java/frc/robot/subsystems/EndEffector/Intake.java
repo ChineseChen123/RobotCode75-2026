@@ -161,49 +161,49 @@ public class Intake extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		if (intakePivotKp.getNumber() != PivotPIDConfig.kP
-				|| intakePivotKd.getNumber() != PivotPIDConfig.kD
-				|| intakePivotKs.getNumber() != PivotPIDConfig.kS
-				|| intakePivotKg.getNumber() != PivotPIDConfig.kG) {
-			PivotPIDConfig.kP = intakePivotKp.getNumber();
-			PivotPIDConfig.kD = intakePivotKd.getNumber();
-			PivotPIDConfig.kS = intakePivotKs.getNumber();
-			PivotPIDConfig.kG = intakePivotKg.getNumber();
+		// if (intakePivotKp.getNumber() != PivotPIDConfig.kP
+		// 		|| intakePivotKd.getNumber() != PivotPIDConfig.kD
+		// 		|| intakePivotKs.getNumber() != PivotPIDConfig.kS
+		// 		|| intakePivotKg.getNumber() != PivotPIDConfig.kG) {
+		// 	PivotPIDConfig.kP = intakePivotKp.getNumber();
+		// 	PivotPIDConfig.kD = intakePivotKd.getNumber();
+		// 	PivotPIDConfig.kS = intakePivotKs.getNumber();
+		// 	PivotPIDConfig.kG = intakePivotKg.getNumber();
 
-			m_PivotMotor.getConfigurator().apply(PivotPIDConfig);
-		}
+		// 	m_PivotMotor.getConfigurator().apply(PivotPIDConfig);
+		// }
 
-		if (intakePivotMMAcc.getNumber() != PivotMMConfigs.MotionMagicAcceleration
-				|| intakePivotMMVel.getNumber() != PivotMMConfigs.MotionMagicCruiseVelocity
-				|| intakePivotMMJerk.getNumber() != PivotMMConfigs.MotionMagicJerk
-				|| intakePivotMMKv.getNumber() != PivotMMConfigs.MotionMagicExpo_kV
-				|| intakePivotMMKa.getNumber() != PivotMMConfigs.MotionMagicExpo_kA) {
-			PivotMMConfigs.MotionMagicAcceleration = intakePivotMMAcc.getNumber();
-			PivotMMConfigs.MotionMagicCruiseVelocity = intakePivotMMVel.getNumber();
-			PivotMMConfigs.MotionMagicJerk = intakePivotMMJerk.getNumber();
-			PivotMMConfigs.MotionMagicExpo_kV = intakePivotMMKv.getNumber();
-			PivotMMConfigs.MotionMagicExpo_kA = intakePivotMMKa.getNumber();
-			m_PivotMotor.getConfigurator().apply(PivotMMConfigs);
-		}
+		// if (intakePivotMMAcc.getNumber() != PivotMMConfigs.MotionMagicAcceleration
+		// 		|| intakePivotMMVel.getNumber() != PivotMMConfigs.MotionMagicCruiseVelocity
+		// 		|| intakePivotMMJerk.getNumber() != PivotMMConfigs.MotionMagicJerk
+		// 		|| intakePivotMMKv.getNumber() != PivotMMConfigs.MotionMagicExpo_kV
+		// 		|| intakePivotMMKa.getNumber() != PivotMMConfigs.MotionMagicExpo_kA) {
+		// 	PivotMMConfigs.MotionMagicAcceleration = intakePivotMMAcc.getNumber();
+		// 	PivotMMConfigs.MotionMagicCruiseVelocity = intakePivotMMVel.getNumber();
+		// 	PivotMMConfigs.MotionMagicJerk = intakePivotMMJerk.getNumber();
+		// 	PivotMMConfigs.MotionMagicExpo_kV = intakePivotMMKv.getNumber();
+		// 	PivotMMConfigs.MotionMagicExpo_kA = intakePivotMMKa.getNumber();
+		// 	m_PivotMotor.getConfigurator().apply(PivotMMConfigs);
+		// }
 
-		if (intakeMotorKp.getNumber() != IntakeMotorPIDConfig.kP
-				|| intakeMotorKi.getNumber() != IntakeMotorPIDConfig.kI
-				|| intakeMotorKd.getNumber() != IntakeMotorPIDConfig.kD
-				|| intakeMotorKs.getNumber() != IntakeMotorPIDConfig.kS) {
-			IntakeMotorPIDConfig.kP = intakeMotorKp.getNumber();
-			IntakeMotorPIDConfig.kI = intakeMotorKi.getNumber();
-			IntakeMotorPIDConfig.kD = intakeMotorKd.getNumber();
-			IntakeMotorPIDConfig.kS = intakeMotorKs.getNumber();
+		// if (intakeMotorKp.getNumber() != IntakeMotorPIDConfig.kP
+		// 		|| intakeMotorKi.getNumber() != IntakeMotorPIDConfig.kI
+		// 		|| intakeMotorKd.getNumber() != IntakeMotorPIDConfig.kD
+		// 		|| intakeMotorKs.getNumber() != IntakeMotorPIDConfig.kS) {
+		// 	IntakeMotorPIDConfig.kP = intakeMotorKp.getNumber();
+		// 	IntakeMotorPIDConfig.kI = intakeMotorKi.getNumber();
+		// 	IntakeMotorPIDConfig.kD = intakeMotorKd.getNumber();
+		// 	IntakeMotorPIDConfig.kS = intakeMotorKs.getNumber();
 
-			m_IntakeMotor.getConfigurator().apply(IntakeMotorPIDConfig);
-		}
+		// 	m_IntakeMotor.getConfigurator().apply(IntakeMotorPIDConfig);
+		// }
 
-		if (m_IntakeState == IntakeStates.STOWED && !RobotStates.turretIsStowed.getAsBoolean()) {
-			// panic!
-			System.out.println(
-					"Attempting to stow intake before turret is stowed... reverting to DEFAULT");
-			m_IntakeState = IntakeStates.DEFAULT;
-		}
+		// if (m_IntakeState == IntakeStates.STOWED && !RobotStates.turretIsStowed.getAsBoolean()) {
+		// 	// panic!
+		// 	System.out.println(
+		// 			"Attempting to stow intake before turret is stowed... reverting to DEFAULT");
+		// 	m_IntakeState = IntakeStates.DEFAULT;
+		// }
 
 		if (m_IntakeState.intakeSpeed.abs(RotationsPerSecond) > 0) {
 			

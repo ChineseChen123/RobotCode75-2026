@@ -185,25 +185,20 @@ public class Indexer extends SubsystemBase {
 			m_IndexerMotor.getConfigurator().apply(indexerConfigs);
 		}
 
-		if (hopperKp.getNumber() != hopperConfigs.kP
-				|| hopperKd.getNumber() != hopperConfigs.kD
-				|| hopperKs.getNumber() != hopperConfigs.kS) {
-			hopperConfigs
-					.withKP(hopperKp.getNumber())
-					.withKD(hopperKd.getNumber())
-					.withKS(hopperKs.getNumber());
-			m_HopperMotor.getConfigurator().apply(hopperConfigs);
-		}
+		// if (hopperKp.getNumber() != hopperConfigs.kP
+		// 		|| hopperKd.getNumber() != hopperConfigs.kD
+		// 		|| hopperKs.getNumber() != hopperConfigs.kS) {
+		// 	hopperConfigs
+		// 			.withKP(hopperKp.getNumber())
+		// 			.withKD(hopperKd.getNumber())
+		// 			.withKS(hopperKs.getNumber());
+		// 	m_HopperMotor.getConfigurator().apply(hopperConfigs);
+		// }
 
 		if (m_IndexerState.indexerSpeed.baseUnitMagnitude() == 0) {
 			m_IndexerMotor.setControl(new CoastOut());
 		} else {
 			m_IndexerMotor.setControl(m_IndexerTorqueCurrent.withVelocity(m_IndexerState.indexerSpeed));
-			// if (Math.abs(m_IndexerState.indexerSpeed.in(RotationsPerSecond) - getIndexerVelocityRPS()) < 150 / 60) {
-			// 	m_IndexerMotor.setControl(m_IndexerTorqueCurrent.withVelocity(m_IndexerState.indexerSpeed));
-			// } else {
-			// 	m_IndexerMotor.setControl(m_IndexerDutyCycle.withVelocity(m_IndexerState.indexerSpeed));
-			// }
 		}
 
 		if (m_IndexerState.hopperSpeed.baseUnitMagnitude() == 0) {

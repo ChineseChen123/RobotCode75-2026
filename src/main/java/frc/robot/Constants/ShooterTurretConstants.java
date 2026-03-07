@@ -65,8 +65,8 @@ public class ShooterTurretConstants {
 		public static final Distance shooterHeight = Inches.of(19.5);
 
 		// A*sqrt(x - C) + B
-		public static final double shooterRegressionA = 650.82535;
-		public static final double shooterRegressionB = 2361.78032;
+		public static final double shooterRegressionA = 252.63148;
+		public static final double shooterRegressionB = 1858.26502;
 		public static final double shooterRegressionC = 2.1;
 
 		public static final class MotorConfigs {
@@ -145,7 +145,7 @@ public class ShooterTurretConstants {
 				config.Slot0.kD = 0.0;
 				config.Slot0.kV = 0.0;
 				config.Slot0.kA = 0.0;
-				config.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
+				config.TorqueCurrent.PeakForwardTorqueCurrent = 70.0;
 				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
 				config.MotorOutput.PeakForwardDutyCycle = 1.0;
 				config.MotorOutput.PeakReverseDutyCycle = 0.0;

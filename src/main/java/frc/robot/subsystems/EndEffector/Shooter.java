@@ -19,6 +19,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.PeddieBounds;
@@ -127,6 +128,10 @@ public class Shooter extends SubsystemBase {
 				< shooterVelocityTolerance;
 	}
 
+	public boolean aboveTargetVelocity() {
+		return getVelocity().in(RotationsPerSecond) > shooterTargetVelocity.in(RotationsPerSecond);
+	}
+
 	public ShooterStates getShooterState() {
 		return m_ShooterState;
 	}
@@ -148,17 +153,17 @@ public class Shooter extends SubsystemBase {
 		// 	m_ShooterMotor2.setControl(m_FollowerRequest);
 		// }
 
-		if (shooterKp.getNumber() != shooterPIDConfigs.kP
-				|| shooterKd.getNumber() != shooterPIDConfigs.kD
-				|| shooterKv.getNumber() != shooterPIDConfigs.kV
-				|| shooterKa.getNumber() != shooterPIDConfigs.kA) {
-			shooterPIDConfigs.kP = shooterKp.getNumber();
-			// shooterPIDConfigs.kD = shooterKd.getNumber();
-			// shooterPIDConfigs.kV = shooterKv.getNumber();
-			// shooterPIDConfigs.kA = shooterKa.getNumber();
-			m_ShooterMotor1.getConfigurator().apply(shooterPIDConfigs);
-			m_ShooterMotor2.getConfigurator().apply(shooterPIDConfigs);
-		}
+		// if (shooterKp.getNumber() != shooterPIDConfigs.kP
+		// 		|| shooterKd.getNumber() != shooterPIDConfigs.kD
+		// 		|| shooterKv.getNumber() != shooterPIDConfigs.kV
+		// 		|| shooterKa.getNumber() != shooterPIDConfigs.kA) {
+		// 	shooterPIDConfigs.kP = shooterKp.getNumber();
+		// 	// shooterPIDConfigs.kD = shooterKd.getNumber();
+		// 	// shooterPIDConfigs.kV = shooterKv.getNumber();
+		// 	// shooterPIDConfigs.kA = shooterKa.getNumber();
+		// 	m_ShooterMotor1.getConfigurator().apply(shooterPIDConfigs);
+		// 	m_ShooterMotor2.getConfigurator().apply(shooterPIDConfigs);
+		// }
 
 		// lookup table stuff
 		Pose2d targetHubPose = PeddieBounds.getHubTarget();
@@ -174,6 +179,8 @@ public class Shooter extends SubsystemBase {
 		AngularVelocity velocity =
 				ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);
 		shooterTargetVelocity = velocity;
+
+		// shooterTargetVelocity = RotationsPerSecond.of(targetSpeed.getNumber() / 60);
 
 		boolean debouncedAtSetpoint = atSetpointDebouncer.calculate(atTargetVelocity());
 

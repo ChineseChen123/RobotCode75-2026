@@ -79,9 +79,10 @@ public class RobotContainer {
 		RaiderLog.register("Swerve", m_Swerve);
 		RaiderLog.register("Shooter", m_Shooter);
 		RaiderLog.register("Turret", m_Turret);
-		RaiderLog.register("Limelight TR", m_LimelightTR);
-		RaiderLog.register("Limelight TL", m_LimelightTL);
+		// RaiderLog.register("Limelight TR", m_LimelightTR);
+		// RaiderLog.register("Limelight TL", m_LimelightTL);
 		RaiderLog.register("Indexer", m_Indexer);
+		// RaiderLog.register("Intake", m_Intake);
 	}
 
 	// Configure button bindings based on driving mode
@@ -121,9 +122,9 @@ public class RobotContainer {
 						new InstantCommand(
 										() -> {
 											m_Indexer.setState(
-													RobotStates.turretIsInDeadzone.getAsBoolean()
-															? IndexerStates.DEFAULT
-															: IndexerStates.SHOOTING);
+													// RobotStates.turretIsInDeadzone.getAsBoolean()
+													// 		? IndexerStates.DEFAULT
+															IndexerStates.SHOOTING);
 										},
 										m_Indexer)
 								.repeatedly()

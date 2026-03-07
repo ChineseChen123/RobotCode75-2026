@@ -48,7 +48,7 @@ public class Limelight extends SubsystemBase {
 	public void resetInternalIMU() {
 		LimelightHelpers.SetIMUMode(llName, 1);
 		updateIMU();
-		LimelightHelpers.SetIMUMode(llName, 4);
+		LimelightHelpers.SetIMUMode(llName, 0);
 		System.out.println("Limelight IMU reset");
 		isIMUReset = true;
 	}
@@ -64,7 +64,7 @@ public class Limelight extends SubsystemBase {
 		}
 
 		LimelightHelpers.PoseEstimate mt2Estimate =
-				LimelightHelpers.getBotPoseEstimate_wpiBlue(llName);
+				LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(llName);
 		if (mt2Estimate == null || mt2Estimate.tagCount == 0) {
 			minAmbiguity = -1;
 			return null;

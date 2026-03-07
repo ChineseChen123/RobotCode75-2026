@@ -46,14 +46,14 @@ public class ShooterPhysics {
 	}
 
 	public static AngularVelocity distanceToWheelAngularVelocity(double distanceToHub) {
-		if (distanceToHub < 2.31280203) { // min speed to pass top of hub
-			return RotationsPerSecond.of(2650 / 60);
+		if (distanceToHub < 2.263119) { // min speed to pass top of hub
+			return RotationsPerSecond.of(2430 / 60);
 		}
 		return RotationsPerSecond.of(
 				Math.min(
-								(shooterRegressionA * Math.sqrt(distanceToHub - shooterRegressionC)
-										+ shooterRegressionB), // TODO; wtf
-								4000)
+								(shooterRegressionA * distanceToHub
+										+ shooterRegressionB),
+								3800)
 						/ 60.0);
 	}
 
@@ -219,26 +219,6 @@ public class ShooterPhysics {
 		angleDeg += 180;
 		angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
 		angleDeg -= 180;
-
-		if (Math.abs(angleDeg) > turretSoftRange.in(Degrees) / 2.0
-				&& ShooterTurretConstants.useVirtualTarget) {
-			// Basically, if the virtual target is OUTSIDE of range DO NOT do wrap around
-			// instead fall back to normal targeting. Hopefully driver isnt stupid
-			// hopefully this prevents super fast turret movements
-
-			// bad coding prob should use more dry
-			targetHubPose = PeddieBounds.getHubTarget();
-			fieldRelativeToHub =
-					new Rotation2d(
-							targetHubPose.getTranslation().getX() - turretPose.getX(),
-							targetHubPose.getTranslation().getY() - turretPose.getY());
-			turretAngle =
-					fieldRelativeToHub.getMeasure().minus(RobotStates.robotHeading.get().getMeasure());
-			angleDeg = turretAngle.in(Degrees); // (-180,180)
-			angleDeg += 180;
-			angleDeg = (angleDeg < 0) ? (360 - Math.abs(angleDeg) % 360) % 360 : (angleDeg % 360);
-			angleDeg -= 180;
-		}
 
 		// Interpolate blind spot in opposite direction by factor of 3
 		if (Math.abs(angleDeg) > turretSoftRange.in(Degrees) / 2.0) {

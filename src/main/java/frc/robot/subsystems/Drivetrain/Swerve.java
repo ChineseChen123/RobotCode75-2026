@@ -3,6 +3,7 @@ package frc.robot.subsystems.Drivetrain;
 import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.Constants.IOConstants.oneDriver;
 import static frc.robot.Constants.VisionConstants.useFomWeighting;
+import static frc.robot.Constants.VisionConstants.visionOdometryStdevs;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.Utils;
@@ -16,6 +17,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -397,6 +399,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
 				if (!useFomWeighting) {
 					// TODO - variable vision x y stdevs based on FOM
+					setVisionMeasurementStdDevs(visionOdometryStdevs.plus(limelights[i].minAmbiguity() * 10));
 					addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
 					continue;
 				}
