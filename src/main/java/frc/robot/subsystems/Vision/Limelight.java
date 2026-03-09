@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.Vision;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.robot.Constants.VisionConstants.*;
@@ -15,7 +16,6 @@ import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.LimelightHelpers;
-import frc.robot.RobotContainer;
 import frc.robot.state.RobotStates;
 
 public class Limelight extends SubsystemBase {
@@ -40,24 +40,29 @@ public class Limelight extends SubsystemBase {
 				llPose.getX(),
 				llPose.getY(),
 				llPose.getZ(),
-				llPose.getRotation().getX(),
-				llPose.getRotation().getY(),
-				llPose.getRotation().getZ());
+				llPose.getRotation().getMeasureX().in(Degrees),
+				llPose.getRotation().getMeasureY().in(Degrees),
+				llPose.getRotation().getMeasureZ().in(Degrees));
 	}
 
 	public void resetInternalIMU() {
 		LimelightHelpers.SetIMUMode(llName, 1);
-		LimelightHelpers.SetRobotOrientation(
-				llName, RobotContainer.getSwerve().getHeading().getDegrees() + 180, 0, 0, 0, 0, 0);
-		LimelightHelpers.SetIMUMode(llName, 2);
+		updateIMU();
+		LimelightHelpers.SetIMUMode(llName, 0);
 		System.out.println("Limelight IMU reset");
 		isIMUReset = true;
+	}
+
+	public void updateIMU() {
+		LimelightHelpers.SetRobotOrientation(
+				llName, RobotStates.robotHeading.get().getDegrees(), 0, 0, 0, 0, 0);
 	}
 
 	public LimelightHelpers.PoseEstimate getEstimatedPose() {
 		if (!isIMUReset) {
 			resetInternalIMU();
 		}
+
 		LimelightHelpers.PoseEstimate mt2Estimate =
 				LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(llName);
 		if (mt2Estimate == null || mt2Estimate.tagCount == 0) {
@@ -67,19 +72,14 @@ public class Limelight extends SubsystemBase {
 		minAmbiguity = Double.MAX_VALUE;
 		LimelightHelpers.RawFiducial[] detectedTags = mt2Estimate.rawFiducials;
 		for (LimelightHelpers.RawFiducial tag : detectedTags) {
-			// // discard result if tag is too far or too small
-			// if (tag.distToRobot > maxTagDistanceThreshold || tag.ta < minTagAreaThreshold) {
-			// 	return null;
-			// }
-			// // discard result if too ambiguous
-			// if (mt2Estimate.tagCount == 1 && tag.ambiguity > ambiguityThreshold) {
-			// 	return null;
-			// }
-			// if (mt2Estimate.tagCount > 1 && tag.ambiguity > multiTagAmbiguityThreshold) {
-			// 	return null;
-			// }
 			minAmbiguity = Math.min(minAmbiguity, tag.ambiguity);
 		}
+
+		// TODO figure out threshold
+		// if (minAmbiguity > minAmbiguityThreshold) {
+		// 	return null;
+		// }
+
 		return mt2Estimate;
 	}
 
@@ -90,6 +90,11 @@ public class Limelight extends SubsystemBase {
 			return pose.pose;
 		}
 		return new Pose2d();
+	}
+
+	@Logged(key = "Min Ambiguity", importance = Importance.DEBUG)
+	public double minAmbiguity() {
+		return minAmbiguity;
 	}
 
 	public double getFOM(LimelightHelpers.PoseEstimate pose) {
@@ -117,5 +122,7 @@ public class Limelight extends SubsystemBase {
 	}
 
 	@Override
-	public void periodic() {}
+	public void periodic() {
+		updateIMU();
+	}
 }

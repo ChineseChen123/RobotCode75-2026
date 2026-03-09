@@ -4,31 +4,50 @@
 
 package frc.robot.subsystems.EndEffector;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.IntakeIndexConstants.IndexerConstants.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
+import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.lib.dashboard.TunableNumber;
+import frc.lib.util.RaiderLog.Logged;
+import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.Constants.IntakeIndexConstants.IndexerConstants.MotorConfigs;
 
 public class Indexer extends SubsystemBase {
 	/** Creates a new Shooter. */
 	public enum IndexerStates {
-		DEFAULT(defaultIndexerSpeed, defaultHopperSpeed),
-		INDEXING(runningIndexerSpeed, runningHopperSpeed),
-		READYTOSHOOT(defaultIndexerSpeed, runningHopperSpeed),
-		SHOOTING(shootingIndexerSpeed, runningHopperSpeed),
-		REVERSING(reverseIndexerSpeed, reverseHopperSpeed);
+		DEFAULT(defaultIndexerSpeed, defaultHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
+		READYTOSHOOT(
+				defaultIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
+		SHOOTING(
+				shootingIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
+		REVERSING(reverseIndexerSpeed, reverseHopperSpeed, MotorConfigs.getIndexerMotorConfig());
 
 		AngularVelocity indexerSpeed;
 		AngularVelocity hopperSpeed;
+		TalonFXConfiguration indexerConfig;
 
-		private IndexerStates(AngularVelocity indexerSpeed, AngularVelocity hopperSpeed) {
+		private IndexerStates(
+				AngularVelocity indexerSpeed,
+				AngularVelocity hopperSpeed,
+				TalonFXConfiguration indexerConfig) {
 			this.indexerSpeed = indexerSpeed;
 			this.hopperSpeed = hopperSpeed;
+			this.indexerConfig = indexerConfig;
 		}
 	}
 
@@ -38,7 +57,36 @@ public class Indexer extends SubsystemBase {
 
 	private final TalonFX m_IndexerMotor;
 	private final TalonFX m_HopperMotor;
-	private final VelocityTorqueCurrentFOC m_VelocityRequest = new VelocityTorqueCurrentFOC(0);
+	private final VelocityDutyCycle m_IndexerDutyCycle = new VelocityDutyCycle(0);
+	private final VelocityTorqueCurrentFOC m_IndexerTorqueCurrent = new VelocityTorqueCurrentFOC(0);
+	private final VelocityTorqueCurrentFOC m_HopperRequest = new VelocityTorqueCurrentFOC(0);
+
+	private final VoltageOut m_sysIdRequest = new VoltageOut(0.0);
+
+	private final Slot0Configs indexerConfigs = new Slot0Configs();
+	private final TunableNumber indexerKp =
+			new TunableNumber("Indexer/Kp", MotorConfigs.indexerVelocityKP);
+	private final TunableNumber indexerKd =
+			new TunableNumber("Indexer/Kd", MotorConfigs.indexerVelocityKD);
+	private final TunableNumber indexerKs =
+			new TunableNumber("Indexer/Ks", MotorConfigs.indexerVelocityKS);
+	private final TunableNumber indexerKv =
+			new TunableNumber("Indexer/Kv", MotorConfigs.indexerVelocityKV);
+
+	private final Slot0Configs hopperConfigs = new Slot0Configs();
+	private final TunableNumber hopperKp =
+			new TunableNumber("Hopper/Kp", MotorConfigs.hopperVelocityKP);
+	private final TunableNumber hopperKd =
+			new TunableNumber("Hopper/Kd", MotorConfigs.hopperVelocityKD);
+	private final TunableNumber hopperKs =
+			new TunableNumber("Hopper/Ks", MotorConfigs.hopperVelocityKS);
+
+	private final TunableNumber indexerSpeed =
+			new TunableNumber("Indexer/IndexerSpeed", defaultIndexerSpeed.in(RotationsPerSecond));
+	private final TunableNumber hopperSpeed =
+			new TunableNumber("Hopper/HopperSpeed", defaultHopperSpeed.in(RotationsPerSecond));
+
+	private final SysIdRoutine m_sysIdRoutine;
 
 	public Indexer() {
 		m_IndexerMotor = new TalonFX(indexerMotorCanID, superstructureCANBusName);
@@ -50,8 +98,43 @@ public class Indexer extends SubsystemBase {
 		m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerMotorConfig());
 		m_HopperMotor.getConfigurator().apply(MotorConfigs.getHopperMotorConfig());
 
-		m_VelocityRequest.UpdateFreqHz = 0;
-		m_VelocityRequest.UseTimesync = true;
+		m_IndexerTorqueCurrent.UpdateFreqHz = 0;
+		m_IndexerTorqueCurrent.UseTimesync = true;
+		m_HopperRequest.UpdateFreqHz = 0;
+		m_HopperRequest.UseTimesync = true;
+
+		indexerConfigs
+				.withKP(MotorConfigs.indexerVelocityKP)
+				.withKD(MotorConfigs.indexerVelocityKD)
+				.withKS(MotorConfigs.indexerVelocityKS);
+
+		hopperConfigs
+				.withKP(MotorConfigs.hopperVelocityKP)
+				.withKD(MotorConfigs.hopperVelocityKD)
+				.withKS(MotorConfigs.hopperVelocityKS);
+
+		m_sysIdRoutine =
+				new SysIdRoutine(
+						new SysIdRoutine.Config(
+								null, // Use default ramp rate (1 V/s)
+								Volts.of(4), // Reduce dynamic step voltage to 4 to prevent brownout
+								null, // Use default timeout (10 s)
+								// Log state with Phoenix SignalLogger class
+								(state) -> SignalLogger.writeString("state", state.toString())),
+						new SysIdRoutine.Mechanism(
+								(volts) -> {
+									m_IndexerMotor.setControl(m_sysIdRequest.withOutput(volts.in(Volts)));
+								},
+								null,
+								this));
+	}
+
+	public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+		return m_sysIdRoutine.quasistatic(direction);
+	}
+
+	public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+		return m_sysIdRoutine.dynamic(direction);
 	}
 
 	public boolean hasFuel() {
@@ -59,8 +142,24 @@ public class Indexer extends SubsystemBase {
 		return false;
 	}
 
-	public double getIndexerVelocity() {
+	@Logged(key = "Indexer Velocity", importance = Importance.DEBUG)
+	public double getIndexerVelocityRPS() {
 		return m_IndexerMotor.getVelocity(true).getValue().in(RotationsPerSecond);
+	}
+
+	@Logged(key = "Hopper Velocity", importance = Importance.DEBUG)
+	public double getHopperVelocityRPS() {
+		return m_HopperMotor.getVelocity(true).getValue().in(RotationsPerSecond);
+	}
+
+	@Logged(key = "Indexer Current", importance = Importance.DEBUG)
+	public double getIndexerCurrent() {
+		return m_IndexerMotor.getStatorCurrent(true).getValue().in(Amps);
+	}
+
+	@Logged(key = "Indexer Supply Current", importance = Importance.DEBUG)
+	public double getIndexerSupplyCurrent() {
+		return m_IndexerMotor.getSupplyCurrent(true).getValue().in(Amps);
 	}
 
 	public IndexerStates getIndexerState() {
@@ -73,7 +172,39 @@ public class Indexer extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		m_IndexerMotor.setControl(m_VelocityRequest.withVelocity(m_IndexerState.indexerSpeed));
-		m_HopperMotor.setControl(m_VelocityRequest.withVelocity(m_IndexerState.hopperSpeed));
+
+		if (indexerKp.getNumber() != indexerConfigs.kP
+				|| indexerKd.getNumber() != indexerConfigs.kD
+				|| indexerKs.getNumber() != indexerConfigs.kS
+				|| indexerKv.getNumber() != indexerConfigs.kV) {
+			indexerConfigs
+					.withKP(indexerKp.getNumber())
+					.withKD(indexerKd.getNumber())
+					.withKS(indexerKs.getNumber())
+					.withKV(indexerKv.getNumber());
+			m_IndexerMotor.getConfigurator().apply(indexerConfigs);
+		}
+
+		// if (hopperKp.getNumber() != hopperConfigs.kP
+		// 		|| hopperKd.getNumber() != hopperConfigs.kD
+		// 		|| hopperKs.getNumber() != hopperConfigs.kS) {
+		// 	hopperConfigs
+		// 			.withKP(hopperKp.getNumber())
+		// 			.withKD(hopperKd.getNumber())
+		// 			.withKS(hopperKs.getNumber());
+		// 	m_HopperMotor.getConfigurator().apply(hopperConfigs);
+		// }
+
+		if (m_IndexerState.indexerSpeed.baseUnitMagnitude() == 0) {
+			m_IndexerMotor.setControl(new CoastOut());
+		} else {
+			m_IndexerMotor.setControl(m_IndexerTorqueCurrent.withVelocity(m_IndexerState.indexerSpeed));
+		}
+
+		if (m_IndexerState.hopperSpeed.baseUnitMagnitude() == 0) {
+			m_HopperMotor.setControl(new CoastOut());
+		} else {
+			m_HopperMotor.setControl(m_HopperRequest.withVelocity(m_IndexerState.hopperSpeed));
+		}
 	}
 }

@@ -18,7 +18,8 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -31,21 +32,21 @@ import edu.wpi.first.units.measure.Time;
 public class ShooterTurretConstants {
 
 	public static final boolean useVirtualTarget = false;
-	public static final int virtualTargetSolveIterations = 6;
+	public static final int virtualTargetSolveIterations = 12;
 
 	public class ShooterConstants {
 		// Kraken X60s
 		public static final int shooterMotor1CanID = 41;
 		public static final int shooterMotor2CanID = 42;
 
-		public static final double shooterGearRatio = 1.0; // 1.5 / 1.0
+		public static final double shooterGearRatio = 1.5;
 
 		public static final Distance shooterWheelDiameter = Inches.of(4);
 
 		public static final AngularVelocity defaultShooterSpeed = RotationsPerSecond.of(0);
 		public static final AngularVelocity reverseShooterSpeed = RotationsPerSecond.of(-10);
 
-		public static final double shooterVelocityTolerance = 50.0 / 60.0; // rotations per second
+		public static final double shooterVelocityTolerance = 150.0 / 60.0; // rotations per second
 
 		// Note that the flywheel MOI effective to the motors is multiplied by the gear ratio squared.
 		// <-- from recalc
@@ -60,12 +61,17 @@ public class ShooterTurretConstants {
 						* (shooterWheelRadius.in(Inches)
 								* shooterWheelRadius.in(Inches)); // in^2 / lbs, 1/2mr^2 approx.
 		public static final double ballWeight = .474; // lbs
-		public static final Angle shooterAngleWithHorizontal = Degrees.of(12);
+		public static final Angle shooterAngleWithVertical = Degrees.of(25);
 		public static final Distance shooterHeight = Inches.of(19.5);
+
+		// A*sqrt(x - C) + B
+		public static final double shooterRegressionA = 252.63148;
+		public static final double shooterRegressionB = 1858.26502;
+		public static final double shooterRegressionC = 2.1;
 
 		public static final class MotorConfigs {
 
-			public static final TalonFXConfiguration m_shooterMotor1Config = new TalonFXConfiguration();
+			public static final TalonFXConfiguration m_shooterMotorConfig = new TalonFXConfiguration();
 			public static final TalonFXConfiguration m_shooterMotor2Config = new TalonFXConfiguration();
 
 			// Neutral modes and inverts
@@ -79,53 +85,72 @@ public class ShooterTurretConstants {
 
 			public static final Current shooterMotorSupplyCurrentLimit = Amps.of(40);
 			public static final Current shooterMotorCurrentLowerThreshold = Amps.of(30);
-			public static final Current shooterMotorStatorCurrentLimit = Amps.of(60);
+			public static final Current shooterMotorStatorCurrentLimit = Amps.of(80);
 
 			// Torque PI
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double shooterMotorVelocityKP = 25;
+			public static final double shooterMotorVelocityKP = 35;
 			public static final double shooterMotorVelocityKI = 0.0;
 			public static final double shooterMotorVelocityKD = 0.0;
-			public static final double shooterMotorVelocityKS = 0.3;
+			public static final double shooterMotorVelocityKS = 0.45181;
+			public static final double shooterMotorVelocityKV = 0.25;
+			public static final double shooterMotorVelocityKA = 0.025;
 
 			public static TalonFXConfiguration getShooterMotorConfiguration() {
 
-				m_shooterMotor1Config.MotorOutput.Inverted = shooterMotorInverted;
-				m_shooterMotor1Config.MotorOutput.NeutralMode = shooterMotorNeutralMode;
+				m_shooterMotorConfig.MotorOutput.Inverted = shooterMotorInverted;
+				m_shooterMotorConfig.MotorOutput.NeutralMode = shooterMotorNeutralMode;
 
-				m_shooterMotor1Config.Feedback.SensorToMechanismRatio = 1 / shooterGearRatio;
+				m_shooterMotorConfig.Feedback.SensorToMechanismRatio = 1 / shooterGearRatio;
 
 				// Current Limiting
-				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLimitEnable = true;
-				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLimit =
+				m_shooterMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+				m_shooterMotorConfig.CurrentLimits.SupplyCurrentLimit =
 						shooterMotorSupplyCurrentLimit.in(Amps);
-				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLowerTime =
+				m_shooterMotorConfig.CurrentLimits.SupplyCurrentLowerTime =
 						shooterMotorCurrentThresholdTime.in(Seconds);
-				m_shooterMotor1Config.CurrentLimits.SupplyCurrentLowerLimit =
+				m_shooterMotorConfig.CurrentLimits.SupplyCurrentLowerLimit =
 						shooterMotorCurrentLowerThreshold.in(Amps);
-				m_shooterMotor1Config.CurrentLimits.StatorCurrentLimitEnable = true;
-				m_shooterMotor1Config.CurrentLimits.StatorCurrentLimit =
+				m_shooterMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+				m_shooterMotorConfig.CurrentLimits.StatorCurrentLimit =
 						shooterMotorStatorCurrentLimit.in(Amps);
 
 				// PID Config
-				m_shooterMotor1Config.Slot0.kP = shooterMotorVelocityKP;
-				m_shooterMotor1Config.Slot0.kI = shooterMotorVelocityKI;
-				m_shooterMotor1Config.Slot0.kD = shooterMotorVelocityKD;
-				m_shooterMotor1Config.Slot0.kS = shooterMotorVelocityKS;
+				m_shooterMotorConfig.Slot0.kP = shooterMotorVelocityKP;
+				m_shooterMotorConfig.Slot0.kI = shooterMotorVelocityKI;
+				m_shooterMotorConfig.Slot0.kD = shooterMotorVelocityKD;
+				m_shooterMotorConfig.Slot0.kS = shooterMotorVelocityKS;
+				m_shooterMotorConfig.Slot0.kV = shooterMotorVelocityKV;
+				m_shooterMotorConfig.Slot0.kA = shooterMotorVelocityKA;
 
 				// Open and Closed Loop Ramping
-				m_shooterMotor1Config.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = openLoopRamp;
-				m_shooterMotor1Config.OpenLoopRamps.VoltageOpenLoopRampPeriod = openLoopRamp;
+				m_shooterMotorConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = openLoopRamp;
+				m_shooterMotorConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = openLoopRamp;
 
-				m_shooterMotor1Config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = closedLoopRamp;
-				m_shooterMotor1Config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = closedLoopRamp;
+				m_shooterMotorConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = closedLoopRamp;
+				m_shooterMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = closedLoopRamp;
 
-				m_shooterMotor1Config.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp;
-				m_shooterMotor1Config.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
+				m_shooterMotorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp;
+				m_shooterMotorConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
 
-				return m_shooterMotor1Config;
+				return m_shooterMotorConfig;
+			}
+
+			public static TalonFXConfiguration getShooterBangBangConfiguration() {
+				TalonFXConfiguration config = getShooterMotorConfiguration();
+
+				config.Slot0.kP = 10000;
+				config.Slot0.kD = 0.0;
+				config.Slot0.kV = 0.0;
+				config.Slot0.kA = 0.0;
+				config.TorqueCurrent.PeakForwardTorqueCurrent = 70.0;
+				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
+				config.MotorOutput.PeakForwardDutyCycle = 1.0;
+				config.MotorOutput.PeakReverseDutyCycle = 0.0;
+
+				return config;
 			}
 		}
 	}
@@ -143,16 +168,19 @@ public class ShooterTurretConstants {
 		public static final double motorToTurretRatio =
 				10.0 / 54.0 * encoderPinion1Teeth / ringGearTeeth;
 		// translation from robot center to turret center, climber is forward
-		public static final Translation2d turretPositionOffset =
-				new Translation2d(Inches.of(2), Inches.of(10));
+		public static final Transform2d turretPositionOffset =
+				new Transform2d(Inches.of(2.5), Inches.of(-5.945), Rotation2d.kZero);
 		public static final double turretPositionToleranceDegrees = 1.5;
+		// stow angle and threshold
+		public static final Angle turretStowAngle = Degrees.of(-90);
 
 		// at CW limit
-		public static final Angle encoder1ZeroPoint = Degrees.of(91.6);
-		public static final Angle encoder2ZeroPoint = Degrees.of(62.8);
+		public static final Angle encoder1ZeroPoint = Degrees.of(191.0);
+		public static final Angle encoder2ZeroPoint = Degrees.of(166.2);
 
 		// discrepancy threshold between encoders to accept solution
-		public static final Angle matchTolerance = Degrees.of(8);
+		public static final Angle goodMatchTolerance = Degrees.of(10);
+		public static final Angle acceptableMatchTolerance = Degrees.of(25);
 		// minimum difference between two possible solutions to avoid ambiguity
 		public static final Angle ambiguityTolerance = Degrees.of(2);
 

@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.Constants.IOConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
@@ -19,8 +18,16 @@ import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.state.Bindings;
 import frc.robot.state.Driver;
 import frc.robot.state.Operator;
+import frc.robot.state.RobotStates;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.Indexer;
+import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
+import frc.robot.subsystems.EndEffector.Intake;
+import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
+import frc.robot.subsystems.EndEffector.Shooter;
+import frc.robot.subsystems.EndEffector.Shooter.ShooterStates;
 import frc.robot.subsystems.EndEffector.Turret;
+import frc.robot.subsystems.EndEffector.Turret.TurretStates;
 import frc.robot.subsystems.Vision.Limelight;
 
 public class RobotContainer {
@@ -37,18 +44,18 @@ public class RobotContainer {
 					DrivetrainConstants.BackLeft,
 					DrivetrainConstants.BackRight);
 
-	// public static final Intake m_Intake = new Intake();
+	public static final Intake m_Intake = new Intake();
 
-	// public static final Indexer m_Indexer = new Indexer();
+	public static final Indexer m_Indexer = new Indexer();
 
-	// public static final Shooter m_Shooter = new Shooter();
+	public static final Shooter m_Shooter = new Shooter();
 
 	public static final Turret m_Turret = new Turret();
 
 	// Cameras
-	// public static final Limelight m_LimelightTL = new Limelight(topLeftLLName, topLeftLLPose);
+	public static final Limelight m_LimelightTL = new Limelight(topLeftLLName, topLeftLLPose);
 
-	// public static final Limelight m_LimelightTR = new Limelight(topRightLLName, topRightLLPose);
+	public static final Limelight m_LimelightTR = new Limelight(topRightLLName, topRightLLPose);
 
 	// Define IO controls
 	private static final Driver m_Driver =
@@ -69,9 +76,13 @@ public class RobotContainer {
 
 	// Register any subsystems to be logged
 	private void configureLogging() {
-		// RaiderLog.register("Swerve", m_Swerve);
-		// RaiderLog.register("Shooter", m_Shooter);
+		RaiderLog.register("Swerve", m_Swerve);
+		RaiderLog.register("Shooter", m_Shooter);
 		RaiderLog.register("Turret", m_Turret);
+		// RaiderLog.register("Limelight TR", m_LimelightTR);
+		// RaiderLog.register("Limelight TL", m_LimelightTL);
+		RaiderLog.register("Indexer", m_Indexer);
+		// RaiderLog.register("Intake", m_Intake);
 	}
 
 	// Configure button bindings based on driving mode
@@ -82,15 +93,79 @@ public class RobotContainer {
 			m_Bindings.bind2Driver();
 		}
 
-		m_Operator.leftBumper.whileTrue(
-				new InstantCommand(() -> m_Turret.changeHeading(Degrees.of(-1)), m_Turret).repeatedly());
-		m_Operator.rightBumper.whileTrue(
-				new InstantCommand(() -> m_Turret.changeHeading(Degrees.of(1)), m_Turret).repeatedly());
+		// m_Operator.leftBumper.onTrue(Commands.runOnce(SignalLogger::start));
+		// m_Operator.rightBumper.onTrue(Commands.runOnce(SignalLogger::stop));
 
-		// m_Operator.Y.whileTrue(
-		// 	new InstantCommand(() -> m_Shooter.setState(ShooterStates.SHOOTING), m_Shooter).repeatedly()
-		// 			.finallyDo(() -> m_Shooter.setState(ShooterStates.DEFAULT))
-		// );
+		// m_Operator.Y.whileTrue(m_Shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+		// m_Operator.A.whileTrue(m_Shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+		// m_Operator.B.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
+		// m_Operator.X.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+		m_Operator
+				.leftTriggerGreater(0.15)
+				.whileTrue(
+						new InstantCommand(
+										() -> {
+											m_Shooter.setState(ShooterStates.SHOOTING);
+										},
+										m_Shooter)
+								.repeatedly()
+								.finallyDo(
+										() -> {
+											m_Shooter.setState(ShooterStates.DEFAULT);
+										}));
+
+		// shoot
+		m_Operator
+				.rightTriggerGreater(.15)
+				.whileTrue(
+						new InstantCommand(
+										() -> {
+											m_Indexer.setState(
+													// RobotStates.turretIsInDeadzone.getAsBoolean()
+													// 		? IndexerStates.DEFAULT
+															IndexerStates.SHOOTING);
+										},
+										m_Indexer)
+								.repeatedly()
+								.finallyDo(
+										() -> {
+											m_Indexer.setState(IndexerStates.DEFAULT);
+										}));
+
+		// intake
+		m_Operator.A.whileTrue(
+				new InstantCommand(
+								() -> {
+									m_Intake.setState(IntakeStates.INTAKING);
+								},
+								m_Intake)
+						.repeatedly()
+						.finallyDo(
+								() -> {
+									m_Intake.setState(IntakeStates.DEFAULT);
+								}));
+
+		// aim turret (hold)
+		m_Operator.B.whileTrue(
+				new InstantCommand(
+								() -> {
+									m_Turret.setState(TurretStates.SCORING);
+								},
+								m_Turret)
+						.repeatedly()
+						.finallyDo(() -> m_Turret.setState(TurretStates.IDLE)));
+
+		// aim turret (toggle)
+		m_Operator.Y.whileTrue(
+				new InstantCommand(
+						() -> {
+							m_Turret.setState(
+									m_Turret.getTurretState() != TurretStates.SCORING
+											? TurretStates.SCORING
+											: TurretStates.IDLE);
+						},
+						m_Turret));
 	}
 
 	// Configure auto selector
@@ -110,25 +185,24 @@ public class RobotContainer {
 		return m_Swerve;
 	}
 
-	// public static Intake getIntake() {
-	// 	return m_Intake;
-	// }
+	public static Intake getIntake() {
+		return m_Intake;
+	}
 
-	// public static Indexer getIndexer() {
-	// 	return m_Indexer;
-	// }
+	public static Indexer getIndexer() {
+		return m_Indexer;
+	}
 
-	// public static Shooter getShooter() {
-	// 	return m_Shooter;
-	// }
+	public static Shooter getShooter() {
+		return m_Shooter;
+	}
 
 	public static Turret getTurret() {
 		return m_Turret;
 	}
 
 	public static Limelight[] getLimelights() {
-		// return new Limelight[] {m_LimelightTL, m_LimelightTR};
-		return new Limelight[] {};
+		return new Limelight[] {m_LimelightTL, m_LimelightTR};
 	}
 
 	public static Driver getDriver() {

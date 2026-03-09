@@ -18,6 +18,8 @@ public final class RobotConstants {
 	public static final String superstructureCANBusName = "superstructure";
 	public static final boolean TUNING_MODE = true; // Set to true for tunable numbers
 
+	public static final double loopTimeSecs = 0.02;
+
 	public static final Distance bumperThickness = Inches.of(3);
 	public static final Distance bumperWidth = Inches.of(27.5 + 2 * bumperThickness.in(Inches));
 }

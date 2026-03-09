@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.Turret;
 import java.util.function.Supplier;
 
 public class RobotStates {
@@ -64,9 +65,12 @@ public class RobotStates {
 	// public static final Trigger shooterAtSpeed = new Trigger(m_Shooter::atTargetVelocity);
 
 	/** Turret states */
-	// public static final Trigger turretReset = new Trigger(m_Turret::isReset);
+	// public static final Trigger turretFullyReset = new Trigger(() -> m_Turret.resetState() == 2);
 
 	// public static final Trigger turretAtTarget = new Trigger(m_Turret::atTargetHeading);
+	// public static final Trigger turretIsStowed = new Trigger(m_Turret::isStowed);
+
+	// public static final Trigger turretIsInDeadzone = new Trigger(m_Turret::inDeadzone);
 
 	// ── Actions ──────────────────────────────────────────────────────────────────
 
