@@ -46,7 +46,7 @@ public class ShooterTurretConstants {
 		public static final AngularVelocity defaultShooterSpeed = RotationsPerSecond.of(0);
 		public static final AngularVelocity reverseShooterSpeed = RotationsPerSecond.of(-10);
 
-		public static final double shooterVelocityTolerance = 150.0 / 60.0; // rotations per second
+		public static final double shooterVelocityTolerance = 150.0; // rpm
 
 		// Note that the flywheel MOI effective to the motors is multiplied by the gear ratio squared.
 		// <-- from recalc

@@ -5,8 +5,6 @@
 package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 import static frc.robot.Constants.ShooterTurretConstants.ShooterConstants.*;
 
@@ -74,7 +72,7 @@ public class Shooter extends SubsystemBase {
 	// ── Internal state ───────────────────────────────────────────────────────────
 
 	private ShooterStates m_ShooterState;
-	private AngularVelocity shooterTargetVelocity = RotationsPerSecond.of(0);
+	private AngularVelocity shooterTargetVelocity = RPM.of(0);
 
 	private final Debouncer atSetpointDebouncer = new Debouncer(0.025, DebounceType.kFalling);
 	private boolean lastAtSetpoint = false;
@@ -89,11 +87,11 @@ public class Shooter extends SubsystemBase {
 		m_ShooterMotor1.getConfigurator().apply(MotorConfigs.getShooterBangBangConfiguration());
 		m_ShooterMotor2.getConfigurator().apply(MotorConfigs.getShooterBangBangConfiguration());
 
-		m_VelocityRequest = new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
+		m_VelocityRequest = new VelocityTorqueCurrentFOC(RPM.of(0));
 		m_FollowerRequest = new Follower(m_ShooterMotor1.getDeviceID(), MotorAlignmentValue.Opposed);
 
-		m_DutyCycleBangBang = new VelocityDutyCycle(RotationsPerSecond.of(0));
-		m_TorqueCurrentBangBang = new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
+		m_DutyCycleBangBang = new VelocityDutyCycle(RPM.of(0));
+		m_TorqueCurrentBangBang = new VelocityTorqueCurrentFOC(RPM.of(0));
 
 		m_ShooterState = ShooterStates.DEFAULT;
 
@@ -119,7 +117,7 @@ public class Shooter extends SubsystemBase {
 
 	@Logged(key = "Shooter Motor Velocity RPM", importance = Importance.CRITICAL)
 	public double getMotorVelocityRPM() {
-		return getVelocity().in(RotationsPerSecond) * 60;
+		return getVelocity().in(RPM);
 	}
 
 	@Logged(key = "Shooter Wheel Velocity RPM", importance = Importance.CRITICAL)
@@ -137,16 +135,16 @@ public class Shooter extends SubsystemBase {
 
 	@Logged(key = "Shooter Target Velocity RPM", importance = Importance.CRITICAL)
 	public double targetVelocityRPM() {
-		return shooterTargetVelocity.in(RotationsPerSecond) * 60;
+		return shooterTargetVelocity.in(RPM);
 	}
 
 	public boolean atTargetVelocity() {
-		return getVelocity().minus(shooterTargetVelocity).abs(RotationsPerSecond)
+		return getVelocity().minus(shooterTargetVelocity).abs(RPM)
 				< shooterVelocityTolerance;
 	}
 
 	public boolean aboveTargetVelocity() {
-		return getVelocity().in(RotationsPerSecond) > shooterTargetVelocity.in(RotationsPerSecond);
+		return getVelocity().in(RPM) > shooterTargetVelocity.in(RPM);
 	}
 
 	public ShooterStates getShooterState() {
@@ -213,7 +211,7 @@ public class Shooter extends SubsystemBase {
 
 		} else if (m_ShooterState == ShooterStates.DEFAULT) {
 			m_ShooterMotor1.setControl(new CoastOut());
-			shooterTargetVelocity = RadiansPerSecond.of(0);
+			shooterTargetVelocity = RPM.of(0);
 		} else {
 			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
 			shooterTargetVelocity = m_ShooterState.shooterSpeed;
