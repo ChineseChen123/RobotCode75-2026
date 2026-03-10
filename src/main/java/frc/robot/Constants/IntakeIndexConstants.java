@@ -42,7 +42,7 @@ public class IntakeIndexConstants {
 		public static final Angle pivotUpAngle = Rotations.of(0.4);
 
 		public static final AngularVelocity defaultIntakeSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(40);
+		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(80);
 		public static final AngularVelocity intakeReversingSpeed = RotationsPerSecond.of(-30);
 
 		public static final class MotorConfigs {
@@ -53,7 +53,7 @@ public class IntakeIndexConstants {
 			public static final InvertedValue intakeMotorInvert = InvertedValue.Clockwise_Positive;
 			public static final InvertedValue pivotInvert = InvertedValue.Clockwise_Positive;
 
-			public static final NeutralModeValue intakeNeutralMode = NeutralModeValue.Brake;
+			public static final NeutralModeValue intakeNeutralMode = NeutralModeValue.Coast;
 			public static final NeutralModeValue pivotNeutralMode = NeutralModeValue.Brake;
 
 			public static final Frequency timeSyncFreq = Hertz.of(250);
@@ -70,7 +70,7 @@ public class IntakeIndexConstants {
 			public static final Current pivotSupplyCurrentLimit = Amps.of(40);
 			public static final Current pivotCurrentLowerThreshold = Amps.of(30);
 
-			public static final Current pivotStatorCurrentLimit = Amps.of(60);
+			public static final Current pivotStatorCurrentLimit = Amps.of(80);
 			public static final Current pivotStatorCurrentLimitForward = Amps.of(60);
 			public static final Current pivotStatorCurrentLimitReverse = Amps.of(-60);
 
@@ -84,10 +84,12 @@ public class IntakeIndexConstants {
 			public static final double closedLoopRamp = 0.1;
 
 			// good enough for now
-			public static final double intakeVelocityKP = 3.5;
+			public static final double intakeVelocityKP = 3;
 			public static final double intakeVelocityKI = 0.0;
-			public static final double intakeVelocityKD = 0.01;
+			public static final double intakeVelocityKD = 0;
 			public static final double intakeVelocityKS = 20;
+			public static final double intakeVelocityKV = .01;
+
 
 			// good enough for now
 			public static final double pivotKP = 70;

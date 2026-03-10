@@ -89,6 +89,8 @@ public class Intake extends SubsystemBase {
 	private final TunableNumber intakeMotorKi;
 	private final TunableNumber intakeMotorKd;
 	private final TunableNumber intakeMotorKs;
+	private final TunableNumber intakeMotorKv;
+
 
 	/** Creates a new Intake. */
 	public Intake() {
@@ -132,6 +134,8 @@ public class Intake extends SubsystemBase {
 		intakeMotorKi = new TunableNumber("Intake Motor/kI", intakeVelocityKI);
 		intakeMotorKd = new TunableNumber("Intake Motor/kD", intakeVelocityKD);
 		intakeMotorKs = new TunableNumber("Intake Motor/kS", intakeVelocityKS);
+		intakeMotorKv = new TunableNumber("Intake Motor/kV", intakeVelocityKV);
+
 
 		m_absoluteEncoder = new DutyCycleEncoder(pivotEncoderPort, 1, pivotZeroPoint.in(Rotations));
 
@@ -205,17 +209,19 @@ public class Intake extends SubsystemBase {
 		// 	m_PivotMotor.getConfigurator().apply(PivotMMConfigs);
 		// }
 
-		// if (intakeMotorKp.getNumber() != IntakeMotorPIDConfig.kP
-		// 		|| intakeMotorKi.getNumber() != IntakeMotorPIDConfig.kI
-		// 		|| intakeMotorKd.getNumber() != IntakeMotorPIDConfig.kD
-		// 		|| intakeMotorKs.getNumber() != IntakeMotorPIDConfig.kS) {
-		// 	IntakeMotorPIDConfig.kP = intakeMotorKp.getNumber();
-		// 	IntakeMotorPIDConfig.kI = intakeMotorKi.getNumber();
-		// 	IntakeMotorPIDConfig.kD = intakeMotorKd.getNumber();
-		// 	IntakeMotorPIDConfig.kS = intakeMotorKs.getNumber();
+		if (intakeMotorKp.getNumber() != IntakeMotorPIDConfig.kP
+				|| intakeMotorKi.getNumber() != IntakeMotorPIDConfig.kI
+				|| intakeMotorKd.getNumber() != IntakeMotorPIDConfig.kD
+				|| intakeMotorKs.getNumber() != IntakeMotorPIDConfig.kS
+				|| intakeMotorKv.getNumber() != IntakeMotorPIDConfig.kV) {
+			IntakeMotorPIDConfig.kP = intakeMotorKp.getNumber();
+			IntakeMotorPIDConfig.kI = intakeMotorKi.getNumber();
+			IntakeMotorPIDConfig.kD = intakeMotorKd.getNumber();
+			IntakeMotorPIDConfig.kS = intakeMotorKs.getNumber();
+			IntakeMotorPIDConfig.kV = intakeMotorKv.getNumber();
 
-		// 	m_IntakeMotor.getConfigurator().apply(IntakeMotorPIDConfig);
-		// }
+			m_IntakeMotor.getConfigurator().apply(IntakeMotorPIDConfig);
+		}
 
 		// if (m_IntakeState == IntakeStates.STOWED && !RobotStates.turretIsStowed.getAsBoolean()) {
 		// 	// panic!
@@ -230,7 +236,7 @@ public class Intake extends SubsystemBase {
 			m_IntakeMotor.setControl(new CoastOut());
 		}
 
-		m_PivotMotor.setControl(m_PivotRequest.withPosition(m_IntakeState.pivotPosition));
+		// m_PivotMotor.setControl(m_PivotRequest.withPosition(m_IntakeState.pivotPosition));
 
 	}
 }

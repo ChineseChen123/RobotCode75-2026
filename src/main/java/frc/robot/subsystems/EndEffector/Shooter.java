@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.EndEffector;
 
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 import static frc.robot.Constants.ShooterTurretConstants.ShooterConstants.*;
@@ -122,14 +124,14 @@ public class Shooter extends SubsystemBase {
 
 	@Logged(key = "Shooter Wheel Velocity RPM", importance = Importance.CRITICAL)
 	public double getWheelVelocityRPM() {
-		return getMotorVelocityRPM() * shooterGearRatio;
+		return getMotorVelocityRPM() * shooterGearRatio + shooterTargetVelocity.in(RPM);
 	}
 
 	public AngularVelocity getVelocity() {
 		return m_ShooterMotor1
 				.getVelocity(true)
 				.getValue()
-				.plus(m_ShooterMotor2.getVelocity(true).getValue())
+				.plus(m_ShooterMotor2.getVelocity(true).getValue().times(-1))
 				.div(2);
 	}
 
@@ -207,8 +209,11 @@ public class Shooter extends SubsystemBase {
 				m_ShooterMotor1.setControl(m_DutyCycleBangBang.withVelocity(shooterTargetVelocity));
 			}
 
+			// shooterTargetVelocity = m_ShooterState.shooterSpeed;
+
 		} else if (m_ShooterState == ShooterStates.DEFAULT) {
 			m_ShooterMotor1.setControl(new CoastOut());
+			shooterTargetVelocity = RadiansPerSecond.of(0);
 		} else {
 			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
 			shooterTargetVelocity = m_ShooterState.shooterSpeed;

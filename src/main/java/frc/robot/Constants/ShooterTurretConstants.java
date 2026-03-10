@@ -31,7 +31,7 @@ import edu.wpi.first.units.measure.Time;
 /** Add your docs here. */
 public class ShooterTurretConstants {
 
-	public static final boolean useVirtualTarget = false;
+	public static final boolean useVirtualTarget = true;
 	public static final int virtualTargetSolveIterations = 12;
 
 	public class ShooterConstants {
