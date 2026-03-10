@@ -41,6 +41,14 @@ public class Operator extends SubsystemBase {
 	public Trigger start = kFalse;
 	public Trigger back = kFalse;
 
+	public DoubleSupplier leftStickX = () -> 0;
+	public DoubleSupplier leftStickY = () -> 0;
+	public DoubleSupplier leftStickXProcessed = () -> 0;
+	public DoubleSupplier leftStickYProcessed = () -> 0;
+	public DoubleSupplier rightStickX = () -> 0;
+	public DoubleSupplier rightStickY = () -> 0;
+	public DoubleSupplier rightStickXProcessed = () -> 0;
+
 	/** Creates a new Driver. */
 	public Operator(CommandXboxController controller) {
 		m_Controller = controller;
@@ -57,64 +65,41 @@ public class Operator extends SubsystemBase {
 		rightDpad = m_Controller.povRight();
 		start = m_Controller.start();
 		back = m_Controller.back();
-	}
 
-	public Trigger leftTriggerGreater(double thresh) {
-		return new Trigger(() -> m_Controller.getLeftTriggerAxis() > thresh);
-	}
-
-	public Trigger rightTriggerGreater(double thresh) {
-		return new Trigger(() -> m_Controller.getRightTriggerAxis() > thresh);
-	}
-
-	public DoubleSupplier leftStickX() {
-		return () -> m_Controller.getLeftX();
-	}
-
-	public DoubleSupplier leftStickY() {
-		return () -> m_Controller.getLeftY();
-	}
-
-	/** applies deadbands and exponents to stick values */
-	public DoubleSupplier leftStickXProcessed() {
-		return () -> {
+		leftStickX = () -> m_Controller.getHID().getLeftX();
+		leftStickY = () -> m_Controller.getHID().getLeftY();
+		leftStickXProcessed = () -> {
 			double val =
-					MathUtil.applyDeadband(m_Controller.getLeftX(), stickDeadband) * translationStickMapValue;
+					MathUtil.applyDeadband(m_Controller.getHID().getLeftX(), stickDeadband) * translationStickMapValue;
 			return val >= 0
 					? Math.pow(val, translationJoystickExpo)
 					: -1 * Math.pow(-val, translationJoystickExpo);
 		};
-	}
-
-	/** applies deadbands and exponents to stick values */
-	public DoubleSupplier leftStickYProcessed() {
-		return () -> {
+		leftStickYProcessed = () -> {
 			double val =
-					MathUtil.applyDeadband(m_Controller.getLeftY(), stickDeadband) * translationStickMapValue;
+					MathUtil.applyDeadband(m_Controller.getHID().getLeftY(), stickDeadband) * translationStickMapValue;
 			return val >= 0
 					? Math.pow(val, translationJoystickExpo)
 					: -1 * Math.pow(-val, translationJoystickExpo);
 		};
-	}
-
-	public DoubleSupplier rightStickX() {
-		return () -> m_Controller.getRightX();
-	}
-
-	public DoubleSupplier rightStickY() {
-		return () -> m_Controller.getRightY();
-	}
-
-	/** applies deadbands and exponents to stick values */
-	public DoubleSupplier rightStickXProcessed() {
-		return () -> {
+		rightStickX = () -> m_Controller.getHID().getRightX();
+		rightStickY = () -> m_Controller.getHID().getRightY();
+		rightStickXProcessed = () -> {
 			double val =
-					MathUtil.applyDeadband(m_Controller.getRightX(), stickDeadband)
+					MathUtil.applyDeadband(m_Controller.getHID().getRightX(), stickDeadband)
 							* translationStickMapValue;
 			return val >= 0
 					? Math.pow(val, translationJoystickExpo)
 					: -1 * Math.pow(-val, translationJoystickExpo);
 		};
+	}
+
+	public Trigger leftTriggerGreater(double thresh) {
+		return new Trigger(() -> m_Controller.getHID().getLeftTriggerAxis() > thresh);
+	}
+
+	public Trigger rightTriggerGreater(double thresh) {
+		return new Trigger(() -> m_Controller.getHID().getRightTriggerAxis() > thresh);
 	}
 
 	public void rumble(double leftIntensity, double rightIntensity) {
@@ -129,9 +114,9 @@ public class Operator extends SubsystemBase {
 	public double[] processedJoystickValues() {
 		// Negation because joystick forward is negative
 		double[] DriverInput = {
-			MathUtil.applyDeadband(-leftStickYProcessed().getAsDouble(), stickDeadband),
-			MathUtil.applyDeadband(-leftStickXProcessed().getAsDouble(), stickDeadband),
-			MathUtil.applyDeadband(-rightStickXProcessed().getAsDouble(), stickDeadband)
+			MathUtil.applyDeadband(-leftStickYProcessed.getAsDouble(), stickDeadband),
+			MathUtil.applyDeadband(-leftStickXProcessed.getAsDouble(), stickDeadband),
+			MathUtil.applyDeadband(-rightStickXProcessed.getAsDouble(), stickDeadband)
 		};
 		boolean fieldRelative = RobotContainer.getSwerve().getFieldRelative();
 		if (!fieldRelative) {

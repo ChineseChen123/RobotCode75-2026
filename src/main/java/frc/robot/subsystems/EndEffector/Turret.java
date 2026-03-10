@@ -229,7 +229,7 @@ public class Turret extends SubsystemBase {
 			return new CRTResult(bestRot.minus(turretRange.div(2)), 1);
 		}
 
-		// Convert range from [0, turretRange] to [-turretRange/2, +turretRange/2]
+		// Convert range from [0, 270] to [-135, +135]
 		return new CRTResult(bestRot.minus(turretRange.div(2)), 2);
 	}
 
@@ -339,7 +339,7 @@ public class Turret extends SubsystemBase {
 			}
 		}
 
-		updateTunables();
+		// updateTunables();
 
 		switch (m_TurretState) {
 			case STOWED:

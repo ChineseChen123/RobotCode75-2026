@@ -30,6 +30,11 @@ public class Driver extends SubsystemBase {
 	public Trigger[] leftButtons = new Trigger[16];
 	public Trigger[] rightButtons = new Trigger[16];
 
+	public DoubleSupplier leftX = () -> 0;
+	public DoubleSupplier leftY = () -> 0;
+	public DoubleSupplier rightX = () -> 0;
+	public DoubleSupplier rightY = () -> 0;
+
 	/** Creates a new Driver. */
 	public Driver(Joystick leftStick, Joystick rightStick) {
 		m_LeftStick = leftStick;
@@ -39,6 +44,23 @@ public class Driver extends SubsystemBase {
 			leftButtons[i] = new JoystickButton(leftStick, i + 1);
 			rightButtons[i] = new JoystickButton(rightStick, i + 1);
 		}
+
+		leftX = () -> {
+			double val =
+					MathUtil.applyDeadband(m_LeftStick.getX() * translationStickMapValue, stickDeadband);
+			return val >= 0
+					? Math.pow(val, translationJoystickExpo)
+					: -1 * Math.pow(-val, translationJoystickExpo);
+		};
+		leftY = () -> {
+			double val =
+					MathUtil.applyDeadband(m_LeftStick.getY() * translationStickMapValue, stickDeadband);
+			return val >= 0
+					? Math.pow(val, translationJoystickExpo)
+					: -1 * Math.pow(-val, translationJoystickExpo);
+		};
+		rightX = () -> MathUtil.applyDeadband(m_RightStick.getX(), stickDeadband);
+		rightY = () -> m_RightStick.getY();
 	}
 
 	public Trigger getLeftButton(int button) {
@@ -49,42 +71,11 @@ public class Driver extends SubsystemBase {
 		return rightButtons[MathUtil.clamp(button, 1, 16) - 1];
 	}
 
-	/** applies deadbands and exponents to stick values */
-	public DoubleSupplier leftX() {
-		return () -> {
-			double val =
-					MathUtil.applyDeadband(m_LeftStick.getX() * translationStickMapValue, stickDeadband);
-			return val >= 0
-					? Math.pow(val, translationJoystickExpo)
-					: -1 * Math.pow(-val, translationJoystickExpo);
-		};
-	}
-
-	/** applies deadbands and exponents to stick values */
-	public DoubleSupplier leftY() {
-		return () -> {
-			double val =
-					MathUtil.applyDeadband(m_LeftStick.getY() * translationStickMapValue, stickDeadband);
-			return val >= 0
-					? Math.pow(val, translationJoystickExpo)
-					: -1 * Math.pow(-val, translationJoystickExpo);
-		};
-	}
-
-	/** applies deadband to stick values */
-	public DoubleSupplier rightX() {
-		return () -> MathUtil.applyDeadband(m_RightStick.getX(), stickDeadband);
-	}
-
-	public DoubleSupplier rightY() {
-		return () -> m_RightStick.getY();
-	}
-
 	/** returns array of all 3 processed joystick values (for two drivers) */
 	public double[] processedJoystickValues() {
 		// Negation because joystick forward is negative
 		double[] DriverInput = {
-			-leftY().getAsDouble(), -leftX().getAsDouble(), -rightX().getAsDouble()
+			-leftY.getAsDouble(), -leftX.getAsDouble(), -rightX.getAsDouble()
 		};
 		boolean fieldRelative = RobotContainer.getSwerve().getFieldRelative();
 		if (!fieldRelative) {
