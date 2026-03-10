@@ -124,7 +124,7 @@ public class Shooter extends SubsystemBase {
 
 	@Logged(key = "Shooter Wheel Velocity RPM", importance = Importance.CRITICAL)
 	public double getWheelVelocityRPM() {
-		return getMotorVelocityRPM() * shooterGearRatio + shooterTargetVelocity.in(RPM);
+		return (getMotorVelocityRPM() + shooterTargetVelocity.in(RPM)) * shooterGearRatio;
 	}
 
 	public AngularVelocity getVelocity() {
