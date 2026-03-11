@@ -90,7 +90,6 @@ public class IntakeIndexConstants {
 			public static final double intakeVelocityKS = 20;
 			public static final double intakeVelocityKV = .01;
 
-
 			// good enough for now
 			public static final double pivotKP = 70;
 			public static final double pivotKI = 0.0;

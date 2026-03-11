@@ -10,7 +10,6 @@ import frc.lib.util.RaiderLog.RaiderLog;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.lib.util.RaiderLog.RaiderLog.LogMode;
 import frc.robot.Constants.RobotConstants;
-
 import org.littletonrobotics.junction.LoggedRobot;
 
 /**

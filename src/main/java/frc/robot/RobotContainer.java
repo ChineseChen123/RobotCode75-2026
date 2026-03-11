@@ -18,7 +18,6 @@ import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.state.Bindings;
 import frc.robot.state.Driver;
 import frc.robot.state.Operator;
-import frc.robot.state.RobotStates;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Indexer;
 import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
@@ -124,7 +123,7 @@ public class RobotContainer {
 											m_Indexer.setState(
 													// RobotStates.turretIsInDeadzone.getAsBoolean()
 													// 		? IndexerStates.DEFAULT
-															IndexerStates.SHOOTING);
+													IndexerStates.SHOOTING);
 										},
 										m_Indexer)
 								.repeatedly()

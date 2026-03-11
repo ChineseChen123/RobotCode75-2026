@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
-import frc.robot.state.RobotStates;
 
 public class Intake extends SubsystemBase {
 
@@ -91,7 +90,6 @@ public class Intake extends SubsystemBase {
 	private final TunableNumber intakeMotorKs;
 	private final TunableNumber intakeMotorKv;
 
-
 	/** Creates a new Intake. */
 	public Intake() {
 		m_IntakeMotor = new TalonFX(intakeMotorCanID, superstructureCANBusName);
@@ -135,7 +133,6 @@ public class Intake extends SubsystemBase {
 		intakeMotorKd = new TunableNumber("Intake Motor/kD", intakeVelocityKD);
 		intakeMotorKs = new TunableNumber("Intake Motor/kS", intakeVelocityKS);
 		intakeMotorKv = new TunableNumber("Intake Motor/kV", intakeVelocityKV);
-
 
 		m_absoluteEncoder = new DutyCycleEncoder(pivotEncoderPort, 1, pivotZeroPoint.in(Rotations));
 
@@ -237,6 +234,5 @@ public class Intake extends SubsystemBase {
 		}
 
 		m_PivotMotor.setControl(m_PivotRequest.withPosition(m_IntakeState.pivotPosition));
-
 	}
 }

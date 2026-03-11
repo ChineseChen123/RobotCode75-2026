@@ -6,23 +6,17 @@ package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.IntakeIndexConstants.IndexerConstants.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
-import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.Constants.IntakeIndexConstants.IndexerConstants.MotorConfigs;
@@ -31,10 +25,8 @@ public class Indexer extends SubsystemBase {
 	/** Creates a new Shooter. */
 	public enum IndexerStates {
 		DEFAULT(defaultIndexerSpeed, defaultHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
-		READYTOSHOOT(
-				defaultIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
-		SHOOTING(
-				shootingIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
+		READYTOSHOOT(defaultIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
+		SHOOTING(shootingIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
 		REVERSING(reverseIndexerSpeed, reverseHopperSpeed, MotorConfigs.getIndexerMotorConfig());
 
 		AngularVelocity indexerSpeed;
@@ -72,6 +64,7 @@ public class Indexer extends SubsystemBase {
 	// 		new TunableNumber("Indexer/Kv", MotorConfigs.indexerVelocityKV);
 
 	private final Slot0Configs hopperConfigs = new Slot0Configs();
+
 	// private final TunableNumber hopperKp =
 	// 		new TunableNumber("Hopper/Kp", MotorConfigs.hopperVelocityKP);
 	// private final TunableNumber hopperKd =

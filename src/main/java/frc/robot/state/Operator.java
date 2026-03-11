@@ -68,30 +68,35 @@ public class Operator extends SubsystemBase {
 
 		leftStickX = () -> m_Controller.getHID().getLeftX();
 		leftStickY = () -> m_Controller.getHID().getLeftY();
-		leftStickXProcessed = () -> {
-			double val =
-					MathUtil.applyDeadband(m_Controller.getHID().getLeftX(), stickDeadband) * translationStickMapValue;
-			return val >= 0
-					? Math.pow(val, translationJoystickExpo)
-					: -1 * Math.pow(-val, translationJoystickExpo);
-		};
-		leftStickYProcessed = () -> {
-			double val =
-					MathUtil.applyDeadband(m_Controller.getHID().getLeftY(), stickDeadband) * translationStickMapValue;
-			return val >= 0
-					? Math.pow(val, translationJoystickExpo)
-					: -1 * Math.pow(-val, translationJoystickExpo);
-		};
+		leftStickXProcessed =
+				() -> {
+					double val =
+							MathUtil.applyDeadband(m_Controller.getHID().getLeftX(), stickDeadband)
+									* translationStickMapValue;
+					return val >= 0
+							? Math.pow(val, translationJoystickExpo)
+							: -1 * Math.pow(-val, translationJoystickExpo);
+				};
+		leftStickYProcessed =
+				() -> {
+					double val =
+							MathUtil.applyDeadband(m_Controller.getHID().getLeftY(), stickDeadband)
+									* translationStickMapValue;
+					return val >= 0
+							? Math.pow(val, translationJoystickExpo)
+							: -1 * Math.pow(-val, translationJoystickExpo);
+				};
 		rightStickX = () -> m_Controller.getHID().getRightX();
 		rightStickY = () -> m_Controller.getHID().getRightY();
-		rightStickXProcessed = () -> {
-			double val =
-					MathUtil.applyDeadband(m_Controller.getHID().getRightX(), stickDeadband)
-							* translationStickMapValue;
-			return val >= 0
-					? Math.pow(val, translationJoystickExpo)
-					: -1 * Math.pow(-val, translationJoystickExpo);
-		};
+		rightStickXProcessed =
+				() -> {
+					double val =
+							MathUtil.applyDeadband(m_Controller.getHID().getRightX(), stickDeadband)
+									* translationStickMapValue;
+					return val >= 0
+							? Math.pow(val, translationJoystickExpo)
+							: -1 * Math.pow(-val, translationJoystickExpo);
+				};
 	}
 
 	public Trigger leftTriggerGreater(double thresh) {

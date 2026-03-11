@@ -128,7 +128,12 @@ public final class DrivetrainConstants {
 
 	// Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
 	// Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
-	private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration();
+	private static final TalonFXConfiguration driveInitialConfigs =
+			new TalonFXConfiguration()
+					.withCurrentLimits(
+							new CurrentLimitsConfigs()
+									.withSupplyCurrentLimit(Amps.of(40))
+									.withSupplyCurrentLimitEnable(true));
 	private static final TalonFXConfiguration steerInitialConfigs =
 			new TalonFXConfiguration()
 					.withCurrentLimits(
@@ -136,6 +141,8 @@ public final class DrivetrainConstants {
 									// Swerve azimuth does not require much torque output, so we can set a relatively
 									// low
 									// stator current limit to help avoid brownouts without impacting performance.
+									.withSupplyCurrentLimit(Amps.of(40))
+									.withSupplyCurrentLimitEnable(true)
 									.withStatorCurrentLimit(Amps.of(60))
 									.withStatorCurrentLimitEnable(true));
 	private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
@@ -248,7 +255,7 @@ public final class DrivetrainConstants {
 	private static final int kBackLeftDriveMotorId = 14;
 	private static final int kBackLeftSteerMotorId = 24;
 	private static final int kBackLeftEncoderId = 34;
-    private static final Angle kBackLeftEncoderOffset = Rotations.of(-0.365966796875);
+	private static final Angle kBackLeftEncoderOffset = Rotations.of(-0.365966796875);
 	private static final boolean kBackLeftSteerMotorInverted = false;
 	private static final boolean kBackLeftEncoderInverted = false;
 

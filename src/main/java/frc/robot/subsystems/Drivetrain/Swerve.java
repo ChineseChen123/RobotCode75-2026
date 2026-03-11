@@ -17,7 +17,6 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -375,7 +374,8 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
 	public void updateCache() {
 		currentPose = this.getState().Pose;
-		currentFieldRelativeSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(this.getState().Speeds, getHeading());
+		currentFieldRelativeSpeeds =
+				ChassisSpeeds.fromRobotRelativeSpeeds(this.getState().Speeds, getHeading());
 		currentHeading = Rotation2d.fromDegrees(m_Pigeon2.getYaw(true).getValue().in(Degrees));
 	}
 

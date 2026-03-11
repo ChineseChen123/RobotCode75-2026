@@ -31,7 +31,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.ShooterTurretConstants;
 import frc.robot.state.RobotStates;
 
 public class ShooterPhysics {
@@ -50,11 +49,7 @@ public class ShooterPhysics {
 		if (distanceToHub < 2.263119) { // min speed to pass top of hub
 			return RPM.of(2430);
 		}
-		return RPM.of(
-				Math.min(
-								(shooterRegressionA * distanceToHub
-										+ shooterRegressionB),
-								3800));
+		return RPM.of(Math.min((shooterRegressionA * distanceToHub + shooterRegressionB), 3800));
 	}
 
 	public static Distance wheelAngularVelocityToDistance(AngularVelocity velocity) {
@@ -122,7 +117,6 @@ public class ShooterPhysics {
 	private static final double phaseDelay = 0.05;
 	private static final double additionalPhaseDelayShooterSpeeds = 0.03;
 
-
 	public static Time calculateTimeToScore(Pose2d turretPose, Pose2d targetHubPose) {
 
 		AngularVelocity shooterVelocity =
@@ -154,9 +148,7 @@ public class ShooterPhysics {
 		Pose2d virtualTargetPose = PeddieBounds.getHubTarget();
 
 		ChassisSpeeds robotRelativeSpeeds =
-				ChassisSpeeds.fromFieldRelativeSpeeds(
-						fieldRelativeSpeeds,
-						robotPose.getRotation());
+				ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeSpeeds, robotPose.getRotation());
 
 		robotPose =
 				robotPose.exp(
@@ -164,20 +156,29 @@ public class ShooterPhysics {
 								robotRelativeSpeeds.vxMetersPerSecond * phaseDelay,
 								robotRelativeSpeeds.vyMetersPerSecond * phaseDelay,
 								robotRelativeSpeeds.omegaRadiansPerSecond * phaseDelay));
-		
-		ChassisSpeeds hubRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeSpeeds, virtualTargetPose.minus(robotPose).getRotation());
+
+		ChassisSpeeds hubRelativeSpeeds =
+				ChassisSpeeds.fromFieldRelativeSpeeds(
+						fieldRelativeSpeeds, virtualTargetPose.minus(robotPose).getRotation());
 
 		// System.out.println(hubRelativeSpeeds.vxMetersPerSecond);
 
 		hubRelativeSpeeds.vyMetersPerSecond = 0;
 		hubRelativeSpeeds.omegaRadiansPerSecond = 0;
 
-		ChassisSpeeds robotRelativeHubRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(ChassisSpeeds.fromRobotRelativeSpeeds(hubRelativeSpeeds, virtualTargetPose.minus(robotPose).getRotation()), robotPose.getRotation());
+		ChassisSpeeds robotRelativeHubRelativeSpeeds =
+				ChassisSpeeds.fromFieldRelativeSpeeds(
+						ChassisSpeeds.fromRobotRelativeSpeeds(
+								hubRelativeSpeeds, virtualTargetPose.minus(robotPose).getRotation()),
+						robotPose.getRotation());
 
-		robotPose = robotPose.exp(
+		robotPose =
+				robotPose.exp(
 						new Twist2d(
-								robotRelativeHubRelativeSpeeds.vxMetersPerSecond * additionalPhaseDelayShooterSpeeds,
-								robotRelativeHubRelativeSpeeds.vyMetersPerSecond * additionalPhaseDelayShooterSpeeds,
+								robotRelativeHubRelativeSpeeds.vxMetersPerSecond
+										* additionalPhaseDelayShooterSpeeds,
+								robotRelativeHubRelativeSpeeds.vyMetersPerSecond
+										* additionalPhaseDelayShooterSpeeds,
 								0));
 
 		Pose2d turretPose = robotPose.transformBy(turretPositionOffset);

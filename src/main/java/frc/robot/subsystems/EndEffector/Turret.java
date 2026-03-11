@@ -85,7 +85,6 @@ public class Turret extends SubsystemBase {
 	private AngularVelocity currentTurretVelocity = RotationsPerSecond.of(0);
 	private double currentTurretErrorDegrees = 0;
 
-
 	/** Creates a new Turret. */
 	public Turret() {
 		m_TurretMotor = new TalonFX(turretMotorCanID, superstructureCANBusName);

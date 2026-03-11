@@ -45,20 +45,22 @@ public class Driver extends SubsystemBase {
 			rightButtons[i] = new JoystickButton(rightStick, i + 1);
 		}
 
-		leftX = () -> {
-			double val =
-					MathUtil.applyDeadband(m_LeftStick.getX() * translationStickMapValue, stickDeadband);
-			return val >= 0
-					? Math.pow(val, translationJoystickExpo)
-					: -1 * Math.pow(-val, translationJoystickExpo);
-		};
-		leftY = () -> {
-			double val =
-					MathUtil.applyDeadband(m_LeftStick.getY() * translationStickMapValue, stickDeadband);
-			return val >= 0
-					? Math.pow(val, translationJoystickExpo)
-					: -1 * Math.pow(-val, translationJoystickExpo);
-		};
+		leftX =
+				() -> {
+					double val =
+							MathUtil.applyDeadband(m_LeftStick.getX() * translationStickMapValue, stickDeadband);
+					return val >= 0
+							? Math.pow(val, translationJoystickExpo)
+							: -1 * Math.pow(-val, translationJoystickExpo);
+				};
+		leftY =
+				() -> {
+					double val =
+							MathUtil.applyDeadband(m_LeftStick.getY() * translationStickMapValue, stickDeadband);
+					return val >= 0
+							? Math.pow(val, translationJoystickExpo)
+							: -1 * Math.pow(-val, translationJoystickExpo);
+				};
 		rightX = () -> MathUtil.applyDeadband(m_RightStick.getX(), stickDeadband);
 		rightY = () -> m_RightStick.getY();
 	}
@@ -74,9 +76,7 @@ public class Driver extends SubsystemBase {
 	/** returns array of all 3 processed joystick values (for two drivers) */
 	public double[] processedJoystickValues() {
 		// Negation because joystick forward is negative
-		double[] DriverInput = {
-			-leftY.getAsDouble(), -leftX.getAsDouble(), -rightX.getAsDouble()
-		};
+		double[] DriverInput = {-leftY.getAsDouble(), -leftX.getAsDouble(), -rightX.getAsDouble()};
 		boolean fieldRelative = RobotContainer.getSwerve().getFieldRelative();
 		if (!fieldRelative) {
 			DriverInput[0] *= 0.5;
