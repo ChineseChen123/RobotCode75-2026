@@ -22,7 +22,9 @@ import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.Constants.IntakeIndexConstants.IndexerConstants.MotorConfigs;
 
 public class Indexer extends SubsystemBase {
-	/** Creates a new Shooter. */
+
+	// ── State enum ───────────────────────────────────────────────────────────────
+
 	public enum IndexerStates {
 		DEFAULT(defaultIndexerSpeed, defaultHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
 		READYTOSHOOT(defaultIndexerSpeed, runningHopperSpeed, MotorConfigs.getIndexerMotorConfig()),
@@ -43,12 +45,13 @@ public class Indexer extends SubsystemBase {
 		}
 	}
 
-	private IndexerStates m_IndexerState;
-
-	// private final DigitalInput m_BeamBreak;
+	// ── Hardware ─────────────────────────────────────────────────────────────────
 
 	private final TalonFX m_IndexerMotor;
 	private final TalonFX m_HopperMotor;
+
+	// ── Control requests / configs ───────────────────────────────────────────────
+
 	private final VelocityDutyCycle m_IndexerDutyCycle = new VelocityDutyCycle(0);
 	private final VelocityTorqueCurrentFOC m_IndexerTorqueCurrent = new VelocityTorqueCurrentFOC(0);
 	private final VelocityTorqueCurrentFOC m_HopperRequest = new VelocityTorqueCurrentFOC(0);
@@ -77,12 +80,19 @@ public class Indexer extends SubsystemBase {
 	// private final TunableNumber hopperSpeed =
 	// 		new TunableNumber("Hopper/HopperSpeed", defaultHopperSpeed.in(RotationsPerSecond));
 
+	// ── Internal state ───────────────────────────────────────────────────────────
+
+	private IndexerStates m_IndexerState;
+
+	private AngularVelocity currentIndexerVelocity = RotationsPerSecond.of(0);
+	private AngularVelocity currentHopperVelocity = RotationsPerSecond.of(0);
+
+	/** Creates a new Indexer. */
 	public Indexer() {
 		m_IndexerMotor = new TalonFX(indexerMotorCanID, superstructureCANBusName);
 		m_HopperMotor = new TalonFX(hopperMotorCanID, superstructureCANBusName);
 
 		m_IndexerState = IndexerStates.DEFAULT;
-		// m_BeamBreak = new DigitalInput(beamBreakPort);
 
 		m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerMotorConfig());
 		m_HopperMotor.getConfigurator().apply(MotorConfigs.getHopperMotorConfig());
@@ -104,19 +114,17 @@ public class Indexer extends SubsystemBase {
 				.withKS(MotorConfigs.hopperVelocityKS);
 	}
 
-	public boolean hasFuel() {
-		// return !m_BeamBreak.get();
-		return false;
-	}
+	// ── Sensor / state accessors ─────────────────────────────────────────────────
+
 
 	@Logged(key = "Indexer Velocity", importance = Importance.DEBUG)
 	public double getIndexerVelocityRPS() {
-		return m_IndexerMotor.getVelocity(true).getValue().in(RotationsPerSecond);
+		return currentIndexerVelocity.in(RotationsPerSecond);
 	}
 
 	// @Logged(key = "Hopper Velocity", importance = Importance.DEBUG)
 	public double getHopperVelocityRPS() {
-		return m_HopperMotor.getVelocity(true).getValue().in(RotationsPerSecond);
+		return currentHopperVelocity.in(RotationsPerSecond);
 	}
 
 	@Logged(key = "Indexer Current", importance = Importance.DEBUG)
@@ -137,8 +145,18 @@ public class Indexer extends SubsystemBase {
 		m_IndexerState = state;
 	}
 
+	// ── Cache updates ────────────────────────────────────────────────────────────
+
+	public void updateCache() {
+		currentIndexerVelocity = m_IndexerMotor.getVelocity(true).getValue();
+		currentHopperVelocity = m_HopperMotor.getVelocity(true).getValue();
+	}
+
+	// ── WPILib lifecycle ─────────────────────────────────────────────────────────
+
 	@Override
 	public void periodic() {
+		updateCache();
 
 		// if (indexerKp.getNumber() != indexerConfigs.kP
 		// 		|| indexerKd.getNumber() != indexerConfigs.kD
@@ -167,7 +185,6 @@ public class Indexer extends SubsystemBase {
 		} else {
 			m_IndexerMotor.setControl(m_IndexerTorqueCurrent.withVelocity(m_IndexerState.indexerSpeed));
 		}
-
 		if (m_IndexerState.hopperSpeed.baseUnitMagnitude() == 0) {
 			m_HopperMotor.setControl(new CoastOut());
 		} else {

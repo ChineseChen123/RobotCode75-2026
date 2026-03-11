@@ -16,7 +16,6 @@ public class AutoAlign {
 	private static RotationController m_RotationController;
 	private static Pose2d lastTarget = null;
 	private static boolean isInit = false;
-	private static double t = 0;
 
 	/** return last part of field auto-aligned to */
 	public static Pose2d lastAutoAlign() {

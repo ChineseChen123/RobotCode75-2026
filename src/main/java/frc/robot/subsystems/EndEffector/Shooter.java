@@ -37,7 +37,7 @@ public class Shooter extends SubsystemBase {
 		SHOOTING(null),
 		REVERSING(reverseShooterSpeed);
 
-		AngularVelocity shooterSpeed;
+		public final AngularVelocity shooterSpeed;
 
 		private ShooterStates(AngularVelocity shooterSpeed) {
 			this.shooterSpeed = shooterSpeed;
@@ -49,7 +49,7 @@ public class Shooter extends SubsystemBase {
 	private final TalonFX m_ShooterMotor1;
 	private final TalonFX m_ShooterMotor2;
 
-	// ── Control requests ─────────────────────────────────────────────────────────
+	// ── Control requests / configs ───────────────────────────────────────────────
 
 	private final VelocityTorqueCurrentFOC m_VelocityRequest;
 	private final Follower m_FollowerRequest;
@@ -57,19 +57,12 @@ public class Shooter extends SubsystemBase {
 	private final VelocityDutyCycle m_DutyCycleBangBang;
 	private final VelocityTorqueCurrentFOC m_TorqueCurrentBangBang;
 
-	// ── Tunables / configs ───────────────────────────────────────────────────────
-
 	private final Slot0Configs shooterPIDConfigs = new Slot0Configs();
-
-	// private final TunableNumber shooterKp;
-	// private final TunableNumber shooterKd;
-	// private final TunableNumber shooterKv;
-	// private final TunableNumber shooterKa;
-	// private final TunableNumber targetSpeed;
 
 	// ── Internal state ───────────────────────────────────────────────────────────
 
-	private ShooterStates m_ShooterState;
+	private ShooterStates m_ShooterState = ShooterStates.DEFAULT;
+
 	private AngularVelocity shooterTargetVelocity = RPM.of(0);
 	private AngularVelocity currentShooterVelocity = RPM.of(0);
 
@@ -92,8 +85,6 @@ public class Shooter extends SubsystemBase {
 		m_DutyCycleBangBang = new VelocityDutyCycle(RPM.of(0));
 		m_TorqueCurrentBangBang = new VelocityTorqueCurrentFOC(RPM.of(0));
 
-		m_ShooterState = ShooterStates.DEFAULT;
-
 		shooterPIDConfigs
 				.withKP(MotorConfigs.shooterMotorVelocityKP)
 				.withKI(MotorConfigs.shooterMotorVelocityKI)
@@ -101,12 +92,6 @@ public class Shooter extends SubsystemBase {
 				.withKS(MotorConfigs.shooterMotorVelocityKS)
 				.withKV(MotorConfigs.shooterMotorVelocityKV)
 				.withKA(MotorConfigs.shooterMotorVelocityKA);
-
-		// shooterKp = new TunableNumber("Shooter/Kp", 10000);
-		// shooterKd = new TunableNumber("Shooter/Kd", MotorConfigs.shooterMotorVelocityKD);
-		// shooterKv = new TunableNumber("Shooter/Kv", MotorConfigs.shooterMotorVelocityKV);
-		// shooterKa = new TunableNumber("Shooter/Ka", MotorConfigs.shooterMotorVelocityKA);
-		// targetSpeed = new TunableNumber("Shooter/Target Speed RPM", 0);
 
 		m_VelocityRequest.UpdateFreqHz = 0;
 		m_VelocityRequest.UseTimesync = true;
@@ -145,10 +130,6 @@ public class Shooter extends SubsystemBase {
 		return currentShooterVelocity.in(RPM) > shooterTargetVelocity.in(RPM);
 	}
 
-	public void updateCache() {
-		currentShooterVelocity = getVelocity();
-	}
-
 	public ShooterStates getShooterState() {
 		return m_ShooterState;
 	}
@@ -157,37 +138,21 @@ public class Shooter extends SubsystemBase {
 		m_ShooterState = state;
 	}
 
-	@Override
-	public void periodic() {
+	@Logged(key = "Shooter Shots Fired", importance = Importance.DEBUG)
+	public int getShotsFired() {
+		return shotsFired;
+	}
 
-		updateCache();
+	// ── Target calculation / caching ─────────────────────────────────────────────
 
-		// if (m_ShooterState == ShooterStates.SHOOTING) {
-		// 	m_ShooterMotor1.setControl(
-		// 			m_VelocityRequest.withVelocity(RotationsPerSecond.of(targetSpeed.getNumber() / 60)));
-		// 	m_ShooterMotor2.setControl(m_FollowerRequest);
-		// 	shooterTargetVelocity = RotationsPerSecond.of(targetSpeed.getNumber() / 60);
-		// } else {
-		// 	m_ShooterMotor1.setControl(new CoastOut());
-		// 	m_ShooterMotor2.setControl(m_FollowerRequest);
-		// }
+	public void updateCache() {
+		currentShooterVelocity = getVelocity();
+	}
 
-		// if (shooterKp.getNumber() != shooterPIDConfigs.kP
-		// 		|| shooterKd.getNumber() != shooterPIDConfigs.kD
-		// 		|| shooterKv.getNumber() != shooterPIDConfigs.kV
-		// 		|| shooterKa.getNumber() != shooterPIDConfigs.kA) {
-		// 	shooterPIDConfigs.kP = shooterKp.getNumber();
-		// 	// shooterPIDConfigs.kD = shooterKd.getNumber();
-		// 	// shooterPIDConfigs.kV = shooterKv.getNumber();
-		// 	// shooterPIDConfigs.kA = shooterKa.getNumber();
-		// 	m_ShooterMotor1.getConfigurator().apply(shooterPIDConfigs);
-		// 	m_ShooterMotor2.getConfigurator().apply(shooterPIDConfigs);
-		// }
-
-		// lookup table stuff
+	/** Updates shooter target velocity from shooter physics. */
+	public void updateShooterTarget() {
 		Pose2d targetHubPose = PeddieBounds.getHubTarget();
 
-		// variable speeds
 		if (ShooterTurretConstants.useVirtualTarget) {
 			targetHubPose =
 					ShooterPhysics.getVirtualTarget(
@@ -195,33 +160,30 @@ public class Shooter extends SubsystemBase {
 							RobotStates.fieldRelativeSpeeds.get(),
 							ShooterTurretConstants.virtualTargetSolveIterations);
 		}
-		AngularVelocity velocity =
-				ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);
-		shooterTargetVelocity = velocity;
 
-		// shooterTargetVelocity = RotationsPerSecond.of(targetSpeed.getNumber() / 60);
+		shooterTargetVelocity =
+				ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);
+	}
+
+	// ── Control helpers ──────────────────────────────────────────────────────────
+
+	private boolean bangbangShooting() {
+		updateShooterTarget();
 
 		boolean debouncedAtSetpoint = atSetpointDebouncer.calculate(atTargetVelocity());
 
-		if (m_ShooterState == ShooterStates.SHOOTING) {
-			// m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(velocity));
-			if (debouncedAtSetpoint) {
-				m_ShooterMotor1.setControl(m_TorqueCurrentBangBang.withVelocity(shooterTargetVelocity));
-			} else {
-				m_ShooterMotor1.setControl(m_DutyCycleBangBang.withVelocity(shooterTargetVelocity));
-			}
-
-			// shooterTargetVelocity = m_ShooterState.shooterSpeed;
-
-		} else if (m_ShooterState == ShooterStates.DEFAULT) {
-			m_ShooterMotor1.setControl(new CoastOut());
-			shooterTargetVelocity = RPM.of(0);
+		if (debouncedAtSetpoint) {
+			m_ShooterMotor1.setControl(m_TorqueCurrentBangBang.withVelocity(shooterTargetVelocity));
 		} else {
-			m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
-			shooterTargetVelocity = m_ShooterState.shooterSpeed;
+			m_ShooterMotor1.setControl(m_DutyCycleBangBang.withVelocity(shooterTargetVelocity));
 		}
 
-		// fuel counting
+		return debouncedAtSetpoint;
+	}
+
+	// ── Shot counting ────────────────────────────────────────────────────────────
+
+	private void updateShotCounting(boolean debouncedAtSetpoint) {
 		if (m_ShooterState == ShooterStates.SHOOTING) {
 			if (!debouncedAtSetpoint && lastAtSetpoint) {
 				shotsFired++;
@@ -230,7 +192,33 @@ public class Shooter extends SubsystemBase {
 		} else {
 			lastAtSetpoint = false;
 		}
+	}
 
+	// ── WPILib lifecycle ─────────────────────────────────────────────────────────
+
+	@Override
+	public void periodic() {
+		updateCache();
+
+		boolean debouncedAtSetpoint = false;
+
+		switch (m_ShooterState) {
+			case SHOOTING:
+				debouncedAtSetpoint = bangbangShooting();
+				break;
+
+			case DEFAULT:
+				m_ShooterMotor1.setControl(new CoastOut());
+				shooterTargetVelocity = RPM.of(0);
+				break;
+
+			case REVERSING:
+				m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
+				shooterTargetVelocity = m_ShooterState.shooterSpeed;
+				break;
+		}
+
+		updateShotCounting(debouncedAtSetpoint);
 		m_ShooterMotor2.setControl(m_FollowerRequest);
 	}
 }
