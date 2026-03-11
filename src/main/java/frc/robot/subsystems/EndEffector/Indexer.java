@@ -116,7 +116,6 @@ public class Indexer extends SubsystemBase {
 
 	// ── Sensor / state accessors ─────────────────────────────────────────────────
 
-
 	@Logged(key = "Indexer Velocity", importance = Importance.DEBUG)
 	public double getIndexerVelocityRPS() {
 		return currentIndexerVelocity.in(RotationsPerSecond);

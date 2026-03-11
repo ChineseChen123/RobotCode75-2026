@@ -20,20 +20,11 @@ public class FieldConstants {
 	// Map of field elements and tags on red field
 	public static final Map<FieldElement, Integer> redTags = Map.ofEntries();
 
-	public static final Pose3d blueHub = new Pose3d(
-		Meters.of(4.626),
-		Meters.of(4.035),
-		Meters.of(6),
-		Rotation3d.kZero
-	);
+	public static final Pose3d blueHub =
+			new Pose3d(Meters.of(4.626), Meters.of(4.035), Meters.of(6), Rotation3d.kZero);
 
-	public static final Pose3d redHub = new Pose3d(
-		Meters.of(11.915),
-		Meters.of(4.035),
-		Meters.of(6),
-		Rotation3d.kZero
-	);
-
+	public static final Pose3d redHub =
+			new Pose3d(Meters.of(11.915), Meters.of(4.035), Meters.of(6), Rotation3d.kZero);
 
 	// TODO: fill values
 	public static final Pose2d blueBumpLeft =

@@ -192,7 +192,7 @@ public class PeddieBounds {
 
 	public static Pose3d getShootingTargetPose(Pose2d pose) {
 		if (isInOwnZone(pose)) return onBlueAlliance() ? FieldConstants.blueHub : FieldConstants.redHub;
-		return new Pose3d(getNearestTrench(pose)); 
+		return new Pose3d(getNearestTrench(pose));
 	}
 
 	public static boolean isInNeutralZone(Pose2d pose) {

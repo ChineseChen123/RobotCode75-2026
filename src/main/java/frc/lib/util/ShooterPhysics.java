@@ -63,7 +63,10 @@ public class ShooterPhysics {
 			return minShootingAngularVelocity;
 		}
 
-		return RPM.of(Math.min(shooterRegressionA * distanceToTarget + shooterRegressionB, maxShootingAngularVelocity.in(RPM)));
+		return RPM.of(
+				Math.min(
+						shooterRegressionA * distanceToTarget + shooterRegressionB,
+						maxShootingAngularVelocity.in(RPM)));
 	}
 
 	public static Distance wheelAngularVelocityToDistance(AngularVelocity velocity) {
@@ -118,11 +121,10 @@ public class ShooterPhysics {
 
 		double velocity =
 				Math.sqrt(
-						9.8 * horizontalDistanceMeters * horizontalDistanceMeters
-								/ (2
-										* sin
-										* sin
-										* (horizontalDistanceMeters * (1.0 / tan) - heightDiffMeters)));
+						9.8
+								* horizontalDistanceMeters
+								* horizontalDistanceMeters
+								/ (2 * sin * sin * (horizontalDistanceMeters * (1.0 / tan) - heightDiffMeters)));
 
 		return MetersPerSecond.of(velocity);
 	}
