@@ -8,7 +8,9 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
@@ -33,6 +35,9 @@ public class ShooterTurretConstants {
 
 	public static final boolean useVirtualTarget = true;
 	public static final int virtualTargetSolveIterations = 12;
+
+	public static final double phaseDelay = 0.05;
+	public static final double additionalPhaseDelayShooterSpeeds = 0.03;
 
 	public class ShooterConstants {
 		// Kraken X60s
@@ -64,10 +69,13 @@ public class ShooterTurretConstants {
 		public static final Angle shooterAngleWithVertical = Degrees.of(25);
 		public static final Distance shooterHeight = Inches.of(19.5);
 
-		// A*sqrt(x - C) + B
 		public static final double shooterRegressionA = 256.63148;
 		public static final double shooterRegressionB = 1858.26502;
 		public static final double shooterRegressionC = 2.1;
+
+		public static final Distance minShootingDistance = Meters.of(2.263119);
+		public static final AngularVelocity minShootingAngularVelocity = RPM.of(2430);
+		public static final AngularVelocity maxShootingAngularVelocity = RPM.of(3800);
 
 		public static final class MotorConfigs {
 

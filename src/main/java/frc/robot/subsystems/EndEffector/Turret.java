@@ -129,7 +129,7 @@ public class Turret extends SubsystemBase {
 		return currentTurretMotorPosition.in(Degrees);
 	}
 
-	@Logged(key = "Turret In Deadzone", importance = Importance.DEBUG)
+	@Logged(key = "Turret In Deadzone", importance = Importance.INFO)
 	public boolean inDeadzone() {
 		return ShooterPhysics.isTurretInDeadzone(
 				RobotStates.robotPose.get(), RobotStates.fieldRelativeSpeeds.get());
@@ -292,14 +292,14 @@ public class Turret extends SubsystemBase {
 		return new Pose2d(translation, rotation);
 	}
 
-	@Logged(key = "Hub Pose", importance = Importance.DEBUG)
-	public Pose2d getHubPose() {
+	@Logged(key = "Shooting Target Pose", importance = Importance.DEBUG)
+	public Pose2d getShootingTargetPose() {
 		return ShooterTurretConstants.useVirtualTarget
 				? ShooterPhysics.getVirtualTarget(
 						RobotStates.robotPose.get(),
 						RobotStates.fieldRelativeSpeeds.get(),
 						ShooterTurretConstants.virtualTargetSolveIterations)
-				: PeddieBounds.getHubTarget();
+				: PeddieBounds.getShootingTargetPose(RobotStates.robotPose.get()).toPose2d();
 	}
 
 	/** Updates turret target angle/velocity from shooter physics. */
@@ -341,7 +341,7 @@ public class Turret extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		if (resetState < 1 && getTurretVelocity().abs(RotationsPerSecond) < 0.005) {
+		if (resetState < 2 && getTurretVelocity().abs(RotationsPerSecond) < 0.005) {
 			resetMotorPosition();
 			if (resetState == 0) {
 				return;

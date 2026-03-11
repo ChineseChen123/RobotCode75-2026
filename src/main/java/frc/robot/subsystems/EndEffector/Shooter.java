@@ -151,10 +151,10 @@ public class Shooter extends SubsystemBase {
 
 	/** Updates shooter target velocity from shooter physics. */
 	public void updateShooterTarget() {
-		Pose2d targetHubPose = PeddieBounds.getHubTarget();
+		Pose2d targetPose = PeddieBounds.getShootingTargetPose(RobotStates.robotPose.get()).toPose2d();
 
 		if (ShooterTurretConstants.useVirtualTarget) {
-			targetHubPose =
+			targetPose =
 					ShooterPhysics.getVirtualTarget(
 							RobotStates.robotPose.get(),
 							RobotStates.fieldRelativeSpeeds.get(),
@@ -162,7 +162,7 @@ public class Shooter extends SubsystemBase {
 		}
 
 		shooterTargetVelocity =
-				ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetHubPose);
+				ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetPose);
 	}
 
 	// ── Control helpers ──────────────────────────────────────────────────────────
