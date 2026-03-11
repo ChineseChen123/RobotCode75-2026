@@ -73,6 +73,7 @@ public class Shooter extends SubsystemBase {
 
 	private ShooterStates m_ShooterState;
 	private AngularVelocity shooterTargetVelocity = RPM.of(0);
+	private AngularVelocity currentShooterVelocity = RPM.of(0);
 
 	private final Debouncer atSetpointDebouncer = new Debouncer(0.025, DebounceType.kFalling);
 	private boolean lastAtSetpoint = false;
@@ -117,7 +118,7 @@ public class Shooter extends SubsystemBase {
 
 	@Logged(key = "Shooter Motor Velocity RPM", importance = Importance.CRITICAL)
 	public double getMotorVelocityRPM() {
-		return getVelocity().in(RPM);
+		return currentShooterVelocity.in(RPM);
 	}
 
 	@Logged(key = "Shooter Wheel Velocity RPM", importance = Importance.CRITICAL)
@@ -139,12 +140,16 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public boolean atTargetVelocity() {
-		return getVelocity().minus(shooterTargetVelocity).abs(RPM)
+		return currentShooterVelocity.minus(shooterTargetVelocity).abs(RPM)
 				< shooterVelocityTolerance;
 	}
 
 	public boolean aboveTargetVelocity() {
-		return getVelocity().in(RPM) > shooterTargetVelocity.in(RPM);
+		return currentShooterVelocity.in(RPM) > shooterTargetVelocity.in(RPM);
+	}
+
+	public void updateCache() {
+		currentShooterVelocity = getVelocity();
 	}
 
 	public ShooterStates getShooterState() {
@@ -157,6 +162,8 @@ public class Shooter extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+
+		updateCache();
 
 		// if (m_ShooterState == ShooterStates.SHOOTING) {
 		// 	m_ShooterMotor1.setControl(
@@ -226,5 +233,7 @@ public class Shooter extends SubsystemBase {
 		} else {
 			lastAtSetpoint = false;
 		}
+
+		m_ShooterMotor2.setControl(m_FollowerRequest);
 	}
 }

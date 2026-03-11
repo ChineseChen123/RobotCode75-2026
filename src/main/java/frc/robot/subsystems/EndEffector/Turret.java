@@ -81,6 +81,11 @@ public class Turret extends SubsystemBase {
 	private Angle turretTargetAngle = Degrees.of(0);
 	private AngularVelocity turretTargetVelocity = RotationsPerSecond.of(0);
 
+	private Angle currentTurretMotorPosition = Degrees.of(0);
+	private AngularVelocity currentTurretVelocity = RotationsPerSecond.of(0);
+	private double currentTurretErrorDegrees = 0;
+
+
 	/** Creates a new Turret. */
 	public Turret() {
 		m_TurretMotor = new TalonFX(turretMotorCanID, superstructureCANBusName);
@@ -122,7 +127,7 @@ public class Turret extends SubsystemBase {
 
 	@Logged(key = "Turret Position Deg", importance = Importance.DEBUG)
 	public double getPositionFromMotorDegrees() {
-		return getPositionFromMotor().in(Degrees);
+		return currentTurretMotorPosition.in(Degrees);
 	}
 
 	@Logged(key = "Turret In Deadzone", importance = Importance.DEBUG)
@@ -132,11 +137,11 @@ public class Turret extends SubsystemBase {
 	}
 
 	public Angle getPositionFromMotor() {
-		return m_TurretMotor.getPosition(true).getValue();
+		return currentTurretMotorPosition;
 	}
 
 	public AngularVelocity getTurretVelocity() {
-		return m_TurretMotor.getVelocity(true).getValue();
+		return currentTurretVelocity;
 	}
 
 	@Logged(key = "Encoder 1 Position Deg No Offset", importance = Importance.DEBUG)
@@ -237,11 +242,11 @@ public class Turret extends SubsystemBase {
 
 	@Logged(key = "Turret Position Error Deg", importance = Importance.DEBUG)
 	public double getTurretPositionErrorDegrees() {
-		return Math.abs(turretTargetAngle.minus(getPositionFromMotor()).in(Degrees));
+		return currentTurretErrorDegrees;
 	}
 
 	public boolean atTargetHeading() {
-		return getTurretPositionErrorDegrees() < turretPositionToleranceDegrees;
+		return currentTurretErrorDegrees < turretPositionToleranceDegrees;
 	}
 
 	@Logged(key = "Turret Target", importance = Importance.DEBUG)
@@ -249,10 +254,10 @@ public class Turret extends SubsystemBase {
 		return turretTargetAngle.in(Degrees);
 	}
 
-	@Logged(key = "Turret Distance", importance = Importance.DEBUG)
-	public double getTurretDistance() {
-		return getTurretPose().getTranslation().getDistance(getHubPose().getTranslation());
-	}
+	// @Logged(key = "Turret Distance", importance = Importance.DEBUG)
+	// public double getTurretDistance() {
+	// 	return getTurretPose().getTranslation().getDistance(getHubPose().getTranslation());
+	// }
 
 	@Logged(key = "Turret Target Velocity DPS", importance = Importance.DEBUG)
 	public double getTurretTargetVelocityDPS() {
@@ -281,10 +286,9 @@ public class Turret extends SubsystemBase {
 		}
 
 		Rotation2d robotHeading = pose.getRotation();
-		Angle turretHeading = getPositionFromMotor();
 
 		Translation2d translation = pose.transformBy(turretPositionOffset).getTranslation();
-		Rotation2d rotation = robotHeading.plus(new Rotation2d(turretHeading));
+		Rotation2d rotation = robotHeading.plus(new Rotation2d(currentTurretMotorPosition));
 
 		return new Pose2d(translation, rotation);
 	}
@@ -311,6 +315,12 @@ public class Turret extends SubsystemBase {
 
 		turretTargetAngle = setpoint.turretAngle;
 		turretTargetVelocity = setpoint.turretVelocity;
+	}
+
+	public void updateCache() {
+		currentTurretMotorPosition = m_TurretMotor.getPosition(true).getValue();
+		currentTurretVelocity = m_TurretMotor.getVelocity(true).getValue();
+		currentTurretErrorDegrees = turretTargetAngle.minus(currentTurretMotorPosition).abs(Degrees);
 	}
 
 	// ── Tunable config updates ───────────────────────────────────────────────────

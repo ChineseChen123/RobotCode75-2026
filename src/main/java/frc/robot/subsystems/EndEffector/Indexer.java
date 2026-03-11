@@ -61,8 +61,6 @@ public class Indexer extends SubsystemBase {
 	private final VelocityTorqueCurrentFOC m_IndexerTorqueCurrent = new VelocityTorqueCurrentFOC(0);
 	private final VelocityTorqueCurrentFOC m_HopperRequest = new VelocityTorqueCurrentFOC(0);
 
-	private final VoltageOut m_sysIdRequest = new VoltageOut(0.0);
-
 	private final Slot0Configs indexerConfigs = new Slot0Configs();
 	// private final TunableNumber indexerKp =
 	// 		new TunableNumber("Indexer/Kp", MotorConfigs.indexerVelocityKP);
@@ -86,8 +84,6 @@ public class Indexer extends SubsystemBase {
 	// private final TunableNumber hopperSpeed =
 	// 		new TunableNumber("Hopper/HopperSpeed", defaultHopperSpeed.in(RotationsPerSecond));
 
-	private final SysIdRoutine m_sysIdRoutine;
-
 	public Indexer() {
 		m_IndexerMotor = new TalonFX(indexerMotorCanID, superstructureCANBusName);
 		m_HopperMotor = new TalonFX(hopperMotorCanID, superstructureCANBusName);
@@ -106,35 +102,13 @@ public class Indexer extends SubsystemBase {
 		indexerConfigs
 				.withKP(MotorConfigs.indexerVelocityKP)
 				.withKD(MotorConfigs.indexerVelocityKD)
-				.withKS(MotorConfigs.indexerVelocityKS);
+				.withKS(MotorConfigs.indexerVelocityKS)
+				.withKV(MotorConfigs.indexerVelocityKV);
 
 		hopperConfigs
 				.withKP(MotorConfigs.hopperVelocityKP)
 				.withKD(MotorConfigs.hopperVelocityKD)
 				.withKS(MotorConfigs.hopperVelocityKS);
-
-		m_sysIdRoutine =
-				new SysIdRoutine(
-						new SysIdRoutine.Config(
-								null, // Use default ramp rate (1 V/s)
-								Volts.of(4), // Reduce dynamic step voltage to 4 to prevent brownout
-								null, // Use default timeout (10 s)
-								// Log state with Phoenix SignalLogger class
-								(state) -> SignalLogger.writeString("state", state.toString())),
-						new SysIdRoutine.Mechanism(
-								(volts) -> {
-									m_IndexerMotor.setControl(m_sysIdRequest.withOutput(volts.in(Volts)));
-								},
-								null,
-								this));
-	}
-
-	public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-		return m_sysIdRoutine.quasistatic(direction);
-	}
-
-	public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-		return m_sysIdRoutine.dynamic(direction);
 	}
 
 	public boolean hasFuel() {

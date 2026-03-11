@@ -67,6 +67,10 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
 	private Pose2d samplePose = new Pose2d();
 
+	private Pose2d currentPose = new Pose2d();
+	private ChassisSpeeds currentFieldRelativeSpeeds = new ChassisSpeeds();
+	private Rotation2d currentHeading = new Rotation2d();
+
 	private final SwerveRequest.ApplyFieldSpeeds fieldRequest =
 			new SwerveRequest.ApplyFieldSpeeds()
 					.withDriveRequestType(DriveRequestType.OpenLoopVoltage)
@@ -221,12 +225,12 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	/** Current odometry pose. */
 	@Logged(key = "Pose", importance = Importance.CRITICAL)
 	public Pose2d getPose() {
-		return this.getState().Pose;
+		return currentPose;
 	}
 
 	@Logged(key = "Field Relative Chassis Speeds", importance = Importance.CRITICAL)
 	public ChassisSpeeds getFieldRelativeChassisSpeeds() {
-		return ChassisSpeeds.fromRobotRelativeSpeeds(this.getChassisSpeeds(), getHeading());
+		return currentFieldRelativeSpeeds;
 	}
 
 	/** Reset odometry pose. */
@@ -298,7 +302,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	/** Field heading from gyro (deg → Rotation2d). */
 	@Logged(key = "Heading", importance = Importance.CRITICAL)
 	public Rotation2d getHeading() {
-		return Rotation2d.fromDegrees(m_Pigeon2.getYaw(true).getValue().in(Degrees));
+		return currentHeading;
 	}
 
 	// ── Vision ───────────────────────────────────────────────────────────────────
@@ -369,6 +373,12 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
 	// ── WPILib lifecycle ─────────────────────────────────────────────────────────
 
+	public void updateCache() {
+		currentPose = this.getState().Pose;
+		currentFieldRelativeSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(this.getState().Speeds, getHeading());
+		currentHeading = Rotation2d.fromDegrees(m_Pigeon2.getYaw(true).getValue().in(Degrees));
+	}
+
 	@Override
 	public void periodic() {
 		// Apply operator perspective each disable/enable cycle so restarts keep alignment sane.
@@ -381,6 +391,8 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 								appliedOperatorPerspective = true;
 							});
 		}
+
+		updateCache();
 
 		if (!Utils.isSimulation()) {
 			Limelight[] limelights = RobotContainer.getLimelights();
