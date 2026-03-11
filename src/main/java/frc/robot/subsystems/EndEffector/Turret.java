@@ -332,7 +332,7 @@ public class Turret extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		if (resetState != 2 && getTurretVelocity().abs(RotationsPerSecond) < 0.005) {
+		if (resetState < 1 && getTurretVelocity().abs(RotationsPerSecond) < 0.005) {
 			resetMotorPosition();
 			if (resetState == 0) {
 				return;

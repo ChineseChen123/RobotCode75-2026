@@ -76,13 +76,13 @@ public class RobotContainer {
 
 	// Register any subsystems to be logged
 	private void configureLogging() {
-		RaiderLog.register("Swerve", m_Swerve);
+		// RaiderLog.register("Swerve", m_Swerve);
 		RaiderLog.register("Shooter", m_Shooter);
-		RaiderLog.register("Turret", m_Turret);
+		// RaiderLog.register("Turret", m_Turret);
 		// RaiderLog.register("Limelight TR", m_LimelightTR);
 		// RaiderLog.register("Limelight TL", m_LimelightTL);
 		RaiderLog.register("Indexer", m_Indexer);
-		RaiderLog.register("Intake", m_Intake);
+		// RaiderLog.register("Intake", m_Intake);
 	}
 
 	// Configure button bindings based on driving mode

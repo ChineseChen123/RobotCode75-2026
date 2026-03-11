@@ -63,11 +63,11 @@ public class Shooter extends SubsystemBase {
 
 	private final Slot0Configs shooterPIDConfigs = new Slot0Configs();
 
-	private final TunableNumber shooterKp;
-	private final TunableNumber shooterKd;
-	private final TunableNumber shooterKv;
-	private final TunableNumber shooterKa;
-	private final TunableNumber targetSpeed;
+	// private final TunableNumber shooterKp;
+	// private final TunableNumber shooterKd;
+	// private final TunableNumber shooterKv;
+	// private final TunableNumber shooterKa;
+	// private final TunableNumber targetSpeed;
 
 	// ── Internal state ───────────────────────────────────────────────────────────
 
@@ -103,11 +103,11 @@ public class Shooter extends SubsystemBase {
 				.withKV(MotorConfigs.shooterMotorVelocityKV)
 				.withKA(MotorConfigs.shooterMotorVelocityKA);
 
-		shooterKp = new TunableNumber("Shooter/Kp", 10000);
-		shooterKd = new TunableNumber("Shooter/Kd", MotorConfigs.shooterMotorVelocityKD);
-		shooterKv = new TunableNumber("Shooter/Kv", MotorConfigs.shooterMotorVelocityKV);
-		shooterKa = new TunableNumber("Shooter/Ka", MotorConfigs.shooterMotorVelocityKA);
-		targetSpeed = new TunableNumber("Shooter/Target Speed RPM", 0);
+		// shooterKp = new TunableNumber("Shooter/Kp", 10000);
+		// shooterKd = new TunableNumber("Shooter/Kd", MotorConfigs.shooterMotorVelocityKD);
+		// shooterKv = new TunableNumber("Shooter/Kv", MotorConfigs.shooterMotorVelocityKV);
+		// shooterKa = new TunableNumber("Shooter/Ka", MotorConfigs.shooterMotorVelocityKA);
+		// targetSpeed = new TunableNumber("Shooter/Target Speed RPM", 0);
 
 		m_VelocityRequest.UpdateFreqHz = 0;
 		m_VelocityRequest.UseTimesync = true;
@@ -122,7 +122,7 @@ public class Shooter extends SubsystemBase {
 
 	@Logged(key = "Shooter Wheel Velocity RPM", importance = Importance.CRITICAL)
 	public double getWheelVelocityRPM() {
-		return (getMotorVelocityRPM() + shooterTargetVelocity.in(RPM)) * shooterGearRatio;
+		return getMotorVelocityRPM() * shooterGearRatio;
 	}
 
 	public AngularVelocity getVelocity() {

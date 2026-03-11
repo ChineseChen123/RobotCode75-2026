@@ -42,7 +42,7 @@ public class IntakeIndexConstants {
 		public static final Angle pivotUpAngle = Rotations.of(0.4);
 
 		public static final AngularVelocity defaultIntakeSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(80);
+		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(55);
 		public static final AngularVelocity intakeReversingSpeed = RotationsPerSecond.of(-30);
 
 		public static final class MotorConfigs {
@@ -244,7 +244,7 @@ public class IntakeIndexConstants {
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double indexerVelocityKP = 7;
+			public static final double indexerVelocityKP = 14;
 			public static final double indexerVelocityKI = 0.0;
 			public static final double indexerVelocityKD = 0.0;
 			public static final double indexerVelocityKS = 25;

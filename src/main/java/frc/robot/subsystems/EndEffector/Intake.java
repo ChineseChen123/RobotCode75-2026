@@ -236,7 +236,7 @@ public class Intake extends SubsystemBase {
 			m_IntakeMotor.setControl(new CoastOut());
 		}
 
-		// m_PivotMotor.setControl(m_PivotRequest.withPosition(m_IntakeState.pivotPosition));
+		m_PivotMotor.setControl(m_PivotRequest.withPosition(m_IntakeState.pivotPosition));
 
 	}
 }

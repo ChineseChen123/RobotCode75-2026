@@ -64,27 +64,27 @@ public class Indexer extends SubsystemBase {
 	private final VoltageOut m_sysIdRequest = new VoltageOut(0.0);
 
 	private final Slot0Configs indexerConfigs = new Slot0Configs();
-	private final TunableNumber indexerKp =
-			new TunableNumber("Indexer/Kp", MotorConfigs.indexerVelocityKP);
-	private final TunableNumber indexerKd =
-			new TunableNumber("Indexer/Kd", MotorConfigs.indexerVelocityKD);
-	private final TunableNumber indexerKs =
-			new TunableNumber("Indexer/Ks", MotorConfigs.indexerVelocityKS);
-	private final TunableNumber indexerKv =
-			new TunableNumber("Indexer/Kv", MotorConfigs.indexerVelocityKV);
+	// private final TunableNumber indexerKp =
+	// 		new TunableNumber("Indexer/Kp", MotorConfigs.indexerVelocityKP);
+	// private final TunableNumber indexerKd =
+	// 		new TunableNumber("Indexer/Kd", MotorConfigs.indexerVelocityKD);
+	// private final TunableNumber indexerKs =
+	// 		new TunableNumber("Indexer/Ks", MotorConfigs.indexerVelocityKS);
+	// private final TunableNumber indexerKv =
+	// 		new TunableNumber("Indexer/Kv", MotorConfigs.indexerVelocityKV);
 
 	private final Slot0Configs hopperConfigs = new Slot0Configs();
-	private final TunableNumber hopperKp =
-			new TunableNumber("Hopper/Kp", MotorConfigs.hopperVelocityKP);
-	private final TunableNumber hopperKd =
-			new TunableNumber("Hopper/Kd", MotorConfigs.hopperVelocityKD);
-	private final TunableNumber hopperKs =
-			new TunableNumber("Hopper/Ks", MotorConfigs.hopperVelocityKS);
+	// private final TunableNumber hopperKp =
+	// 		new TunableNumber("Hopper/Kp", MotorConfigs.hopperVelocityKP);
+	// private final TunableNumber hopperKd =
+	// 		new TunableNumber("Hopper/Kd", MotorConfigs.hopperVelocityKD);
+	// private final TunableNumber hopperKs =
+	// 		new TunableNumber("Hopper/Ks", MotorConfigs.hopperVelocityKS);
 
-	private final TunableNumber indexerSpeed =
-			new TunableNumber("Indexer/IndexerSpeed", defaultIndexerSpeed.in(RotationsPerSecond));
-	private final TunableNumber hopperSpeed =
-			new TunableNumber("Hopper/HopperSpeed", defaultHopperSpeed.in(RotationsPerSecond));
+	// private final TunableNumber indexerSpeed =
+	// 		new TunableNumber("Indexer/IndexerSpeed", defaultIndexerSpeed.in(RotationsPerSecond));
+	// private final TunableNumber hopperSpeed =
+	// 		new TunableNumber("Hopper/HopperSpeed", defaultHopperSpeed.in(RotationsPerSecond));
 
 	private final SysIdRoutine m_sysIdRoutine;
 
@@ -147,7 +147,7 @@ public class Indexer extends SubsystemBase {
 		return m_IndexerMotor.getVelocity(true).getValue().in(RotationsPerSecond);
 	}
 
-	@Logged(key = "Hopper Velocity", importance = Importance.DEBUG)
+	// @Logged(key = "Hopper Velocity", importance = Importance.DEBUG)
 	public double getHopperVelocityRPS() {
 		return m_HopperMotor.getVelocity(true).getValue().in(RotationsPerSecond);
 	}
@@ -157,7 +157,7 @@ public class Indexer extends SubsystemBase {
 		return m_IndexerMotor.getStatorCurrent(true).getValue().in(Amps);
 	}
 
-	@Logged(key = "Indexer Supply Current", importance = Importance.DEBUG)
+	// @Logged(key = "Indexer Supply Current", importance = Importance.DEBUG)
 	public double getIndexerSupplyCurrent() {
 		return m_IndexerMotor.getSupplyCurrent(true).getValue().in(Amps);
 	}
@@ -173,17 +173,17 @@ public class Indexer extends SubsystemBase {
 	@Override
 	public void periodic() {
 
-		if (indexerKp.getNumber() != indexerConfigs.kP
-				|| indexerKd.getNumber() != indexerConfigs.kD
-				|| indexerKs.getNumber() != indexerConfigs.kS
-				|| indexerKv.getNumber() != indexerConfigs.kV) {
-			indexerConfigs
-					.withKP(indexerKp.getNumber())
-					.withKD(indexerKd.getNumber())
-					.withKS(indexerKs.getNumber())
-					.withKV(indexerKv.getNumber());
-			m_IndexerMotor.getConfigurator().apply(indexerConfigs);
-		}
+		// if (indexerKp.getNumber() != indexerConfigs.kP
+		// 		|| indexerKd.getNumber() != indexerConfigs.kD
+		// 		|| indexerKs.getNumber() != indexerConfigs.kS
+		// 		|| indexerKv.getNumber() != indexerConfigs.kV) {
+		// 	indexerConfigs
+		// 			.withKP(indexerKp.getNumber())
+		// 			.withKD(indexerKd.getNumber())
+		// 			.withKS(indexerKs.getNumber())
+		// 			.withKV(indexerKv.getNumber());
+		// 	m_IndexerMotor.getConfigurator().apply(indexerConfigs);
+		// }
 
 		// if (hopperKp.getNumber() != hopperConfigs.kP
 		// 		|| hopperKd.getNumber() != hopperConfigs.kD
