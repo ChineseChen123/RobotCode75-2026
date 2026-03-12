@@ -18,6 +18,7 @@ import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.state.Bindings;
 import frc.robot.state.Driver;
 import frc.robot.state.Operator;
+import frc.robot.state.RobotStates;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Indexer;
 import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
@@ -92,14 +93,6 @@ public class RobotContainer {
 			m_Bindings.bind2Driver();
 		}
 
-		// m_Operator.leftBumper.onTrue(Commands.runOnce(SignalLogger::start));
-		// m_Operator.rightBumper.onTrue(Commands.runOnce(SignalLogger::stop));
-
-		// m_Operator.Y.whileTrue(m_Shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-		// m_Operator.A.whileTrue(m_Shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-		// m_Operator.B.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
-		// m_Operator.X.whileTrue(m_Shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
 		m_Operator
 				.leftTriggerGreater(0.15)
 				.whileTrue(
@@ -121,9 +114,9 @@ public class RobotContainer {
 						new InstantCommand(
 										() -> {
 											m_Indexer.setState(
-													// RobotStates.turretIsInDeadzone.getAsBoolean()
-													// 		? IndexerStates.DEFAULT
-													IndexerStates.SHOOTING);
+													RobotStates.turretIsInDeadzone.getAsBoolean()
+															? IndexerStates.DEFAULT
+															: IndexerStates.SHOOTING);
 										},
 										m_Indexer)
 								.repeatedly()

@@ -69,7 +69,7 @@ public class RobotStates {
 	// public static final Trigger turretAtTarget = new Trigger(m_Turret::atTargetHeading);
 	public static final Trigger turretIsStowed = new Trigger(m_Turret::isStowed);
 
-	// public static final Trigger turretIsInDeadzone = new Trigger(m_Turret::inDeadzone);
+	public static final Trigger turretIsInDeadzone = new Trigger(m_Turret::inDeadzone);
 
 	// ── Actions ──────────────────────────────────────────────────────────────────
 

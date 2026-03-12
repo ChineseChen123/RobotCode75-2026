@@ -102,7 +102,7 @@ public class Shooter extends SubsystemBase {
 		return m_ShooterMotor1
 				.getVelocity(true)
 				.getValue()
-				.plus(m_ShooterMotor2.getVelocity(true).getValue().times(-1))
+				.plus(m_ShooterMotor2.getVelocity(true).getValue())
 				.div(2);
 	}
 
