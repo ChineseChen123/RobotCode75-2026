@@ -213,13 +213,13 @@ public class ShooterTurretConstants {
 
 			public static final Frequency timeSyncFreq = Hertz.of(250);
 
-			public static final double kA = 0; // voltage per unit of acceleration
-			public static final double kG = 0; // voltage to overcome gravity
-			public static final double kS = 3.2; // voltage to overcome static friction
-			public static final double kV = 0; // voltage per unit of requested velocity
-			public static final double kP = 70;
-			public static final double kI = 0;
-			public static final double kD = 3;
+			public static final double turretKA = 0; // voltage per unit of acceleration
+			public static final double turretKG = 0; // voltage to overcome gravity
+			public static final double turretKS = 3.2; // voltage to overcome static friction
+			public static final double turretKV = 0; // voltage per unit of requested velocity
+			public static final double turretKP = 70;
+			public static final double turretKI = 0;
+			public static final double turretKD = 3;
 
 			public static final double motionMagicCruiseVelocity = 5;
 			public static final double motionMagicCruiseAcceleration = 5;
@@ -253,12 +253,12 @@ public class ShooterTurretConstants {
 				m_TurretMotorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 				m_TurretMotorConfig.Slot0.StaticFeedforwardSign =
 						StaticFeedforwardSignValue.UseVelocitySign;
-				m_TurretMotorConfig.Slot0.kA = kA; // tune third
-				m_TurretMotorConfig.Slot0.kS = kS; // tune second
-				m_TurretMotorConfig.Slot0.kV = kV; // tune third
-				m_TurretMotorConfig.Slot0.kP = kP; // tune fourth
-				m_TurretMotorConfig.Slot0.kI = kI; // tune only if needed
-				m_TurretMotorConfig.Slot0.kD = kD; // tune fifth
+				m_TurretMotorConfig.Slot0.kA = turretKA; // tune third
+				m_TurretMotorConfig.Slot0.kS = turretKS; // tune second
+				m_TurretMotorConfig.Slot0.kV = turretKV; // tune third
+				m_TurretMotorConfig.Slot0.kP = turretKP; // tune fourth
+				m_TurretMotorConfig.Slot0.kI = turretKI; // tune only if needed
+				m_TurretMotorConfig.Slot0.kD = turretKD; // tune fifth
 
 				m_TurretMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent =
 						statorForwardCurrentLimit.in(Amps);

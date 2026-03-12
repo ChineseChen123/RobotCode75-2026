@@ -204,6 +204,7 @@ public class IntakeIndexConstants {
 
 		public static final int indexerMotorCanID = 54;
 		public static final int hopperMotorCanID = 53;
+		public static final int parallelMotorCanID = 55;
 
 		public static final int beamBreakPort = 3;
 
@@ -216,15 +217,24 @@ public class IntakeIndexConstants {
 		public static final AngularVelocity runningHopperSpeed = RotationsPerSecond.of(20);
 		public static final AngularVelocity reverseHopperSpeed = RotationsPerSecond.of(-15);
 
+		public static final AngularVelocity defaultParallelSpeed = RotationsPerSecond.of(0);
+		public static final AngularVelocity runningParallelSpeed = RotationsPerSecond.of(30);
+		public static final AngularVelocity reverseParallelSpeed = RotationsPerSecond.of(-20);
+
+		public static final double indexerSpeedThresholdRPS = 10;
+
 		public class MotorConfigs {
 			public static final TalonFXConfiguration m_IndexerMotorConfig = new TalonFXConfiguration();
 			public static final TalonFXConfiguration m_HopperMotorConfig = new TalonFXConfiguration();
+			public static final TalonFXConfiguration m_ParallelMotorConfig = new TalonFXConfiguration();
 
 			public static final InvertedValue indexerMotorInvert = InvertedValue.Clockwise_Positive;
 			public static final InvertedValue hopperMotorInvert = InvertedValue.CounterClockwise_Positive;
+			public static final InvertedValue parallelMotorInvert = InvertedValue.Clockwise_Positive;
 
-			public static final NeutralModeValue indexerNeutralMode = NeutralModeValue.Brake;
-			public static final NeutralModeValue hopperNeutralMode = NeutralModeValue.Brake;
+			public static final NeutralModeValue indexerNeutralMode = NeutralModeValue.Coast;
+			public static final NeutralModeValue hopperNeutralMode = NeutralModeValue.Coast;
+			public static final NeutralModeValue parallelNeutralMode = NeutralModeValue.Brake;
 
 			public static final Frequency timeSyncFreq = Hertz.of(250);
 
@@ -233,12 +243,16 @@ public class IntakeIndexConstants {
 			public static final Current indexerCurrentLowerThreshold = Amps.of(30);
 			public static final Current hopperSupplyCurrentLimit = Amps.of(40);
 			public static final Current hopperCurrentLowerThreshold = Amps.of(30);
+			public static final Current parallelSupplyCurrentLimit = Amps.of(40);
+			public static final Current parallelCurrentLowerThreshold = Amps.of(30);
 
 			public static final Current indexerStatorCurrentLimit = Amps.of(80);
 			public static final Current hopperStatorCurrentLimit = Amps.of(60);
+			public static final Current parallelStatorCurrentLimit = Amps.of(60);
 
 			public static final Time indexerCurrentThresholdTime = Seconds.of(0.50);
 			public static final Time hopperCurrentThresholdTime = Seconds.of(0.50);
+			public static final Time parallelCurrentThresholdTime = Seconds.of(0.50);
 
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
@@ -253,6 +267,12 @@ public class IntakeIndexConstants {
 			public static final double hopperVelocityKI = 0.0;
 			public static final double hopperVelocityKD = 0.0;
 			public static final double hopperVelocityKS = 1.5;
+
+			public static final double parallelVelocityKP = 0;
+			public static final double parallelVelocityKI = 0.0;
+			public static final double parallelVelocityKD = 0.0;
+			public static final double parallelVelocityKS = 0;
+			public static final double parallelVelocityKV = 0;
 
 			public static TalonFXConfiguration getIndexerMotorConfig() {
 				m_IndexerMotorConfig.MotorOutput.Inverted = indexerMotorInvert;
@@ -323,19 +343,39 @@ public class IntakeIndexConstants {
 				return m_HopperMotorConfig;
 			}
 
-			public static TalonFXConfiguration getIndexerBangBangConfiguration() {
-				TalonFXConfiguration config = getIndexerMotorConfig();
+			public static TalonFXConfiguration getParallelMotorConfig() {
+				m_ParallelMotorConfig.MotorOutput.Inverted = parallelMotorInvert;
+				m_ParallelMotorConfig.MotorOutput.NeutralMode = parallelNeutralMode;
 
-				config.Slot0.kP = 1000000;
-				config.Slot0.kD = 0.0;
-				config.Slot0.kV = 0.0;
-				config.Slot0.kA = 0.0;
-				config.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
-				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
-				config.MotorOutput.PeakForwardDutyCycle = 1.0;
-				config.MotorOutput.PeakReverseDutyCycle = 0.0;
+				// Current Limiting
+				m_ParallelMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+				m_ParallelMotorConfig.CurrentLimits.SupplyCurrentLimit =
+						parallelSupplyCurrentLimit.in(Amps);
+				m_ParallelMotorConfig.CurrentLimits.SupplyCurrentLowerTime =
+						parallelCurrentThresholdTime.in(Seconds);
+				m_ParallelMotorConfig.CurrentLimits.SupplyCurrentLowerLimit =
+						parallelCurrentLowerThreshold.in(Amps);
+				m_ParallelMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+				m_ParallelMotorConfig.CurrentLimits.StatorCurrentLimit =
+						parallelStatorCurrentLimit.in(Amps);
 
-				return config;
+				// PID Config
+				m_ParallelMotorConfig.Slot0.kP = parallelVelocityKP;
+				m_ParallelMotorConfig.Slot0.kI = parallelVelocityKI;
+				m_ParallelMotorConfig.Slot0.kD = parallelVelocityKD;
+				m_ParallelMotorConfig.Slot0.kS = parallelVelocityKS;
+				m_ParallelMotorConfig.Slot0.kV = parallelVelocityKV;
+
+				// Open and Closed Loop Ramping
+				m_ParallelMotorConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = openLoopRamp;
+				m_ParallelMotorConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = openLoopRamp;
+				m_ParallelMotorConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = closedLoopRamp;
+				m_ParallelMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = closedLoopRamp;
+
+				m_ParallelMotorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp;
+				m_ParallelMotorConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
+
+				return m_ParallelMotorConfig;
 			}
 		}
 	}

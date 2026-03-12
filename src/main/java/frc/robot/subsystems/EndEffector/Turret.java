@@ -29,6 +29,7 @@ import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.lib.util.ShooterPhysics;
 import frc.lib.util.ShooterPhysics.TurretSetpoint;
+import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.ShooterTurretConstants;
 import frc.robot.Constants.ShooterTurretConstants.TurretConstants;
 import frc.robot.Constants.ShooterTurretConstants.TurretConstants.MotorConfigs;
@@ -68,10 +69,10 @@ public class Turret extends SubsystemBase {
 
 	// ── Tunables ─────────────────────────────────────────────────────────────────
 
-	private final TunableNumber turretP = new TunableNumber("Turret/kP", MotorConfigs.kP);
-	private final TunableNumber turretD = new TunableNumber("Turret/kD", MotorConfigs.kD);
-	private final TunableNumber turretS = new TunableNumber("Turret/kS", MotorConfigs.kS);
-	private final TunableNumber turretV = new TunableNumber("Turret/kV", MotorConfigs.kV);
+	private TunableNumber turretP;
+	private TunableNumber turretD;
+	private TunableNumber turretS;
+	private TunableNumber turretV;
 
 	// ── Internal state ───────────────────────────────────────────────────────────
 
@@ -97,7 +98,12 @@ public class Turret extends SubsystemBase {
 
 		m_TurretMotor.getConfigurator().apply(MotorConfigs.getTurretMotorConfig());
 
-		turretConfigs.withKP(MotorConfigs.kP).withKD(MotorConfigs.kD).withKS(MotorConfigs.kS);
+		turretConfigs
+				.withKP(MotorConfigs.turretKP)
+				.withKD(MotorConfigs.turretKD)
+				.withKS(MotorConfigs.turretKS);
+
+		initTunables();
 
 		turretRequest.UpdateFreqHz = 0;
 		turretRequest.UseTimesync = true;
@@ -322,21 +328,6 @@ public class Turret extends SubsystemBase {
 		currentTurretErrorDegrees = turretTargetAngle.minus(currentTurretMotorPosition).abs(Degrees);
 	}
 
-	// ── Tunable config updates ───────────────────────────────────────────────────
-
-	private void updateTunables() {
-		if (turretP.getNumber() != turretConfigs.kP
-				|| turretD.getNumber() != turretConfigs.kD
-				|| turretS.getNumber() != turretConfigs.kS
-				|| turretV.getNumber() != turretConfigs.kV) {
-			turretConfigs.kP = turretP.getNumber();
-			turretConfigs.kD = turretD.getNumber();
-			turretConfigs.kS = turretS.getNumber();
-			turretConfigs.kV = turretV.getNumber();
-			m_TurretMotor.getConfigurator().apply(turretConfigs);
-		}
-	}
-
 	// ── WPILib lifecycle ─────────────────────────────────────────────────────────
 
 	@Override
@@ -348,7 +339,7 @@ public class Turret extends SubsystemBase {
 			}
 		}
 
-		// updateTunables();
+		updateTunables();
 
 		switch (m_TurretState) {
 			case STOWED:
@@ -365,6 +356,30 @@ public class Turret extends SubsystemBase {
 				break;
 			case FEEDING: // TODO: get rid of or implement
 				break;
+		}
+	}
+
+	// ── Tuning ───────────────────────────────────────────────────
+
+	public void initTunables() {
+		if (RobotConstants.TuningModes.tuneTurret) {
+			turretP = new TunableNumber("Turret/kP", MotorConfigs.turretKP);
+			turretD = new TunableNumber("Turret/kD", MotorConfigs.turretKD);
+			turretS = new TunableNumber("Turret/kS", MotorConfigs.turretKS);
+			turretV = new TunableNumber("Turret/kV", MotorConfigs.turretKV);
+		}
+	}
+
+	private void updateTunables() {
+		if (RobotConstants.TuningModes.tuneTurret && turretP.getNumber() != turretConfigs.kP
+				|| turretD.getNumber() != turretConfigs.kD
+				|| turretS.getNumber() != turretConfigs.kS
+				|| turretV.getNumber() != turretConfigs.kV) {
+			turretConfigs.kP = turretP.getNumber();
+			turretConfigs.kD = turretD.getNumber();
+			turretConfigs.kS = turretS.getNumber();
+			turretConfigs.kV = turretV.getNumber();
+			m_TurretMotor.getConfigurator().apply(turretConfigs);
 		}
 	}
 }

@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 import static frc.robot.Constants.ShooterTurretConstants.ShooterConstants.*;
 
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
@@ -57,8 +56,6 @@ public class Shooter extends SubsystemBase {
 	private final VelocityDutyCycle m_DutyCycleBangBang;
 	private final VelocityTorqueCurrentFOC m_TorqueCurrentBangBang;
 
-	private final Slot0Configs shooterPIDConfigs = new Slot0Configs();
-
 	// ── Internal state ───────────────────────────────────────────────────────────
 
 	private ShooterStates m_ShooterState = ShooterStates.DEFAULT;
@@ -84,14 +81,6 @@ public class Shooter extends SubsystemBase {
 
 		m_DutyCycleBangBang = new VelocityDutyCycle(RPM.of(0));
 		m_TorqueCurrentBangBang = new VelocityTorqueCurrentFOC(RPM.of(0));
-
-		shooterPIDConfigs
-				.withKP(MotorConfigs.shooterMotorVelocityKP)
-				.withKI(MotorConfigs.shooterMotorVelocityKI)
-				.withKD(MotorConfigs.shooterMotorVelocityKD)
-				.withKS(MotorConfigs.shooterMotorVelocityKS)
-				.withKV(MotorConfigs.shooterMotorVelocityKV)
-				.withKA(MotorConfigs.shooterMotorVelocityKA);
 
 		m_VelocityRequest.UpdateFreqHz = 0;
 		m_VelocityRequest.UseTimesync = true;

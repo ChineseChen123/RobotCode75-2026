@@ -10,7 +10,6 @@ import static frc.robot.Constants.IntakeIndexConstants.IntakeConstants.*;
 import static frc.robot.Constants.IntakeIndexConstants.IntakeConstants.MotorConfigs.*;
 import static frc.robot.Constants.RobotConstants.*;
 
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
@@ -27,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
+import frc.robot.Constants.RobotConstants;
 import frc.robot.state.RobotStates;
 
 public class Intake extends SubsystemBase {
@@ -68,28 +68,20 @@ public class Intake extends SubsystemBase {
 
 	private Slot0Configs PivotPIDConfig = new Slot0Configs();
 
-	private final TunableNumber intakePivotKp;
-	private final TunableNumber intakePivotKd;
-	private final TunableNumber intakePivotKs;
-	private final TunableNumber intakePivotKg;
-
-	private MotionMagicConfigs PivotMMConfigs = new MotionMagicConfigs();
-
-	private final TunableNumber intakePivotMMAcc;
-	private final TunableNumber intakePivotMMVel;
-	private final TunableNumber intakePivotMMJerk;
-	private final TunableNumber intakePivotMMKa;
-	private final TunableNumber intakePivotMMKv;
+	private TunableNumber intakePivotKp;
+	private TunableNumber intakePivotKd;
+	private TunableNumber intakePivotKs;
+	private TunableNumber intakePivotKg;
 
 	// ── Intake motor tunables / configs ─────────────────────────────────────────
 
 	private Slot0Configs IntakeMotorPIDConfig = new Slot0Configs();
 
-	private final TunableNumber intakeMotorKp;
-	private final TunableNumber intakeMotorKi;
-	private final TunableNumber intakeMotorKd;
-	private final TunableNumber intakeMotorKs;
-	private final TunableNumber intakeMotorKv;
+	private TunableNumber intakeMotorKp;
+	private TunableNumber intakeMotorKi;
+	private TunableNumber intakeMotorKd;
+	private TunableNumber intakeMotorKs;
+	private TunableNumber intakeMotorKv;
 
 	/** Creates a new Intake. */
 	public Intake() {
@@ -101,39 +93,18 @@ public class Intake extends SubsystemBase {
 
 		m_IntakeState = IntakeStates.DEFAULT;
 
-		PivotMMConfigs.withMotionMagicAcceleration(pivotMMAcc)
-				.withMotionMagicCruiseVelocity(pivotMMVel)
-				.withMotionMagicJerk(pivotMMJerk)
-				.withMotionMagicExpo_kA(pivotMMKa)
-				.withMotionMagicExpo_kV(pivotMMKv);
-
-		intakePivotMMAcc = new TunableNumber("Intake Pivot/MMAcc", pivotMMAcc);
-		intakePivotMMVel = new TunableNumber("Intake Pivot/MMVel", pivotMMVel);
-		intakePivotMMJerk = new TunableNumber("Intake Pivot/MMJerk", pivotMMJerk);
-		intakePivotMMKa = new TunableNumber("Intake Pivot/MMKa", pivotMMKa);
-		intakePivotMMKv = new TunableNumber("Intake Pivot/MMKv", pivotMMKv);
-
 		PivotPIDConfig.withKS(pivotKS)
 				.withKG(pivotKG)
 				.withKP(pivotKP)
 				.withKD(pivotKD)
 				.withGravityType(GravityTypeValue.Arm_Cosine);
 
-		intakePivotKp = new TunableNumber("Intake Pivot/kP", pivotKP);
-		intakePivotKd = new TunableNumber("Intake Pivot/kD", pivotKD);
-		intakePivotKg = new TunableNumber("Intake Pivot/kG", pivotKG);
-		intakePivotKs = new TunableNumber("Intake Pivot/kS", pivotKS);
-
 		IntakeMotorPIDConfig.withKP(intakeVelocityKP)
 				.withKI(intakeVelocityKI)
 				.withKD(intakeVelocityKD)
 				.withKS(intakeVelocityKS);
 
-		intakeMotorKp = new TunableNumber("Intake Motor/kP", intakeVelocityKP);
-		intakeMotorKi = new TunableNumber("Intake Motor/kI", intakeVelocityKI);
-		intakeMotorKd = new TunableNumber("Intake Motor/kD", intakeVelocityKD);
-		intakeMotorKs = new TunableNumber("Intake Motor/kS", intakeVelocityKS);
-		intakeMotorKv = new TunableNumber("Intake Motor/kV", intakeVelocityKV);
+		initTunables();
 
 		m_absoluteEncoder = new DutyCycleEncoder(pivotEncoderPort, 1, pivotZeroPoint.in(Rotations));
 
@@ -182,31 +153,8 @@ public class Intake extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		// if (intakePivotKp.getNumber() != PivotPIDConfig.kP
-		// 		|| intakePivotKd.getNumber() != PivotPIDConfig.kD
-		// 		|| intakePivotKs.getNumber() != PivotPIDConfig.kS
-		// 		|| intakePivotKg.getNumber() != PivotPIDConfig.kG) {
-		// 	PivotPIDConfig.kP = intakePivotKp.getNumber();
-		// 	PivotPIDConfig.kD = intakePivotKd.getNumber();
-		// 	PivotPIDConfig.kS = intakePivotKs.getNumber();
-		// 	PivotPIDConfig.kG = intakePivotKg.getNumber();
 
-		// 	m_PivotMotor.getConfigurator().apply(PivotPIDConfig);
-		// }
-
-		if (intakeMotorKp.getNumber() != IntakeMotorPIDConfig.kP
-				|| intakeMotorKi.getNumber() != IntakeMotorPIDConfig.kI
-				|| intakeMotorKd.getNumber() != IntakeMotorPIDConfig.kD
-				|| intakeMotorKs.getNumber() != IntakeMotorPIDConfig.kS
-				|| intakeMotorKv.getNumber() != IntakeMotorPIDConfig.kV) {
-			IntakeMotorPIDConfig.kP = intakeMotorKp.getNumber();
-			IntakeMotorPIDConfig.kI = intakeMotorKi.getNumber();
-			IntakeMotorPIDConfig.kD = intakeMotorKd.getNumber();
-			IntakeMotorPIDConfig.kS = intakeMotorKs.getNumber();
-			IntakeMotorPIDConfig.kV = intakeMotorKv.getNumber();
-
-			m_IntakeMotor.getConfigurator().apply(IntakeMotorPIDConfig);
-		}
+		updateTunables();
 
 		if (m_IntakeState == IntakeStates.STOWED && !RobotStates.turretIsStowed.getAsBoolean()) {
 			// panic!
@@ -222,5 +170,53 @@ public class Intake extends SubsystemBase {
 		}
 
 		m_PivotMotor.setControl(m_PivotRequest.withPosition(m_IntakeState.pivotPosition));
+	}
+
+	// ── Tuning ───────────────────────────────────────────────────────────
+
+	public void initTunables() {
+		if (RobotConstants.TuningModes.tunePivot) {
+			intakePivotKp = new TunableNumber("Intake Pivot/kP", pivotKP);
+			intakePivotKd = new TunableNumber("Intake Pivot/kD", pivotKD);
+			intakePivotKs = new TunableNumber("Intake Pivot/kS", pivotKS);
+			intakePivotKg = new TunableNumber("Intake Pivot/kG", pivotKG);
+		}
+
+		if (RobotConstants.TuningModes.tuneIntake) {
+			intakeMotorKp = new TunableNumber("Intake Motor/kP", intakeVelocityKP);
+			intakeMotorKi = new TunableNumber("Intake Motor/kI", intakeVelocityKI);
+			intakeMotorKd = new TunableNumber("Intake Motor/kD", intakeVelocityKD);
+			intakeMotorKs = new TunableNumber("Intake Motor/kS", intakeVelocityKS);
+			intakeMotorKv = new TunableNumber("Intake Motor/kV", intakeVelocityKV);
+		}
+	}
+
+	public void updateTunables() {
+		if (RobotConstants.TuningModes.tunePivot && intakePivotKp.getNumber() != PivotPIDConfig.kP
+				|| intakePivotKd.getNumber() != PivotPIDConfig.kD
+				|| intakePivotKs.getNumber() != PivotPIDConfig.kS
+				|| intakePivotKg.getNumber() != PivotPIDConfig.kG) {
+			PivotPIDConfig.kP = intakePivotKp.getNumber();
+			PivotPIDConfig.kD = intakePivotKd.getNumber();
+			PivotPIDConfig.kS = intakePivotKs.getNumber();
+			PivotPIDConfig.kG = intakePivotKg.getNumber();
+
+			m_PivotMotor.getConfigurator().apply(PivotPIDConfig);
+		}
+
+		if (RobotConstants.TuningModes.tuneIntake
+						&& intakeMotorKp.getNumber() != IntakeMotorPIDConfig.kP
+				|| intakeMotorKi.getNumber() != IntakeMotorPIDConfig.kI
+				|| intakeMotorKd.getNumber() != IntakeMotorPIDConfig.kD
+				|| intakeMotorKs.getNumber() != IntakeMotorPIDConfig.kS
+				|| intakeMotorKv.getNumber() != IntakeMotorPIDConfig.kV) {
+			IntakeMotorPIDConfig.kP = intakeMotorKp.getNumber();
+			IntakeMotorPIDConfig.kI = intakeMotorKi.getNumber();
+			IntakeMotorPIDConfig.kD = intakeMotorKd.getNumber();
+			IntakeMotorPIDConfig.kS = intakeMotorKs.getNumber();
+			IntakeMotorPIDConfig.kV = intakeMotorKv.getNumber();
+
+			m_IntakeMotor.getConfigurator().apply(IntakeMotorPIDConfig);
+		}
 	}
 }
