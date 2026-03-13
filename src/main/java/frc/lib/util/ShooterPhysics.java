@@ -163,6 +163,7 @@ public class ShooterPhysics {
 	public static Pose2d getVirtualTarget(
 			Pose2d robotPose, ChassisSpeeds fieldRelativeSpeeds, int iterations) {
 		Pose3d virtualTargetPose = PeddieBounds.getShootingTargetPose(robotPose);
+		Pose3d originalTarget = virtualTargetPose;
 
 		// Compensate for system delay by projecting robot motion forward.
 		ChassisSpeeds robotRelativeSpeeds =
@@ -220,7 +221,7 @@ public class ShooterPhysics {
 							MetersPerSecond.of(-turretVelocityY).times(tofEstimate));
 
 			virtualTargetPose =
-					PeddieBounds.getShootingTargetPose(robotPose)
+					originalTarget
 							.plus(new Transform3d(new Transform2d(targetTranslation, Rotation2d.kZero)));
 		}
 

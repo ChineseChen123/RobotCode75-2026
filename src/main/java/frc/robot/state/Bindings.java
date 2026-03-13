@@ -15,11 +15,10 @@ public class Bindings {
 		// Swerve bindings
 		swerve.setDefaultCommand(swerve.teleopSwerveCommand());
 		RobotStates.actionResetGyro.whileTrue(swerve.resetHeadingCommand());
-		if (!oneDriver) {
-			RobotStates.actionXStance.whileTrue(swerve.xStanceCommand());
-		}
+		RobotStates.actionXStance.whileTrue(swerve.xStanceCommand());
 		RobotStates.actionRobotRelative.onChange(
 				new InstantCommand(() -> swerve.toggleFieldRelative()));
+		RobotStates.trenchAlignDrive.whileTrue(swerve.trenchAlignTeleopSwerveCommand());
 	}
 
 	/** rebinds actions to match one driver controls */

@@ -79,4 +79,6 @@ public class RobotStates {
 
 	public static Trigger actionXStance = m_Driver.getRightButton(xstanceButton).and(teleop);
 	public static Trigger actionResetGyro = m_Driver.getLeftButton(resetHeadingButton).and(teleop);
+
+	public static Trigger trenchAlignDrive = m_Driver.getLeftButton(trenchDriveButton).and(teleop);
 }

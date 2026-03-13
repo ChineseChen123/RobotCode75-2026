@@ -42,8 +42,7 @@ public class Turret extends SubsystemBase {
 	public enum TurretStates {
 		STOWED,
 		IDLE,
-		SCORING,
-		FEEDING;
+		SCORING;
 	}
 
 	public class CRTResult {
@@ -353,8 +352,6 @@ public class Turret extends SubsystemBase {
 				updateTurretTarget();
 				m_TurretMotor.setControl(
 						turretRequest.withPosition(turretTargetAngle) /*.withVelocity(turretTargetVelocity)*/);
-				break;
-			case FEEDING: // TODO: get rid of or implement
 				break;
 		}
 	}

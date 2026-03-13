@@ -193,6 +193,7 @@ public class Indexer extends SubsystemBase {
 						? !(currentIndexerVelocity.abs(RotationsPerSecond) < 0.01)
 						: (currentIndexerVelocity.minus(m_IndexerState.indexerSpeed).abs(RotationsPerSecond)
 								< indexerSpeedThresholdRPS);
+		runParallel = true;
 		if (m_IndexerState == IndexerStates.SHOOTING && runParallel) {
 			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(runningParallelSpeed));
 		} else {
