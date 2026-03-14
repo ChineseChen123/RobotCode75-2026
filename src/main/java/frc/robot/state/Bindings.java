@@ -1,7 +1,5 @@
 package frc.robot.state;
 
-import static frc.robot.Constants.IOConstants.oneDriver;
-
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;

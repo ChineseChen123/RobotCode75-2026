@@ -7,10 +7,14 @@ package frc.robot;
 import static frc.robot.Constants.IOConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
+import choreo.Choreo;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.RaiderLog.RaiderLog;
@@ -69,6 +73,9 @@ public class RobotContainer {
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */
 	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
+
+		m_AutoSelector.setupAutoTab();
+
 		configureLogging();
 		configureBinds();
 		configureChooser();
@@ -158,6 +165,19 @@ public class RobotContainer {
 											: TurretStates.IDLE);
 						},
 						m_Turret));
+
+		m_Operator.leftBumper.whileTrue(
+				new SequentialCommandGroup(
+						Commands.runOnce(
+								() ->
+										m_Swerve.zeroGyro(
+												Choreo.loadTrajectory("TUNING_PATH_LINE")
+														.get()
+														.getInitialPose(DriverStation.getAlliance().get() == Alliance.Red)
+														.get()
+														.getRotation())),
+						m_AutoSelector.choreoFactory.resetOdometry("TUNING_PATH_LINE"),
+						m_AutoSelector.choreoFactory.trajectoryCmd("TUNING_PATH_LINE")));
 	}
 
 	// Configure auto selector

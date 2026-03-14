@@ -89,7 +89,7 @@ public class AutoSelector {
 
 	private final SendableChooser<String> presetChooser;
 
-	private final AutoFactory choreoFactory;
+	public final AutoFactory choreoFactory;
 
 	public AutoSelector() {
 		NetworkTableInstance nt = NetworkTableInstance.getDefault();
@@ -264,7 +264,7 @@ public class AutoSelector {
 				try {
 					// m_trajectories.add(
 					//     new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "_" + point).get()));
-
+					// so sdo
 					// reset pose and gyro if not done yet
 					if (!isOdometryReset) {
 						var trajectory = Choreo.loadTrajectory("" + lastPose + "_" + point);

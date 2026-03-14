@@ -221,8 +221,8 @@ public class ShooterPhysics {
 							MetersPerSecond.of(-turretVelocityY).times(tofEstimate));
 
 			virtualTargetPose =
-					originalTarget
-							.plus(new Transform3d(new Transform2d(targetTranslation, Rotation2d.kZero)));
+					originalTarget.plus(
+							new Transform3d(new Transform2d(targetTranslation, Rotation2d.kZero)));
 		}
 
 		return virtualTargetPose.toPose2d();
