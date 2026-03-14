@@ -162,13 +162,9 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	public void driveClosedLoop(Translation2d translation, double omega) {
-		final ChassisSpeeds speeds =
-				fieldRelative
-						? ChassisSpeeds.fromFieldRelativeSpeeds(
-								translation.getX(), translation.getY(), omega, getHeading())
-						: new ChassisSpeeds(translation.getX(), translation.getY(), omega);
+		final ChassisSpeeds speeds = new ChassisSpeeds(translation.getX(), translation.getY(), omega);
 
-		setRobotRelativeClosedLoop(speeds);
+		setFieldRelativeClosedLoop(speeds);
 	}
 
 	public void setFieldRelative(ChassisSpeeds speeds) {
@@ -181,7 +177,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		setControl(robotRequest.withSpeeds(speeds));
 	}
 
-	public void setRobotRelativeClosedLoop(ChassisSpeeds speeds) {
+	public void setFieldRelativeClosedLoop(ChassisSpeeds speeds) {
 		setpointSpeeds = speeds;
 		setControl(closedLoopRequest.withSpeeds(speeds));
 	}
@@ -341,7 +337,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 															? RobotContainer.getOperator().processedJoystickValues()
 															: RobotContainer.getDriver().processedJoystickValues();
 											if (!AutoAlign.TrenchAlign.isFinished()) {
-												output[1] = AutoAlign.TrenchAlign.execute().vyMetersPerSecond;
+												output[1] = -AutoAlign.TrenchAlign.execute().vyMetersPerSecond;
 											}
 											driveClosedLoop(new Translation2d(output[0], output[1]), output[2]);
 										},

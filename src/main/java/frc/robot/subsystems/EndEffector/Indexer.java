@@ -193,7 +193,6 @@ public class Indexer extends SubsystemBase {
 						? !(currentIndexerVelocity.abs(RotationsPerSecond) < 0.01)
 						: (currentIndexerVelocity.minus(m_IndexerState.indexerSpeed).abs(RotationsPerSecond)
 								< indexerSpeedThresholdRPS);
-		runParallel = true;
 		if (m_IndexerState == IndexerStates.SHOOTING && runParallel) {
 			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(runningParallelSpeed));
 		} else {
@@ -229,10 +228,10 @@ public class Indexer extends SubsystemBase {
 	}
 
 	public void updateTunables() {
-		if (RobotConstants.TuningModes.tuneIndexer && indexerKp.getNumber() != indexerConfigs.kP
+		if (RobotConstants.TuningModes.tuneIndexer && (indexerKp.getNumber() != indexerConfigs.kP
 				|| indexerKd.getNumber() != indexerConfigs.kD
 				|| indexerKs.getNumber() != indexerConfigs.kS
-				|| indexerKv.getNumber() != indexerConfigs.kV) {
+				|| indexerKv.getNumber() != indexerConfigs.kV)) {
 			indexerConfigs
 					.withKP(indexerKp.getNumber())
 					.withKD(indexerKd.getNumber())
@@ -241,9 +240,9 @@ public class Indexer extends SubsystemBase {
 			m_IndexerMotor.getConfigurator().apply(indexerConfigs);
 		}
 
-		if (RobotConstants.TuningModes.tuneHopper && hopperKp.getNumber() != hopperConfigs.kP
+		if (RobotConstants.TuningModes.tuneHopper && (hopperKp.getNumber() != hopperConfigs.kP
 				|| hopperKd.getNumber() != hopperConfigs.kD
-				|| hopperKs.getNumber() != hopperConfigs.kS) {
+				|| hopperKs.getNumber() != hopperConfigs.kS)) {
 			hopperConfigs
 					.withKP(hopperKp.getNumber())
 					.withKD(hopperKd.getNumber())
@@ -251,10 +250,10 @@ public class Indexer extends SubsystemBase {
 			m_HopperMotor.getConfigurator().apply(hopperConfigs);
 		}
 
-		if (RobotConstants.TuningModes.tuneParallel && parallelKp.getNumber() != parallelConfigs.kP
+		if (RobotConstants.TuningModes.tuneParallel && (parallelKp.getNumber() != parallelConfigs.kP
 				|| parallelKd.getNumber() != parallelConfigs.kD
 				|| parallelKs.getNumber() != parallelConfigs.kS
-				|| parallelKv.getNumber() != parallelConfigs.kV) {
+				|| parallelKv.getNumber() != parallelConfigs.kV)) {
 			parallelConfigs
 					.withKP(parallelKp.getNumber())
 					.withKD(parallelKd.getNumber())

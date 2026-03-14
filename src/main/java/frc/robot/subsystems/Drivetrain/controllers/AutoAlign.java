@@ -35,6 +35,7 @@ public class AutoAlign {
 			m_Swerve = RobotContainer.getSwerve();
 			m_ChezyController = m_Swerve.getChezyController();
 			targetPose = PeddieBounds.getNearestTrench(RobotStates.robotPose.get());
+			m_ChezyController.reset(targetPose);
 			isInit = true;
 		}
 

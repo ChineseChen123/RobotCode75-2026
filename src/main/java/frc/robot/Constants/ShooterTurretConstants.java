@@ -37,7 +37,7 @@ public class ShooterTurretConstants {
 	public static final int virtualTargetSolveIterations = 12;
 
 	public static final double phaseDelay = 0.05;
-	public static final double additionalPhaseDelayShooterSpeeds = 0.03;
+	public static final double additionalPhaseDelayShooterSpeeds = 0.08;
 
 	public class ShooterConstants {
 		// Kraken X60s
@@ -69,7 +69,7 @@ public class ShooterTurretConstants {
 		public static final Angle shooterAngleWithVertical = Degrees.of(25);
 		public static final Distance shooterHeight = Inches.of(19.5);
 
-		public static final double shooterRegressionA = 256.63148;
+		public static final double shooterRegressionA = 252.63148;
 		public static final double shooterRegressionB = 1858.26502;
 		public static final double shooterRegressionC = 2.1;
 
@@ -183,8 +183,8 @@ public class ShooterTurretConstants {
 		public static final Angle turretStowAngle = Degrees.of(-90);
 
 		// at CW limit
-		public static final Angle encoder1ZeroPoint = Degrees.of(191.0);
-		public static final Angle encoder2ZeroPoint = Degrees.of(166.2);
+		public static final Angle encoder1ZeroPoint = Degrees.of(25.628);
+		public static final Angle encoder2ZeroPoint = Degrees.of(162.640);
 
 		// discrepancy threshold between encoders to accept solution
 		public static final Angle goodMatchTolerance = Degrees.of(10);

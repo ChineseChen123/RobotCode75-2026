@@ -85,7 +85,7 @@ public class RobotContainer {
 	private void configureLogging() {
 		// RaiderLog.register("Swerve", m_Swerve);
 		RaiderLog.register("Shooter", m_Shooter);
-		// RaiderLog.register("Turret", m_Turret);
+		RaiderLog.register("Turret", m_Turret);
 		// RaiderLog.register("Limelight TR", m_LimelightTR);
 		// RaiderLog.register("Limelight TL", m_LimelightTL);
 		RaiderLog.register("Indexer", m_Indexer);
@@ -166,24 +166,26 @@ public class RobotContainer {
 						},
 						m_Turret));
 
-		m_Operator.leftBumper.whileTrue(
-				new SequentialCommandGroup(
-						Commands.runOnce(
-								() ->
-										m_Swerve.zeroGyro(
-												Choreo.loadTrajectory("TUNING_PATH_LINE")
-														.get()
-														.getInitialPose(DriverStation.getAlliance().get() == Alliance.Red)
-														.get()
-														.getRotation())),
-						m_AutoSelector.choreoFactory.resetOdometry("TUNING_PATH_LINE"),
-						m_AutoSelector.choreoFactory.trajectoryCmd("TUNING_PATH_LINE")));
+
+		// TODO: reset Odometry to this pose AND disable vision33
+		// m_Operator.leftBumper.whileTrue(
+		// 		new SequentialCommandGroup(
+		// 				Commands.runOnce(
+		// 						() ->
+		// 								m_Swerve.zeroGyro(
+		// 										Choreo.loadTrajectory("TUNING_PATH_LINE")
+		// 												.get()
+		// 												.getInitialPose(DriverStation.getAlliance().get() == Alliance.Red)
+		// 												.get()
+		// 												.getRotation())),
+		// 				m_AutoSelector.choreoFactory.resetOdometry("TUNING_PATH_LINE"),
+		// 				m_AutoSelector.choreoFactory.trajectoryCmd("TUNING_PATH_LINE")));
 	}
 
 	// Configure auto selector
 	private void configureChooser() {
-		m_AutoSelector.setupAutoTab();
-		m_AutoSelector.clearAll();
+		// m_AutoSelector.setupAutoTab();
+		// m_AutoSelector.clearAll();
 	}
 
 	public Command getAutonomousCommand() {
