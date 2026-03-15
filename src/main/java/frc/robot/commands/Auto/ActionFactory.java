@@ -51,16 +51,11 @@ public class ActionFactory {
 									m_Turret.setState(TurretStates.SCORING);
 								},
 								m_Turret),
-						new ConditionalCommand(
-										new InstantCommand(
-												() -> {
-													m_Indexer.setState(IndexerStates.SHOOTING);
-												},
-												m_Indexer),
-										null,
-										RobotStates.turretAtTarget.and(RobotStates.shooterAtSpeed))
-								.repeatedly()
-								.until(() -> m_Indexer.getIndexerState() == IndexerStates.SHOOTING));
+						new InstantCommand(
+								() -> {
+									m_Indexer.setState(IndexerStates.SHOOTING);
+								},
+								m_Indexer));
 			case 2:
 				return new ParallelCommandGroup(
 						new InstantCommand(
@@ -88,7 +83,7 @@ public class ActionFactory {
 			case 4:
 				return new InstantCommand(
 						() -> {
-							m_Intake.setState(IntakeStates.DEFAULT);
+							m_Intake.setState(IntakeStates.STOWED);
 						},
 						m_Intake);
 		}

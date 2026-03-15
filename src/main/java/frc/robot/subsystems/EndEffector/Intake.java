@@ -142,6 +142,7 @@ public class Intake extends SubsystemBase {
 	}
 
 	public void setState(IntakeStates state) {
+		System.out.println("Changing Intake State");
 		m_IntakeState = state;
 	}
 

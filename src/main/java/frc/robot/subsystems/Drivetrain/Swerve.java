@@ -91,9 +91,13 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 					.withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
 	// ── Movement controllers ─────────────────────────────────────────────────────────
+	// private final PIDController xController = new PIDController(2.65, 0, 0);
+	// private final PIDController yController = new PIDController(3.9, 0, 0);
+	// private final PIDController rController = new PIDController(3.05, 0, 0);
+
 	private final PIDController xController = new PIDController(2.65, 0, 0);
 	private final PIDController yController = new PIDController(3.9, 0, 0);
-	private final PIDController rController = new PIDController(3.05, 0, 0);
+	private final PIDController rController = new PIDController(3.7, 0, 0);
 
 	private static final ChezyController m_ChezyController = new ChezyController();
 	private static final RotationController m_RotationController = new RotationController();

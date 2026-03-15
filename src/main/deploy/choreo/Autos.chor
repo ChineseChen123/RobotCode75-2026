@@ -7,8 +7,8 @@
    "cruise_velo":{
     "dimension":"LinVel",
     "var":{
-     "exp":"4 m / s",
-     "val":4.0
+     "exp":"2 m / s",
+     "val":2.0
     }
    },
    "end_acc":{
@@ -21,8 +21,8 @@
    "end_velo":{
     "dimension":"LinVel",
     "var":{
-     "exp":"2 m / s",
-     "val":2.0
+     "exp":"1 m / s",
+     "val":1.0
     }
    },
    "start_acc":{
@@ -148,12 +148,12 @@
    },
    "so_pose":{
     "x":{
-     "exp":"3.6044533252716064 m",
-     "val":3.6044533252716064
+     "exp":"4.4 m",
+     "val":4.4
     },
     "y":{
-     "exp":"0.42545 m",
-     "val":0.42545
+     "exp":"0.467 m",
+     "val":0.467
     },
     "heading":{
      "exp":"180 deg",

@@ -220,11 +220,11 @@ public class AutoSelector {
 		String autoString = autoStringEntry.getString("");
 		String[] words = autoString.split(" ");
 
-		if (!m_startPositions.containsKey(words[0].toLowerCase())) {
-			setFeedback("Invalid start position");
-			return;
-		}
-		m_startPose = m_startPositions.get(words[0].toLowerCase());
+		// if (!m_startPositions.containsKey(words[0].toLowerCase())) {
+		// 	setFeedback("Invalid start position");
+		// 	return;
+		// }
+		// m_startPose = m_startPositions.get(words[0].toLowerCase());
 
 		SequentialCommandGroup sequential = new SequentialCommandGroup();
 		// feedback string with parsed commands
@@ -240,7 +240,7 @@ public class AutoSelector {
 
 		String lastPose = "";
 		for (int i = 0; i < words.length; i++) {
-			ParallelRaceGroup parallelGroup = new ParallelRaceGroup();
+			SequentialCommandGroup sequentialGroup = new SequentialCommandGroup();
 			// parse movement and actions separately in each word
 			StringBuilder pointString = new StringBuilder();
 			StringBuilder actionString = new StringBuilder();
@@ -256,7 +256,7 @@ public class AutoSelector {
 			String point = pointString.toString().toLowerCase();
 			int action = actionString.length() > 0 ? Integer.parseInt(actionString.toString()) : -1;
 
-			if (i == 0) {
+			if (lastPose == "" && point != "") {
 				lastPose = point;
 				continue;
 			}
@@ -282,7 +282,7 @@ public class AutoSelector {
 					}
 
 					// generate movement command and add to group
-					parallelGroup.addCommands(choreoFactory.trajectoryCmd("" + lastPose + "_" + point));
+					sequentialGroup.addCommands(choreoFactory.trajectoryCmd("" + lastPose + "_" + point));
 					// if (DriverStation.getAlliance().get() == Alliance.Red) {
 					//   m_trajectories.set(
 					//       m_trajectories.size() - 1,
@@ -299,16 +299,17 @@ public class AutoSelector {
 			}
 			if (action != -1 && m_actionFactory.getCommand(action) != null) {
 				// convert action number into command and add to group
-				parallelGroup.addCommands(m_actionFactory.getCommand(action));
+				sequentialGroup.addCommands(m_actionFactory.getCommand(action));
 				s.append(m_actionFactory.getName(action) + " ");
 			} else if (action != -1) {
 				setFeedback("Action Not Found: " + action);
 				m_autoCommand = Commands.runOnce(() -> {});
 				return;
 			}
-			sequential.addCommands(parallelGroup);
+			sequential.addCommands(sequentialGroup);
 			sequential.addCommands(new InstantCommand(() -> m_swerve.stopModules(), m_swerve));
 		}
+
 		setFeedback(s.toString());
 		drawPaths();
 		m_autoCommand = sequential;

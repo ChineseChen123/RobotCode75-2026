@@ -32,7 +32,7 @@ public class Limelight extends SubsystemBase {
 		llPose = pose;
 
 		// set valid tags for pose estimation
-		LimelightHelpers.SetFiducialIDFiltersOverride(llName, validMT2Tags);
+		// LimelightHelpers.SetFiducialIDFiltersOverride(llName, validMT2Tags);
 
 		// set camera pose relative to robot center
 		LimelightHelpers.setCameraPose_RobotSpace(
@@ -76,9 +76,9 @@ public class Limelight extends SubsystemBase {
 		}
 
 		// TODO figure out threshold
-		if (minAmbiguity > minAmbiguityThreshold) {
-			return null;
-		}
+		// if (minAmbiguity > minAmbiguityThreshold) {
+		// 	return null;
+		// }
 
 		return mt2Estimate;
 	}

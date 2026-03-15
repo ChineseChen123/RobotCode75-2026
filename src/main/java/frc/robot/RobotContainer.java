@@ -74,7 +74,6 @@ public class RobotContainer {
 	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
 
-		m_AutoSelector.setupAutoTab();
 
 		configureLogging();
 		configureBinds();
@@ -83,12 +82,12 @@ public class RobotContainer {
 
 	// Register any subsystems to be logged
 	private void configureLogging() {
-		// RaiderLog.register("Swerve", m_Swerve);
-		RaiderLog.register("Shooter", m_Shooter);
-		RaiderLog.register("Turret", m_Turret);
-		// RaiderLog.register("Limelight TR", m_LimelightTR);
-		// RaiderLog.register("Limelight TL", m_LimelightTL);
-		RaiderLog.register("Indexer", m_Indexer);
+		RaiderLog.register("Swerve", m_Swerve);
+		// RaiderLog.register("Shooter", m_Shooter);
+		// RaiderLog.register("Turret", m_Turret);
+		RaiderLog.register("Limelight TR", m_LimelightTR);
+		RaiderLog.register("Limelight TL", m_LimelightTL);
+		// RaiderLog.register("Indexer", m_Indexer);
 		// RaiderLog.register("Intake", m_Intake);
 	}
 
@@ -167,25 +166,34 @@ public class RobotContainer {
 						m_Turret));
 
 
-		// TODO: reset Odometry to this pose AND disable vision33
 		// m_Operator.leftBumper.whileTrue(
 		// 		new SequentialCommandGroup(
 		// 				Commands.runOnce(
 		// 						() ->
 		// 								m_Swerve.zeroGyro(
-		// 										Choreo.loadTrajectory("TUNING_PATH_LINE")
+		// 										Choreo.loadTrajectory("so_nzo")
 		// 												.get()
 		// 												.getInitialPose(DriverStation.getAlliance().get() == Alliance.Red)
 		// 												.get()
 		// 												.getRotation())),
-		// 				m_AutoSelector.choreoFactory.resetOdometry("TUNING_PATH_LINE"),
-		// 				m_AutoSelector.choreoFactory.trajectoryCmd("TUNING_PATH_LINE")));
+		// 				Commands.runOnce(
+		// 						() ->
+		// 								m_Swerve.resetPose(
+		// 										Choreo.loadTrajectory("so_nzo")
+		// 												.get()
+		// 												.getInitialPose(DriverStation.getAlliance().get() == Alliance.Red)
+		// 												.get())),
+		// 				m_AutoSelector.choreoFactory.resetOdometry("so_nzo"),
+		// 				m_AutoSelector.choreoFactory.trajectoryCmd("so_nzo")));
+
+		m_Operator.leftBumper.whileTrue(m_AutoSelector.getAutoCommand());
 	}
 
 	// Configure auto selector
 	private void configureChooser() {
-		// m_AutoSelector.setupAutoTab();
-		// m_AutoSelector.clearAll();
+		m_AutoSelector.setupAutoTab();
+		m_AutoSelector.clearAll();
+		
 	}
 
 	public Command getAutonomousCommand() {

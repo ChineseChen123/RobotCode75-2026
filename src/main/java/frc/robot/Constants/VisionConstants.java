@@ -48,10 +48,10 @@ public class VisionConstants {
 							Units.degreesToRadians(-42.3)));
 
 	public static final int[] validMT2Tags = {
-		2, 5, 7, 8, 9, 10, 12, 15, 16, 18, 21, 23, 24, 25, 26, 27, 28, 31, 32
+		1, 2, 5, 7, 8, 9, 10, 12, 15, 16, 18, 21, 23, 24, 25, 26, 27, 28, 31, 32
 	};
 
 	// Thresholds for filtering out vision odometry estimates
 	public static final double maxTagDistanceThreshold = 1.5;
-	public static final double minAmbiguityThreshold = 0.3;
+	public static final double minAmbiguityThreshold = 0.1;
 }
