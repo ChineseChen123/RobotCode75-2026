@@ -55,6 +55,12 @@ public class ShooterPhysics {
 			LinearFilter.movingAverage((int) (0.1 / loopTimeSecs));
 	private static Angle lastTurretAngle = null;
 
+	private static final SG5PointFilter shooterVelFilterX = new SG5PointFilter(loopTimeSecs);
+	private static final SG5PointFilter shooterVelFilterY = new SG5PointFilter(loopTimeSecs);
+	private static final SG5PointFilter shooterVelFilterOmega = new SG5PointFilter(loopTimeSecs);
+
+	private static final double dragCoeff = .2; // .37?
+
 	// ── Shooter speed / distance conversions ─────────────────────────────────────
 
 	public static AngularVelocity distanceToWheelAngularVelocity(double distanceToTarget) {
@@ -176,12 +182,16 @@ public class ShooterPhysics {
 		ChassisSpeeds robotRelativeSpeeds =
 				ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeSpeeds, robotPose.getRotation());
 
+		double vxAccel = shooterVelFilterX.updateDeriv(robotRelativeSpeeds.vxMetersPerSecond);
+		double vyAccel = shooterVelFilterY.updateDeriv(robotRelativeSpeeds.vyMetersPerSecond);
+		double omegaAccel = shooterVelFilterOmega.updateDeriv(robotRelativeSpeeds.omegaRadiansPerSecond);
+
 		robotPose =
 				robotPose.exp(
 						new Twist2d(
-								robotRelativeSpeeds.vxMetersPerSecond * phaseDelay,
-								robotRelativeSpeeds.vyMetersPerSecond * phaseDelay,
-								robotRelativeSpeeds.omegaRadiansPerSecond * phaseDelay));
+								robotRelativeSpeeds.vxMetersPerSecond * phaseDelay + 0.5 * vxAccel * phaseDelay * phaseDelay,
+								robotRelativeSpeeds.vyMetersPerSecond * phaseDelay + 0.5 * vyAccel * phaseDelay * phaseDelay,
+								robotRelativeSpeeds.omegaRadiansPerSecond * phaseDelay + 0.5 * omegaAccel * phaseDelay * phaseDelay));
 
 		// Re-express target-relative motion and ignore lateral/rotational target motion.
 		Rotation2d targetFrame = virtualTargetPose.toPose2d().minus(robotPose).getRotation();
@@ -196,6 +206,7 @@ public class ShooterPhysics {
 						ChassisSpeeds.fromRobotRelativeSpeeds(targetRelativeSpeeds, targetFrame),
 						robotPose.getRotation());
 
+		// TODO: finding this acceleration seems mad annoying... maybe just assume constant velocity?
 		robotPose =
 				robotPose.exp(
 						new Twist2d(
@@ -222,10 +233,12 @@ public class ShooterPhysics {
 		for (int i = 0; i < iterations; i++) {
 			Time tofEstimate = calculateTimeToScore(turretPose, virtualTargetPose);
 
+			Time tofEstimateDragComp = Seconds.of((1 - Math.exp(-tofEstimate.in(Seconds) * dragCoeff)) / dragCoeff);
+
 			Translation2d targetTranslation =
 					new Translation2d(
-							MetersPerSecond.of(-turretVelocityX).times(tofEstimate),
-							MetersPerSecond.of(-turretVelocityY).times(tofEstimate));
+							MetersPerSecond.of(-turretVelocityX).times(tofEstimateDragComp),
+							MetersPerSecond.of(-turretVelocityY).times(tofEstimateDragComp));
 
 			virtualTargetPose =
 					originalTarget.plus(
