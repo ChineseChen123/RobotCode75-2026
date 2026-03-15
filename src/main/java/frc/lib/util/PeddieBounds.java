@@ -208,7 +208,7 @@ public class PeddieBounds {
 	}
 
 	public static boolean isInTrench(Pose2d pose) {
-		return Math.abs(pose.getX() - blueHub.getX()) < 0.03
-				|| Math.abs(pose.getX() - redHub.getX()) < 0.03;
+		return Math.abs(pose.getX() - blueHub.getX()) < 0.4
+				|| Math.abs(pose.getX() - redHub.getX()) < 0.4;
 	}
 }

@@ -86,6 +86,9 @@ public class ShooterPhysics {
 	public static AngularVelocity calculateShooterSpeed(Pose2d robotPose, Pose2d targetPose) {
 		Translation2d turretTranslation = getTurretPose(robotPose).getTranslation();
 		double distanceToTarget = turretTranslation.getDistance(targetPose.getTranslation());
+		if (!PeddieBounds.isInOwnZone(robotPose)) {
+			distanceToTarget += feedingDistPastBump.in(Meters);
+		}
 		return distanceToWheelAngularVelocity(distanceToTarget);
 	}
 
