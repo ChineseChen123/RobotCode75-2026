@@ -228,10 +228,11 @@ public class Indexer extends SubsystemBase {
 	}
 
 	public void updateTunables() {
-		if (RobotConstants.TuningModes.tuneIndexer && (indexerKp.getNumber() != indexerConfigs.kP
-				|| indexerKd.getNumber() != indexerConfigs.kD
-				|| indexerKs.getNumber() != indexerConfigs.kS
-				|| indexerKv.getNumber() != indexerConfigs.kV)) {
+		if (RobotConstants.TuningModes.tuneIndexer
+				&& (indexerKp.getNumber() != indexerConfigs.kP
+						|| indexerKd.getNumber() != indexerConfigs.kD
+						|| indexerKs.getNumber() != indexerConfigs.kS
+						|| indexerKv.getNumber() != indexerConfigs.kV)) {
 			indexerConfigs
 					.withKP(indexerKp.getNumber())
 					.withKD(indexerKd.getNumber())
@@ -240,9 +241,10 @@ public class Indexer extends SubsystemBase {
 			m_IndexerMotor.getConfigurator().apply(indexerConfigs);
 		}
 
-		if (RobotConstants.TuningModes.tuneHopper && (hopperKp.getNumber() != hopperConfigs.kP
-				|| hopperKd.getNumber() != hopperConfigs.kD
-				|| hopperKs.getNumber() != hopperConfigs.kS)) {
+		if (RobotConstants.TuningModes.tuneHopper
+				&& (hopperKp.getNumber() != hopperConfigs.kP
+						|| hopperKd.getNumber() != hopperConfigs.kD
+						|| hopperKs.getNumber() != hopperConfigs.kS)) {
 			hopperConfigs
 					.withKP(hopperKp.getNumber())
 					.withKD(hopperKd.getNumber())
@@ -250,10 +252,11 @@ public class Indexer extends SubsystemBase {
 			m_HopperMotor.getConfigurator().apply(hopperConfigs);
 		}
 
-		if (RobotConstants.TuningModes.tuneParallel && (parallelKp.getNumber() != parallelConfigs.kP
-				|| parallelKd.getNumber() != parallelConfigs.kD
-				|| parallelKs.getNumber() != parallelConfigs.kS
-				|| parallelKv.getNumber() != parallelConfigs.kV)) {
+		if (RobotConstants.TuningModes.tuneParallel
+				&& (parallelKp.getNumber() != parallelConfigs.kP
+						|| parallelKd.getNumber() != parallelConfigs.kD
+						|| parallelKs.getNumber() != parallelConfigs.kS
+						|| parallelKv.getNumber() != parallelConfigs.kV)) {
 			parallelConfigs
 					.withKP(parallelKp.getNumber())
 					.withKD(parallelKd.getNumber())

@@ -7,14 +7,9 @@ package frc.robot;
 import static frc.robot.Constants.IOConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
-import choreo.Choreo;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.RaiderLog.RaiderLog;
@@ -22,16 +17,11 @@ import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.state.Bindings;
 import frc.robot.state.Driver;
 import frc.robot.state.Operator;
-import frc.robot.state.RobotStates;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Indexer;
-import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
 import frc.robot.subsystems.EndEffector.Intake;
-import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
 import frc.robot.subsystems.EndEffector.Shooter;
-import frc.robot.subsystems.EndEffector.Shooter.ShooterStates;
 import frc.robot.subsystems.EndEffector.Turret;
-import frc.robot.subsystems.EndEffector.Turret.TurretStates;
 import frc.robot.subsystems.Vision.Limelight;
 
 public class RobotContainer {
@@ -74,7 +64,6 @@ public class RobotContainer {
 	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
 
-
 		configureLogging();
 		configureBinds();
 		configureChooser();
@@ -98,102 +87,12 @@ public class RobotContainer {
 		} else {
 			m_Bindings.bind2Driver();
 		}
-
-		m_Operator
-				.leftTriggerGreater(0.15)
-				.whileTrue(
-						new InstantCommand(
-										() -> {
-											m_Shooter.setState(ShooterStates.SHOOTING);
-										},
-										m_Shooter)
-								.repeatedly()
-								.finallyDo(
-										() -> {
-											m_Shooter.setState(ShooterStates.DEFAULT);
-										}));
-
-		// shoot
-		m_Operator
-				.rightTriggerGreater(.15)
-				.whileTrue(
-						new InstantCommand(
-										() -> {
-											m_Indexer.setState(
-													RobotStates.turretIsInDeadzone.getAsBoolean()
-															? IndexerStates.DEFAULT
-															: IndexerStates.SHOOTING);
-										},
-										m_Indexer)
-								.repeatedly()
-								.finallyDo(
-										() -> {
-											m_Indexer.setState(IndexerStates.DEFAULT);
-										}));
-
-		// intake
-		m_Operator.A.whileTrue(
-				new InstantCommand(
-								() -> {
-									m_Intake.setState(IntakeStates.INTAKING);
-								},
-								m_Intake)
-						.repeatedly()
-						.finallyDo(
-								() -> {
-									m_Intake.setState(IntakeStates.DEFAULT);
-								}));
-
-		// aim turret (hold)
-		m_Operator.B.whileTrue(
-				new InstantCommand(
-								() -> {
-									m_Turret.setState(TurretStates.SCORING);
-								},
-								m_Turret)
-						.repeatedly()
-						.finallyDo(() -> m_Turret.setState(TurretStates.IDLE)));
-
-		// aim turret (toggle)
-		m_Operator.Y.whileTrue(
-				new InstantCommand(
-						() -> {
-							m_Turret.setState(
-									m_Turret.getTurretState() != TurretStates.SCORING
-											? TurretStates.SCORING
-											: TurretStates.IDLE);
-						},
-						m_Turret));
-
-
-		// m_Operator.leftBumper.whileTrue(
-		// 		new SequentialCommandGroup(
-		// 				Commands.runOnce(
-		// 						() ->
-		// 								m_Swerve.zeroGyro(
-		// 										Choreo.loadTrajectory("so_nzo")
-		// 												.get()
-		// 												.getInitialPose(DriverStation.getAlliance().get() == Alliance.Red)
-		// 												.get()
-		// 												.getRotation())),
-		// 				Commands.runOnce(
-		// 						() ->
-		// 								m_Swerve.resetPose(
-		// 										Choreo.loadTrajectory("so_nzo")
-		// 												.get()
-		// 												.getInitialPose(DriverStation.getAlliance().get() == Alliance.Red)
-		// 												.get())),
-		// 				m_AutoSelector.choreoFactory.resetOdometry("so_nzo"),
-		// 				m_AutoSelector.choreoFactory.trajectoryCmd("so_nzo")));
-
-		m_Operator.leftBumper.whileTrue(m_AutoSelector.getAutoCommand());
 	}
 
 	// Configure auto selector
 	private void configureChooser() {
 		m_AutoSelector.setupAutoTab();
 		m_AutoSelector.clearAll();
-		
 	}
 
 	public Command getAutonomousCommand() {

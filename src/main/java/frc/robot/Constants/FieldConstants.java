@@ -11,8 +11,6 @@ import edu.wpi.first.units.measure.Distance;
 import frc.lib.util.FieldPose.FieldElement;
 import java.util.Map;
 
-import javax.crypto.spec.PSource.PSpecified;
-
 public class FieldConstants {
 	public static final Map<Integer, FieldElement> tagIDToFieldElement = Map.ofEntries();
 
@@ -34,7 +32,8 @@ public class FieldConstants {
 	public static final Pose2d blueBumpRight =
 			new Pose2d(blueHub.getMeasureX(), Meters.of(2.513244390487671), Rotation2d.kZero);
 
-	public static final Pose2d redBumpLeft = new Pose2d(redHub.getMeasureX(), Meters.of(2.513244390487671), Rotation2d.kZero);
+	public static final Pose2d redBumpLeft =
+			new Pose2d(redHub.getMeasureX(), Meters.of(2.513244390487671), Rotation2d.kZero);
 	public static final Pose2d redBumpRight =
 			new Pose2d(redHub.getMeasureX(), Meters.of(5.465127944946289), Rotation2d.kZero);
 

@@ -48,6 +48,7 @@ public class Operator extends SubsystemBase {
 	public DoubleSupplier rightStickX = () -> 0;
 	public DoubleSupplier rightStickY = () -> 0;
 	public DoubleSupplier rightStickXProcessed = () -> 0;
+	public DoubleSupplier rightStickYProcessed = () -> 0;
 
 	/** Creates a new Driver. */
 	public Operator(CommandXboxController controller) {
@@ -97,6 +98,15 @@ public class Operator extends SubsystemBase {
 							? Math.pow(val, translationJoystickExpo)
 							: -1 * Math.pow(-val, translationJoystickExpo);
 				};
+		rightStickYProcessed =
+				() -> {
+					double val =
+							MathUtil.applyDeadband(m_Controller.getHID().getRightY(), stickDeadband)
+									* translationStickMapValue;
+					return val >= 0
+							? Math.pow(val, translationJoystickExpo)
+							: -1 * Math.pow(-val, translationJoystickExpo);
+				};
 	}
 
 	public Trigger leftTriggerGreater(double thresh) {
@@ -135,6 +145,30 @@ public class Operator extends SubsystemBase {
 		DriverInput[0] *= maxVelocity.in(MetersPerSecond);
 		DriverInput[1] *= maxVelocity.in(MetersPerSecond);
 		DriverInput[2] *= maxAngularVelocity.in(RadiansPerSecond);
+
+		return DriverInput;
+	}
+
+	double lastJoystickAngle = 0;
+
+	public double[] processedJoystickValuesPositionalRotation() {
+		// Negation because joystick forward is negative
+		double[] DriverInput = processedJoystickValues();
+
+		// get normalized vector of rotation translation
+
+		double magnitude =
+				Math.sqrt(
+						Math.pow(rightStickXProcessed.getAsDouble(), 2)
+								+ Math.pow(rightStickYProcessed.getAsDouble(), 2));
+		if (magnitude > 0.1) {
+			double angle =
+					Math.atan2(rightStickYProcessed.getAsDouble(), rightStickXProcessed.getAsDouble());
+			DriverInput[2] = angle; // set rotation input to angle of right stick
+			lastJoystickAngle = angle; // update last joystick angle
+		} else {
+			DriverInput[2] = lastJoystickAngle; // if right stick is not significantly moved
+		}
 
 		return DriverInput;
 	}

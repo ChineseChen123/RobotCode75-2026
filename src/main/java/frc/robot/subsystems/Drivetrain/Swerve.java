@@ -85,6 +85,11 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 					.withDriveRequestType(DriveRequestType.OpenLoopVoltage)
 					.withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
+	private final SwerveRequest.FieldCentricFacingAngle positionSteerRequest =
+			new SwerveRequest.FieldCentricFacingAngle()
+					.withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+					.withSteerRequestType(SteerRequestType.MotionMagicExpo);
+
 	private final SwerveRequest.SwerveDriveBrake xStanceRequest =
 			new SwerveRequest.SwerveDriveBrake()
 					.withDriveRequestType(DriveRequestType.OpenLoopVoltage)
@@ -174,6 +179,21 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	public void setFieldRelative(ChassisSpeeds speeds) {
 		setpointSpeeds = speeds;
 		setControl(fieldRequest.withSpeeds(speeds));
+	}
+
+	public void positionalRotationDrive(Translation2d translation, Rotation2d targetAngle) {
+		final ChassisSpeeds speeds =
+				fieldRelative
+						? ChassisSpeeds.fromFieldRelativeSpeeds(
+								translation.getX(), translation.getY(), 0, getHeading())
+						: new ChassisSpeeds(translation.getX(), translation.getY(), 0);
+
+		setpointSpeeds = speeds;
+		setControl(
+				positionSteerRequest
+						.withVelocityX(speeds.vxMetersPerSecond)
+						.withVelocityY(speeds.vyMetersPerSecond)
+						.withTargetDirection(targetAngle));
 	}
 
 	public void setRobotRelative(ChassisSpeeds speeds) {
@@ -347,6 +367,18 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 										},
 										this)
 								.repeatedly());
+	}
+
+	public Command positionRotationTeleopSwerveCommand() {
+		return new InstantCommand(
+						() -> {
+							double[] output =
+									RobotContainer.getOperator().processedJoystickValuesPositionalRotation();
+							positionalRotationDrive(
+									new Translation2d(output[0], output[1]), Rotation2d.fromRadians(output[2]));
+						},
+						this)
+				.repeatedly();
 	}
 
 	public Command resetHeadingCommand() {

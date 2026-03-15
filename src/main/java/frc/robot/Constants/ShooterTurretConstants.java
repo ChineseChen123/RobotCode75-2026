@@ -34,7 +34,7 @@ import edu.wpi.first.units.measure.Time;
 public class ShooterTurretConstants {
 
 	public static final boolean useVirtualTarget = true;
-	public static final int virtualTargetSolveIterations = 12;
+	public static final int virtualTargetSolveIterations = 24;
 
 	public static final double phaseDelay = 0.05;
 	public static final double additionalPhaseDelayShooterSpeeds = 0.08;

@@ -193,10 +193,11 @@ public class Intake extends SubsystemBase {
 	}
 
 	public void updateTunables() {
-		if (RobotConstants.TuningModes.tunePivot && (intakePivotKp.getNumber() != PivotPIDConfig.kP
-				|| intakePivotKd.getNumber() != PivotPIDConfig.kD
-				|| intakePivotKs.getNumber() != PivotPIDConfig.kS
-				|| intakePivotKg.getNumber() != PivotPIDConfig.kG)) {
+		if (RobotConstants.TuningModes.tunePivot
+				&& (intakePivotKp.getNumber() != PivotPIDConfig.kP
+						|| intakePivotKd.getNumber() != PivotPIDConfig.kD
+						|| intakePivotKs.getNumber() != PivotPIDConfig.kS
+						|| intakePivotKg.getNumber() != PivotPIDConfig.kG)) {
 			PivotPIDConfig.kP = intakePivotKp.getNumber();
 			PivotPIDConfig.kD = intakePivotKd.getNumber();
 			PivotPIDConfig.kS = intakePivotKs.getNumber();
@@ -206,11 +207,11 @@ public class Intake extends SubsystemBase {
 		}
 
 		if (RobotConstants.TuningModes.tuneIntake
-						&& (intakeMotorKp.getNumber() != IntakeMotorPIDConfig.kP
-				|| intakeMotorKi.getNumber() != IntakeMotorPIDConfig.kI
-				|| intakeMotorKd.getNumber() != IntakeMotorPIDConfig.kD
-				|| intakeMotorKs.getNumber() != IntakeMotorPIDConfig.kS
-				|| intakeMotorKv.getNumber() != IntakeMotorPIDConfig.kV)) {
+				&& (intakeMotorKp.getNumber() != IntakeMotorPIDConfig.kP
+						|| intakeMotorKi.getNumber() != IntakeMotorPIDConfig.kI
+						|| intakeMotorKd.getNumber() != IntakeMotorPIDConfig.kD
+						|| intakeMotorKs.getNumber() != IntakeMotorPIDConfig.kS
+						|| intakeMotorKv.getNumber() != IntakeMotorPIDConfig.kV)) {
 			IntakeMotorPIDConfig.kP = intakeMotorKp.getNumber();
 			IntakeMotorPIDConfig.kI = intakeMotorKi.getNumber();
 			IntakeMotorPIDConfig.kD = intakeMotorKd.getNumber();

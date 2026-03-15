@@ -184,14 +184,18 @@ public class ShooterPhysics {
 
 		double vxAccel = shooterVelFilterX.updateDeriv(robotRelativeSpeeds.vxMetersPerSecond);
 		double vyAccel = shooterVelFilterY.updateDeriv(robotRelativeSpeeds.vyMetersPerSecond);
-		double omegaAccel = shooterVelFilterOmega.updateDeriv(robotRelativeSpeeds.omegaRadiansPerSecond);
+		double omegaAccel =
+				shooterVelFilterOmega.updateDeriv(robotRelativeSpeeds.omegaRadiansPerSecond);
 
 		robotPose =
 				robotPose.exp(
 						new Twist2d(
-								robotRelativeSpeeds.vxMetersPerSecond * phaseDelay + 0.5 * vxAccel * phaseDelay * phaseDelay,
-								robotRelativeSpeeds.vyMetersPerSecond * phaseDelay + 0.5 * vyAccel * phaseDelay * phaseDelay,
-								robotRelativeSpeeds.omegaRadiansPerSecond * phaseDelay + 0.5 * omegaAccel * phaseDelay * phaseDelay));
+								robotRelativeSpeeds.vxMetersPerSecond * phaseDelay
+										+ 0.5 * vxAccel * phaseDelay * phaseDelay,
+								robotRelativeSpeeds.vyMetersPerSecond * phaseDelay
+										+ 0.5 * vyAccel * phaseDelay * phaseDelay,
+								robotRelativeSpeeds.omegaRadiansPerSecond * phaseDelay
+										+ 0.5 * omegaAccel * phaseDelay * phaseDelay));
 
 		// Re-express target-relative motion and ignore lateral/rotational target motion.
 		Rotation2d targetFrame = virtualTargetPose.toPose2d().minus(robotPose).getRotation();
@@ -233,7 +237,8 @@ public class ShooterPhysics {
 		for (int i = 0; i < iterations; i++) {
 			Time tofEstimate = calculateTimeToScore(turretPose, virtualTargetPose);
 
-			Time tofEstimateDragComp = Seconds.of((1 - Math.exp(-tofEstimate.in(Seconds) * dragCoeff)) / dragCoeff);
+			Time tofEstimateDragComp =
+					Seconds.of((1 - Math.exp(-tofEstimate.in(Seconds) * dragCoeff)) / dragCoeff);
 
 			Translation2d targetTranslation =
 					new Translation2d(

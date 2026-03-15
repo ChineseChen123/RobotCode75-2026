@@ -83,4 +83,24 @@ public class RobotStates {
 	public static Trigger actionResetGyro = m_Driver.getLeftButton(resetHeadingButton).and(teleop);
 
 	public static Trigger trenchAlignDrive = m_Driver.getLeftButton(trenchDriveButton).and(teleop);
+	public static Trigger positionalRotationDrive =
+			m_Driver.getRightButton(trenchDriveButton).and(teleop);
+
+	/* Intake actions */
+
+	public static Trigger actionIntakeDown = m_Operator.A.and(teleop);
+
+	/* Indexer actions */
+
+	public static Trigger actionIndexerShoot = m_Operator.rightTriggerGreater(.15).and(teleop);
+	public static Trigger actionIndexerReverse = m_Operator.rightBumper.and(teleop);
+
+	/* Shooter actions */
+
+	public static Trigger actionShoot = m_Operator.rightTriggerGreater(.15).and(teleop);
+
+	/* Turret actions */
+
+	public static Trigger actionAimTurretHold = m_Operator.B.and(teleop);
+	public static Trigger actionAimTurretToggle = m_Operator.upDpad.and(teleop);
 }

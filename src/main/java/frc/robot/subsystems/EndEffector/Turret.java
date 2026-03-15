@@ -368,10 +368,11 @@ public class Turret extends SubsystemBase {
 	}
 
 	private void updateTunables() {
-		if (RobotConstants.TuningModes.tuneTurret && (turretP.getNumber() != turretConfigs.kP
-				|| turretD.getNumber() != turretConfigs.kD
-				|| turretS.getNumber() != turretConfigs.kS
-				|| turretV.getNumber() != turretConfigs.kV)) {
+		if (RobotConstants.TuningModes.tuneTurret
+				&& (turretP.getNumber() != turretConfigs.kP
+						|| turretD.getNumber() != turretConfigs.kD
+						|| turretS.getNumber() != turretConfigs.kS
+						|| turretV.getNumber() != turretConfigs.kV)) {
 			turretConfigs.kP = turretP.getNumber();
 			turretConfigs.kD = turretD.getNumber();
 			turretConfigs.kS = turretS.getNumber();
