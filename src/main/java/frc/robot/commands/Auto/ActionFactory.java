@@ -3,6 +3,8 @@ package frc.robot.commands.Auto;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Indexer;
@@ -84,6 +86,9 @@ public class ActionFactory {
 							m_Intake.setState(IntakeStates.STOWED);
 						},
 						m_Intake);
+			case 5:
+				return new ParallelRaceGroup(m_Shooter.shootXBallsCommand(8),
+						new WaitCommand(3));
 		}
 		return null;
 	}

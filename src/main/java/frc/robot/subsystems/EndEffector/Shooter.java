@@ -18,7 +18,10 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.lib.util.PeddieBounds;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
@@ -181,6 +184,14 @@ public class Shooter extends SubsystemBase {
 		} else {
 			lastAtSetpoint = false;
 		}
+	}
+
+
+	public Command shootXBallsCommand(int numBalls) {
+		return new InstantCommand(() -> m_ShooterState = ShooterStates.SHOOTING).andThen(new InstantCommand(() -> shotsFired = 0))
+				.andThen(
+						new WaitUntilCommand(() -> shotsFired >= numBalls)
+								.andThen(new InstantCommand(() -> m_ShooterState = ShooterStates.DEFAULT)));
 	}
 
 	// ── WPILib lifecycle ─────────────────────────────────────────────────────────
