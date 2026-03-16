@@ -63,9 +63,9 @@ public class DriverDashboard {
 		} else if (RobotStates.turretIsInDeadzone.getAsBoolean()) {
 			SmartDashboard.putString("Turret Status", turretDeadzoneColor.toHexString());
 		} else if (RobotStates.actionAimTurretHold.getAsBoolean()) {
-            SmartDashboard.putString("Turret Status", turretHoldAlignColor.toHexString());
-        } else {
-            SmartDashboard.putString("Turret Status", turretToggleAlignColor.toHexString());
-        }
+			SmartDashboard.putString("Turret Status", turretHoldAlignColor.toHexString());
+		} else {
+			SmartDashboard.putString("Turret Status", turretToggleAlignColor.toHexString());
+		}
 	}
 }

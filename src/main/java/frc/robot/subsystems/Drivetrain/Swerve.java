@@ -139,7 +139,6 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		m_Pigeon2 = this.getPigeon2();
 		m_Pigeon2.getConfigurator().apply(new Pigeon2Configuration());
 		zeroGyro();
-		
 
 		rController.enableContinuousInput(-Math.PI, Math.PI);
 
