@@ -1,5 +1,7 @@
 package frc.robot.Constants;
 
+import edu.wpi.first.wpilibj.util.Color;
+
 public final class IOConstants {
 	public static final boolean oneDriver = false;
 
@@ -20,4 +22,9 @@ public final class IOConstants {
 
 	// Joystick value exponentiated by...
 	public static final double translationJoystickExpo = oneDriver ? 1.7 : 1.46;
+
+	public static final Color turretHoldAlignColor = new Color(0, 255, 0);
+	public static final Color turretToggleAlignColor = new Color(0, 0, 255);
+	public static final Color turretDeadzoneColor = new Color(255, 255, 0);
+	public static final Color turretAlignInactiveColor = new Color(255, 0, 0);
 }

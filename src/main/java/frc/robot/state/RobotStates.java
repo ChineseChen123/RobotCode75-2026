@@ -12,6 +12,7 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Turret;
+import frc.robot.subsystems.EndEffector.Turret.TurretStates;
 import java.util.function.Supplier;
 
 public class RobotStates {
@@ -70,8 +71,9 @@ public class RobotStates {
 	public static final Trigger turretAtTarget = new Trigger(m_Turret::atTargetHeading);
 
 	public static final Trigger turretIsStowed = new Trigger(m_Turret::isStowed);
-
 	public static final Trigger turretIsInDeadzone = new Trigger(m_Turret::inDeadzone);
+	public static final Trigger turretIsAligning =
+			new Trigger(() -> m_Turret.getTurretState() == TurretStates.SCORING);
 
 	// ── Actions ──────────────────────────────────────────────────────────────────
 

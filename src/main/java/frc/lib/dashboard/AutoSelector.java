@@ -54,6 +54,7 @@ import java.util.Map;
  * 2 - end shooting/turret aligning
  * 3 - run intake (including driving)
  * 4 - intake from depot
+ * 5 - shoot 8 preload
  */
 
 /* POINTS
@@ -239,7 +240,7 @@ public class AutoSelector {
 
 		String lastPose = "";
 		for (int i = 0; i < words.length; i++) {
-			SequentialCommandGroup sequentialGroup = new SequentialCommandGroup();
+			Command parallelGroup = null;
 			// parse movement and actions separately in each word
 			StringBuilder pointString = new StringBuilder();
 			StringBuilder actionString = new StringBuilder();
@@ -281,7 +282,7 @@ public class AutoSelector {
 					}
 
 					// generate movement command and add to group
-					sequentialGroup.addCommands(choreoFactory.trajectoryCmd("" + lastPose + "_" + point));
+					parallelGroup = choreoFactory.trajectoryCmd("" + lastPose + "_" + point);
 					// if (DriverStation.getAlliance().get() == Alliance.Red) {
 					//   m_trajectories.set(
 					//       m_trajectories.size() - 1,
@@ -298,14 +299,20 @@ public class AutoSelector {
 			}
 			if (action != -1 && m_actionFactory.getCommand(action) != null) {
 				// convert action number into command and add to group
-				sequentialGroup.addCommands(m_actionFactory.getCommand(action));
+				if (parallelGroup != null) {
+					// with movement, action ends when path ends
+					parallelGroup = parallelGroup.deadlineFor(m_actionFactory.getCommand(action));
+				} else {
+					// no movement - run action until done
+					parallelGroup = m_actionFactory.getCommand(action);
+				}
 				s.append(m_actionFactory.getName(action) + " ");
 			} else if (action != -1) {
 				setFeedback("Action Not Found: " + action);
 				m_autoCommand = Commands.runOnce(() -> {});
 				return;
 			}
-			sequential.addCommands(sequentialGroup);
+			sequential.addCommands(parallelGroup);
 			sequential.addCommands(new InstantCommand(() -> m_swerve.stopModules(), m_swerve));
 		}
 
