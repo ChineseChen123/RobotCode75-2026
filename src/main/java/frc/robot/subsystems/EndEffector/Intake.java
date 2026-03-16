@@ -146,10 +146,16 @@ public class Intake extends SubsystemBase {
 		m_IntakeState = state;
 	}
 
+	// ── Commands ─────────────────────────────────────────────────────────────────
+
 	public Command setStateCommand(IntakeStates state) {
 		return new InstantCommand(() -> setState(state), this)
 				.repeatedly()
 				.finallyDo(() -> setState(IntakeStates.DEFAULT));
+	}
+
+	public Command setStateCommandPersistent(IntakeStates state) {
+		return new InstantCommand(() -> setState(state), this);
 	}
 
 	@Override

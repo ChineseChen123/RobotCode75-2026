@@ -17,6 +17,8 @@ import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.RaiderLog.Logged;
@@ -160,7 +162,19 @@ public class Indexer extends SubsystemBase {
 		m_IndexerState = state;
 	}
 
-	// ── Updates ────────────────────────────────────────────────────────────
+	// ── Commands ─────────────────────────────────────────────────────────────────
+
+	public Command setStateCommand(IndexerStates state) {
+		return new InstantCommand(() -> setState(state), this)
+				.repeatedly()
+				.finallyDo(() -> setState(IndexerStates.DEFAULT));
+	}
+
+	public Command setStateCommandPersistent(IndexerStates state) {
+		return new InstantCommand(() -> setState(state), this);
+	}
+
+	// ── Updates ──────────────────────────────────────────────────────────────────
 
 	public void updateCache() {
 		currentIndexerVelocity = m_IndexerMotor.getVelocity(true).getValue();
@@ -200,7 +214,7 @@ public class Indexer extends SubsystemBase {
 		}
 	}
 
-	// ── Tuning ─────────────────────────────────────────────────────────
+	// ── Tuning ───────────────────────────────────────────────────────────────────
 
 	public void initTunables() {
 		if (RobotConstants.TuningModes.tuneIndexer) {

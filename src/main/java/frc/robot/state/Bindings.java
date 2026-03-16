@@ -1,6 +1,7 @@
 package frc.robot.state;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Indexer;
@@ -32,79 +33,29 @@ public class Bindings {
 
 		RobotStates.positionalRotationDrive.whileTrue(swerve.positionRotationTeleopSwerveCommand());
 
-		RobotStates.actionShoot.whileTrue(
-				new InstantCommand(
-								() -> {
-									m_Shooter.setState(ShooterStates.SHOOTING);
-								},
-								m_Shooter)
-						.repeatedly()
-						.finallyDo(
-								() -> {
-									m_Shooter.setState(ShooterStates.DEFAULT);
-								}));
+		RobotStates.actionShoot.whileTrue(m_Shooter.setStateCommand(ShooterStates.SHOOTING));
+
+		RobotStates.teleop.onTrue(
+				new ParallelCommandGroup(
+						m_Indexer.setStateCommandPersistent(IndexerStates.DEFAULT),
+						m_Shooter.setStateCommandPersistent(ShooterStates.DEFAULT),
+						m_Turret.setStateCommandPersistent(TurretStates.IDLE)));
 
 		// shoot
-		RobotStates.actionIndexerShoot.whileTrue(
-				new InstantCommand(
-								() -> {
-									m_Indexer.setState(
-											RobotStates.turretIsInDeadzone.getAsBoolean()
-													? IndexerStates.DEFAULT
-													: IndexerStates.SHOOTING);
-								},
-								m_Indexer)
-						.repeatedly()
-						.finallyDo(
-								() -> {
-									m_Indexer.setState(IndexerStates.DEFAULT);
-								}));
+		RobotStates.actionIndexerShoot
+				.and(RobotStates.turretIsInDeadzone.negate())
+				.whileTrue(m_Indexer.setStateCommand(IndexerStates.SHOOTING));
 
-		RobotStates.actionIndexerReverse.whileTrue(
-				new InstantCommand(
-								() -> {
-									m_Indexer.setState(IndexerStates.REVERSING);
-								},
-								m_Indexer)
-						.repeatedly()
-						.finallyDo(
-								() -> {
-									m_Indexer.setState(IndexerStates.DEFAULT);
-								}));
+		RobotStates.actionIndexerReverse.whileTrue(m_Indexer.setStateCommand(IndexerStates.REVERSING));
 
 		// intake
-		RobotStates.actionIntakeDown.whileTrue(
-				new InstantCommand(
-								() -> {
-									m_Intake.setState(IntakeStates.INTAKING);
-								},
-								m_Intake)
-						.repeatedly()
-						.finallyDo(
-								() -> {
-									m_Intake.setState(IntakeStates.DEFAULT);
-								}));
+		RobotStates.actionIntakeDown.whileTrue(m_Intake.setStateCommand(IntakeStates.INTAKING));
 
 		// aim turret (hold)
-		RobotStates.actionAimTurretHold.whileTrue(
-				new InstantCommand(
-								() -> {
-									m_Turret.setState(TurretStates.SCORING);
-								},
-								m_Turret)
-						.repeatedly()
-						.finallyDo(() -> m_Turret.setState(TurretStates.IDLE)));
+		RobotStates.actionAimTurretHold.whileTrue(m_Turret.setStateCommand(TurretStates.SCORING));
 
 		// aim turret (toggle)
-		RobotStates.actionAimTurretToggle.whileTrue(
-				new InstantCommand(
-						() -> {
-							m_Turret.setState(
-									m_Turret.getTurretState() != TurretStates.SCORING
-											? TurretStates.SCORING
-											: TurretStates.IDLE);
-						},
-						m_Turret));
+		RobotStates.actionAimTurretToggle.toggleOnTrue(m_Turret.setStateCommand(TurretStates.SCORING));
 	}
 
 	/** rebinds actions to match one driver controls */

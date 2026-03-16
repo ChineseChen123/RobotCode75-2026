@@ -1,7 +1,6 @@
 package frc.robot.commands.Auto;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -41,54 +40,21 @@ public class ActionFactory {
 		switch (action) {
 			case 1:
 				return new ParallelCommandGroup(
-						new InstantCommand(
-								() -> {
-									m_Shooter.setState(ShooterStates.SHOOTING);
-								},
-								m_Shooter),
-						new InstantCommand(
-								() -> {
-									m_Turret.setState(TurretStates.SCORING);
-								},
-								m_Turret),
-						new InstantCommand(
-								() -> {
-									m_Indexer.setState(IndexerStates.SHOOTING);
-								},
-								m_Indexer));
+						m_Shooter.setStateCommandPersistent(ShooterStates.SHOOTING),
+						m_Turret.setStateCommandPersistent(TurretStates.SCORING),
+						m_Indexer.setStateCommandPersistent(IndexerStates.SHOOTING));
 			case 2:
 				return new ParallelCommandGroup(
-						new InstantCommand(
-								() -> {
-									m_Shooter.setState(ShooterStates.DEFAULT);
-								},
-								m_Shooter),
-						new InstantCommand(
-								() -> {
-									m_Indexer.setState(IndexerStates.DEFAULT);
-								},
-								m_Indexer),
-						new InstantCommand(
-								() -> {
-									m_Turret.setState(TurretStates.IDLE);
-								},
-								m_Turret));
+						m_Shooter.setStateCommandPersistent(ShooterStates.DEFAULT),
+						m_Turret.setStateCommandPersistent(TurretStates.IDLE),
+						m_Indexer.setStateCommandPersistent(IndexerStates.DEFAULT));
 
 			case 3:
-				return new InstantCommand(
-						() -> {
-							m_Intake.setState(IntakeStates.INTAKING);
-						},
-						m_Intake);
+				return m_Intake.setStateCommandPersistent(IntakeStates.INTAKING);
 			case 4:
-				return new InstantCommand(
-						() -> {
-							m_Intake.setState(IntakeStates.STOWED);
-						},
-						m_Intake);
+				return m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT);
 			case 5:
-				return new ParallelRaceGroup(m_Shooter.shootXBallsCommand(8),
-						new WaitCommand(3));
+				return new ParallelRaceGroup(m_Shooter.shootXBallsCommand(8), new WaitCommand(3));
 		}
 		return null;
 	}
@@ -104,6 +70,8 @@ public class ActionFactory {
 				return "Start Intaking";
 			case 4:
 				return "Stop Intaking";
+			case 5:
+				return "Shoot Preload";
 		}
 		return null;
 	}

@@ -22,6 +22,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.PeddieBounds;
@@ -325,6 +327,18 @@ public class Turret extends SubsystemBase {
 		currentTurretMotorPosition = m_TurretMotor.getPosition(true).getValue();
 		currentTurretVelocity = m_TurretMotor.getVelocity(true).getValue();
 		currentTurretErrorDegrees = turretTargetAngle.minus(currentTurretMotorPosition).abs(Degrees);
+	}
+
+	// ── Commands ─────────────────────────────────────────────────────────────────
+
+	public Command setStateCommand(TurretStates state) {
+		return new InstantCommand(() -> setState(state), this)
+				.repeatedly()
+				.finallyDo(() -> setState(TurretStates.IDLE));
+	}
+
+	public Command setStateCommandPersistent(TurretStates state) {
+		return new InstantCommand(() -> setState(state), this);
 	}
 
 	// ── WPILib lifecycle ─────────────────────────────────────────────────────────
