@@ -26,12 +26,12 @@ public class SG5PointFilter {
 
 	public double updateDeriv(double velocity) {
 		// derivative of velocity filter
+		double now = Timer.getFPGATimestamp();
 
-		lastTimeGivenVelocity = Timer.getFPGATimestamp();
-
-		if (lastTimeGivenVelocity - Timer.getFPGATimestamp() > dt * 5) {
+		if (!Double.isNaN(lastTimeGivenVelocity) && now - lastTimeGivenVelocity > dt * 7.0) {
 			velocities.clear();
 		}
+		lastTimeGivenVelocity = now;
 
 		velocities.addLast(velocity);
 		if (velocities.size() > 5) {
@@ -54,6 +54,6 @@ public class SG5PointFilter {
 		double vk3 = v[1];
 		double vk4 = v[0];
 
-		return (25.0 * vk - 48.0 * vk1 + 36.0 * vk2 - 16.0 * vk3 + 3.0 * vk4) / (12.0 * dt);
+		return (vk4 - 8.0 * vk3 + 8.0 * vk1 - vk) / (12.0 * dt);
 	}
 }
