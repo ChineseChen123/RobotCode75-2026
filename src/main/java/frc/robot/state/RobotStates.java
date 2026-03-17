@@ -99,7 +99,7 @@ public class RobotStates {
 
 	/* Shooter actions */
 
-	public static Trigger actionShoot = m_Operator.rightTriggerGreater(.15).and(teleop);
+	public static Trigger actionShoot = m_Operator.leftTriggerGreater(.15).and(teleop);
 
 	/* Turret actions */
 

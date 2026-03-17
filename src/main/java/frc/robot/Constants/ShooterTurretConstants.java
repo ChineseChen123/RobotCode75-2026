@@ -36,7 +36,7 @@ public class ShooterTurretConstants {
 	public static final boolean useVirtualTarget = true;
 	public static final int virtualTargetSolveIterations = 24;
 
-	public static final double phaseDelay = 0.05;
+	public static final double phaseDelay = 0.1;
 	public static final double additionalPhaseDelayShooterSpeeds = 0.08;
 
 	public class ShooterConstants {
@@ -185,8 +185,8 @@ public class ShooterTurretConstants {
 		public static final Angle turretStowAngle = Degrees.of(-90);
 
 		// at CW limit
-		public static final Angle encoder1ZeroPoint = Degrees.of(25.628);
-		public static final Angle encoder2ZeroPoint = Degrees.of(162.640);
+		public static final Angle encoder1ZeroPoint = Degrees.of(30.547);
+		public static final Angle encoder2ZeroPoint = Degrees.of(166.342);
 
 		// discrepancy threshold between encoders to accept solution
 		public static final Angle goodMatchTolerance = Degrees.of(10);
@@ -218,8 +218,8 @@ public class ShooterTurretConstants {
 			public static final double turretKA = 0; // voltage per unit of acceleration
 			public static final double turretKG = 0; // voltage to overcome gravity
 			public static final double turretKS = 3.2; // voltage to overcome static friction
-			public static final double turretKV = 0; // voltage per unit of requested velocity
-			public static final double turretKP = 70;
+			public static final double turretKV = 0.1; // voltage per unit of requested velocity
+			public static final double turretKP = 80.0;
 			public static final double turretKI = 0;
 			public static final double turretKD = 3;
 
@@ -261,6 +261,8 @@ public class ShooterTurretConstants {
 				m_TurretMotorConfig.Slot0.kP = turretKP; // tune fourth
 				m_TurretMotorConfig.Slot0.kI = turretKI; // tune only if needed
 				m_TurretMotorConfig.Slot0.kD = turretKD; // tune fifth
+
+				
 
 				m_TurretMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent =
 						statorForwardCurrentLimit.in(Amps);

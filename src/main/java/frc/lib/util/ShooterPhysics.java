@@ -178,6 +178,8 @@ public class ShooterPhysics {
 			return originalTarget.toPose2d(); // TODO: unfade sotm
 		}
 
+		fieldRelativeSpeeds = fieldRelativeSpeeds.times(1.5);
+
 		// Compensate for system delay by projecting robot motion forward.
 		ChassisSpeeds robotRelativeSpeeds =
 				ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeSpeeds, robotPose.getRotation());

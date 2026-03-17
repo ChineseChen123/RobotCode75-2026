@@ -326,7 +326,7 @@ public class Turret extends SubsystemBase {
 	public void updateCache() {
 		currentTurretMotorPosition = m_TurretMotor.getPosition(true).getValue();
 		currentTurretVelocity = m_TurretMotor.getVelocity(true).getValue();
-		currentTurretErrorDegrees = turretTargetAngle.minus(currentTurretMotorPosition).abs(Degrees);
+		currentTurretErrorDegrees = turretTargetAngle.minus(currentTurretMotorPosition).in(Degrees);
 	}
 
 	// ── Commands ─────────────────────────────────────────────────────────────────
@@ -353,6 +353,7 @@ public class Turret extends SubsystemBase {
 		}
 
 		updateTunables();
+		updateCache();
 
 		switch (m_TurretState) {
 			case STOWED:
@@ -365,7 +366,7 @@ public class Turret extends SubsystemBase {
 			case SCORING:
 				updateTurretTarget();
 				m_TurretMotor.setControl(
-						turretRequest.withPosition(turretTargetAngle) /*.withVelocity(turretTargetVelocity)*/);
+						turretRequest.withPosition(turretTargetAngle));
 				break;
 		}
 	}

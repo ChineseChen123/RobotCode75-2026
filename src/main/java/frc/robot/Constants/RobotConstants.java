@@ -29,6 +29,6 @@ public final class RobotConstants {
 		public static final boolean tunePivot = false && TUNING_MODE;
 		public static final boolean tuneIndexer = false && TUNING_MODE;
 		public static final boolean tuneHopper = false && TUNING_MODE;
-		public static final boolean tuneParallel = true && TUNING_MODE;
+		public static final boolean tuneParallel = false && TUNING_MODE;
 	}
 }
