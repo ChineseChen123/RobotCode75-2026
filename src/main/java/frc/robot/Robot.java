@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.util.RaiderLog.RaiderLog;
@@ -40,9 +41,8 @@ public class Robot extends LoggedRobot {
 
 		m_robotContainer = new RobotContainer();
 
-		// Configure PhotonVision debug tabs
-		// PortForwarder.add(5800, "photon-frontcams.local", 5801);
-		// PortForwarder.add(5800, "photon-rearcams.local", 5802);
+		// Configure PhotonVision debug tab
+		PortForwarder.add(5800, "photon-cams26.local", 5801);
 	}
 
 	@Override

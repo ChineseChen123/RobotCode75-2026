@@ -92,7 +92,6 @@ public class RobotContainer {
 	// Configure auto selector
 	private void configureChooser() {
 		m_AutoSelector.setupAutoTab();
-		m_AutoSelector.clearAll();
 	}
 
 	public Command getAutonomousCommand() {
