@@ -33,7 +33,7 @@ public class ClimberConstants {
 
 	public static final class MotorConfigs {
 
-        public static final InvertedValue climberMotorInverted = InvertedValue.Clockwise_Positive;
+		public static final InvertedValue climberMotorInverted = InvertedValue.Clockwise_Positive;
 
 		// takes 0.25 seconds to go from 0-100% current output
 		public static final Time closedLoopRamp = Seconds.of(0.25);

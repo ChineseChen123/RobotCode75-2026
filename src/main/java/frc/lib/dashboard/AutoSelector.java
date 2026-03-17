@@ -50,11 +50,13 @@ import java.util.Map;
  */
 
 /* ACTIONS
- * 1 - start shooting/turret aligning
- * 2 - end shooting/turret aligning
- * 3 - run intake (including driving)
- * 4 - intake from depot
- * 5 - shoot 8 preload
+ * 1 - start shooter/turret aligning
+ * 2 - stop shooter/turret aligning
+ * 3 - start indexer
+ * 4 - stop indexer
+ * 5 - run intake
+ * 6 - stop intake
+ * 7 - shoot 8 preload
  */
 
 /* POINTS
@@ -66,20 +68,16 @@ import java.util.Map;
  * O - outpost ()
  * ND - depot side neutral zone ()
  * NO - outpost side neutral zone ()
+ * TO - outpost side trench ()
+ * TD - depot side trench ()
  *
- * A - shooting position 1 on depot side (2.1360738277435303, 6.745790481567383, 315)
- * B - shooting position 2 on outpost side (2.1360738277435303, 1.32340952, 45)
- * C-F - add shooting positions as needed
- *
- * TD - depot side tower ()
- * TO - outpost side tower ()
+ * TWD - depot side tower ()
+ * TWO - outpost side tower ()
  */
 
 public class AutoSelector {
-	private List<Trajectory> m_trajectories = new ArrayList<>();
 	private Command m_autoCommand = Commands.runOnce(() -> {});
 	private Pose2d m_startPose;
-	private Field2d m_field;
 	private final ActionFactory m_actionFactory;
 	private final Swerve m_swerve;
 	private Map<String, Pose2d> m_startPositions;
@@ -98,7 +96,6 @@ public class AutoSelector {
 		feedbackEntry = table.getTopic("Feedback").getGenericEntry();
 		feedbackEntry.setString("Enter a command!");
 
-		m_field = new Field2d();
 		m_actionFactory = new ActionFactory();
 		m_swerve = RobotContainer.getSwerve();
 
@@ -113,38 +110,8 @@ public class AutoSelector {
 						m_swerve::getPose, m_swerve::setPose, m_swerve::followSwerveSample, true, m_swerve);
 	}
 
-	/** unused: clear trajectories from dashboard field */
-	public void clearField() {
-		// for displaying; clears shuffleboard field
-		for (int i = 0; i < 100; i++) {
-			FieldObject2d obj = m_field.getObject("traj" + i);
-			obj.setTrajectory(new edu.wpi.first.math.trajectory.Trajectory());
-		}
-	}
-
-	/** unused, broken: draw trajectories on dashboard field */
-	private void drawPaths() {
-		// draws trajectory on shuffleboard field
-		clearField();
-		for (int i = 0; i < m_trajectories.size(); i++) {
-			Trajectory pathTraj = m_trajectories.get(i);
-			List<Pose2d> poses = Arrays.asList(pathTraj.getPoses());
-			edu.wpi.first.math.trajectory.Trajectory displayTraj =
-					TrajectoryGenerator.generateTrajectory(
-							poses, new TrajectoryConfig(AutoConstants.kMaxSpeed, AutoConstants.kMaxAcceleration));
-			m_field.getObject("traj" + i).setTrajectory(displayTraj);
-		}
-	}
-
-	/** clears all trajectories (including Choreo) */
-	public void clearAll() {
-		m_trajectories.clear();
-		clearField();
-	}
-
 	/** complete reset */
 	public void reset() {
-		clearAll();
 		autoStringEntry.setString("");
 		feedbackEntry.setString("Enter a command!");
 		m_autoCommand = Commands.runOnce(() -> {});
@@ -168,11 +135,10 @@ public class AutoSelector {
 		ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
 
 		autoTab.add("Enter Command", "").withSize(4, 1).withPosition(0, 0);
-		autoTab.add(m_field).withSize(6, 4).withPosition(4, 0);
 
 		autoTab.add(presetChooser).withSize(2, 1).withPosition(2, 2);
 
-		autoTab.addString("Feedback", () -> getFeedback()).withSize(4, 1).withPosition(0, 1);
+		autoTab.addString("Feedback", () -> getFeedback()).withSize(8, 1).withPosition(0, 1);
 
 		autoTab
 				.add("Generate", true)
@@ -231,7 +197,6 @@ public class AutoSelector {
 		// feedback string with parsed commands
 		StringBuilder s = new StringBuilder();
 		boolean isOdometryReset = false;
-		m_trajectories.clear();
 
 		if (autoString.length() == 0) {
 			m_autoCommand = sequential;
@@ -318,7 +283,6 @@ public class AutoSelector {
 		}
 
 		setFeedback(s.toString());
-		drawPaths();
 		m_autoCommand = sequential;
 	}
 

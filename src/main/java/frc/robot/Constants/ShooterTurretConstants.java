@@ -262,8 +262,6 @@ public class ShooterTurretConstants {
 				m_TurretMotorConfig.Slot0.kI = turretKI; // tune only if needed
 				m_TurretMotorConfig.Slot0.kD = turretKD; // tune fifth
 
-				
-
 				m_TurretMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent =
 						statorForwardCurrentLimit.in(Amps);
 				m_TurretMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent =

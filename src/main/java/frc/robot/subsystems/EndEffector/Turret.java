@@ -365,8 +365,7 @@ public class Turret extends SubsystemBase {
 				break;
 			case SCORING:
 				updateTurretTarget();
-				m_TurretMotor.setControl(
-						turretRequest.withPosition(turretTargetAngle));
+				m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngle));
 				break;
 		}
 	}

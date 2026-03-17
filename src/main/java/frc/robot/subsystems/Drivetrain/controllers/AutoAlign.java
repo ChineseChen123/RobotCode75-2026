@@ -46,17 +46,15 @@ public class AutoAlign {
 				return new ChassisSpeeds(0, 0, 0);
 			}
 
+			Pose2d currentPose = RobotStates.robotPose.get();
+
 			Pose2d xLockedTargetPose =
 					new Pose2d(
-							RobotStates.robotPose.get().getMeasureX(),
-							targetPose.getMeasureY(),
-							RobotStates.robotPose.get().getRotation());
+							currentPose.getMeasureX(), targetPose.getMeasureY(), currentPose.getRotation());
 
 			m_Swerve.setSample(xLockedTargetPose);
 			// get chezy speeds
-			chezySpeeds =
-					ChassisSpeeds.fromFieldRelativeSpeeds(
-							m_ChezyController.update(xLockedTargetPose), m_Swerve.getHeading());
+			chezySpeeds = m_ChezyController.update(xLockedTargetPose);
 
 			chezySpeeds.vxMetersPerSecond = 0;
 			chezySpeeds.vyMetersPerSecond = MathUtil.clamp(chezySpeeds.vyMetersPerSecond, -2, 2);

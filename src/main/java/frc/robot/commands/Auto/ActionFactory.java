@@ -41,19 +41,21 @@ public class ActionFactory {
 			case 1:
 				return new ParallelCommandGroup(
 						m_Shooter.setStateCommandPersistent(ShooterStates.SHOOTING),
-						m_Turret.setStateCommandPersistent(TurretStates.SCORING),
-						m_Indexer.setStateCommandPersistent(IndexerStates.SHOOTING));
+						m_Turret.setStateCommandPersistent(TurretStates.SCORING));
 			case 2:
 				return new ParallelCommandGroup(
 						m_Shooter.setStateCommandPersistent(ShooterStates.DEFAULT),
-						m_Turret.setStateCommandPersistent(TurretStates.IDLE),
-						m_Indexer.setStateCommandPersistent(IndexerStates.DEFAULT));
-
+						m_Turret.setStateCommandPersistent(TurretStates.IDLE));
 			case 3:
-				return m_Intake.setStateCommandPersistent(IntakeStates.INTAKING);
+				return m_Indexer.setStateCommandPersistent(IndexerStates.SHOOTING);
 			case 4:
-				return m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT);
+				return m_Indexer.setStateCommandPersistent(IndexerStates.DEFAULT);
+
 			case 5:
+				return m_Intake.setStateCommandPersistent(IntakeStates.INTAKING);
+			case 6:
+				return m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT);
+			case 7:
 				return new ParallelRaceGroup(m_Shooter.shootXBallsCommand(8), new WaitCommand(3));
 		}
 		return null;
@@ -63,14 +65,18 @@ public class ActionFactory {
 	public String getName(int action) {
 		switch (action) {
 			case 1:
-				return "Start Shooting";
+				return "Start Shooter/Turret";
 			case 2:
-				return "Stop Shooting";
+				return "Stop Shooter/Turret";
 			case 3:
-				return "Start Intaking";
+				return "Start Indexer";
 			case 4:
-				return "Stop Intaking";
+				return "Stop Indexer";
 			case 5:
+				return "Start Intaking";
+			case 6:
+				return "Stop Intaking";
+			case 7:
 				return "Shoot Preload";
 		}
 		return null;
