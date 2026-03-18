@@ -361,7 +361,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 															? RobotContainer.getOperator().processedJoystickValues()
 															: RobotContainer.getDriver().processedJoystickValues();
 											if (!AutoAlign.TrenchAlign.isFinished()) {
-												output[1] = -AutoAlign.TrenchAlign.execute().vyMetersPerSecond;
+												output[1] = AutoAlign.TrenchAlign.execute().vyMetersPerSecond;
 											} else {
 												output[1] = 0;
 											}

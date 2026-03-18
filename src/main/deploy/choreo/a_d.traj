@@ -22,7 +22,7 @@
   "waypoints":[
     {"x":{"exp":"a_pose.x", "val":2.1360738277435303}, "y":{"exp":"a_pose.y", "val":6.745790481567383}, "heading":{"exp":"a_pose.heading", "val":5.497787143782138}, "intervals":21, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"1.4534893035888672 m", "val":1.4534893035888672}, "y":{"exp":"d_pose.y", "val":5.967445373535156}, "heading":{"exp":"0 rad", "val":0.0}, "intervals":13, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"d_pose.x", "val":1.02}, "y":{"exp":"d_pose.y", "val":5.967445373535156}, "heading":{"exp":"d_pose.heading", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"d_pose.x", "val":0.97}, "y":{"exp":"d_pose.y", "val":5.967445373535156}, "heading":{"exp":"d_pose.heading", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},

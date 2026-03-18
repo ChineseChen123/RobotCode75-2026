@@ -102,7 +102,8 @@ public class AutoSelector {
 		// initialize presets
 		presetChooser = new SendableChooser<>();
 		presetChooser.setDefaultOption("Custom", "");
-		presetChooser.addOption("Outpost Side NZ + Outpost", Presets.outposeSideNZOutpose);
+		presetChooser.addOption("Outpost Side NZ + Outpost", Presets.outposeSideNZOutpost);
+		presetChooser.addOption("Depot Side NZ + Depot", Presets.depotSideNZDepot);
 
 		// define auto factory for autos
 		choreoFactory =
