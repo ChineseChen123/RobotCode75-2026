@@ -12,6 +12,8 @@ import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Shooter.ShooterStates;
 import frc.robot.subsystems.EndEffector.Turret;
 import frc.robot.subsystems.EndEffector.Turret.TurretStates;
+import frc.robot.subsystems.Endgame.Climber;
+import frc.robot.subsystems.Endgame.Climber.ClimberState;
 
 public class Bindings {
 
@@ -22,6 +24,7 @@ public class Bindings {
 		Indexer m_Indexer = RobotContainer.getIndexer();
 		Intake m_Intake = RobotContainer.getIntake();
 		Turret m_Turret = RobotContainer.getTurret();
+		Climber m_Climber = RobotContainer.getClimber();
 
 		// Swerve bindings
 		swerve.setDefaultCommand(swerve.teleopSwerveCommand());
@@ -56,11 +59,14 @@ public class Bindings {
 
 		// aim turret (toggle)
 		RobotStates.actionAimTurretToggle.toggleOnTrue(m_Turret.setStateCommand(TurretStates.SCORING));
+
+		// climber
+		RobotStates.actionClimberUp.whileTrue(m_Climber.setStateCommand(ClimberState.RAISING));
+		RobotStates.actionClimberDown.whileTrue(m_Climber.setStateCommand(ClimberState.LOWERING));
 	}
 
 	/** rebinds actions to match one driver controls */
 	public void bind1Driver() {
-
 		bind2Driver();
 	}
 }

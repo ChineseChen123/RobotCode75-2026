@@ -94,15 +94,23 @@ public class RobotStates {
 
 	/* Indexer actions */
 
-	public static Trigger actionIndexerShoot = m_Operator.rightTriggerGreater(.15).and(teleop);
+	public static Trigger actionIndexerShoot =
+			m_Operator.rightTriggerGreater(operatorDeadband).and(teleop);
 	public static Trigger actionIndexerReverse = m_Operator.rightBumper.and(teleop);
 
 	/* Shooter actions */
 
-	public static Trigger actionShoot = m_Operator.leftTriggerGreater(.15).and(teleop);
+	public static Trigger actionShoot = m_Operator.leftTriggerGreater(operatorDeadband).and(teleop);
 
 	/* Turret actions */
 
 	public static Trigger actionAimTurretHold = m_Operator.B.and(teleop);
 	public static Trigger actionAimTurretToggle = m_Operator.upDpad.and(teleop);
+
+	/* Climber actions */
+
+	public static Trigger actionClimberUp =
+			new Trigger(() -> m_Operator.leftStickY.getAsDouble() < -operatorDeadband).and(teleop);
+	public static Trigger actionClimberDown =
+			new Trigger(() -> m_Operator.leftStickY.getAsDouble() > operatorDeadband).and(teleop);
 }

@@ -13,6 +13,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.StaticBrake;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -20,20 +21,14 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 
-/*
- * Cascading climber driven by 2 Kraken X60s
- * 2 stage WCP GreyT climber
- * Uses motion magic to honor a target \ and acceleration
- *  Motion magic is used to prevent the climber from destroying itself by moving too fast
- *
- */
 public class Climber extends SubsystemBase {
 
 	// we only have a certain number of states the climber will be in at any given time
@@ -50,7 +45,21 @@ public class Climber extends SubsystemBase {
 		}
 	}
 
+	public static enum ClimberState {
+		RAISING(raisingVoltage),
+		LOWERING(loweringVoltage),
+		HOLDING(holdingVoltage),
+		SETPOINT(null);
+
+		public final Voltage voltage;
+
+		private ClimberState(Voltage voltage) {
+			this.voltage = voltage;
+		}
+	}
+
 	private ClimberPositions m_SetpointPosition = ClimberPositions.STOW;
+	private ClimberState m_ClimberState = ClimberState.HOLDING;
 
 	// define motors
 	private final TalonFX m_ClimberMotor1;
@@ -58,15 +67,16 @@ public class Climber extends SubsystemBase {
 
 	// define control requests
 	private final PositionTorqueCurrentFOC m_PositionRequest;
+	private final VoltageOut m_VoltageRequest;
 	private final Follower m_FollowerRequest;
 
-	private final TunableNumber climberKp;
-	private final TunableNumber climberKi;
-	private final TunableNumber climberKd;
-	private final TunableNumber climberKs;
-	private final TunableNumber climberKa;
-	private final TunableNumber climberKv;
-	private final TunableNumber climberKg;
+	// private final TunableNumber climberKp;
+	// private final TunableNumber climberKi;
+	// private final TunableNumber climberKd;
+	// private final TunableNumber climberKs;
+	// private final TunableNumber climberKa;
+	// private final TunableNumber climberKv;
+	// private final TunableNumber climberKg;
 
 	private Slot0Configs config;
 
@@ -77,6 +87,7 @@ public class Climber extends SubsystemBase {
 
 		// initialize control requests
 		m_PositionRequest = new PositionTorqueCurrentFOC(0);
+		m_VoltageRequest = new VoltageOut(0);
 		m_FollowerRequest = new Follower(climberMotor1CANID, MotorAlignmentValue.Aligned);
 
 		// configure motors with correct inverts
@@ -90,13 +101,16 @@ public class Climber extends SubsystemBase {
 		m_PositionRequest.UpdateFreqHz = 0;
 		m_PositionRequest.UseTimesync = true;
 
-		climberKp = new TunableNumber("Climber/kP", MotorConfigs.kP);
-		climberKi = new TunableNumber("Climber/kI", MotorConfigs.kI);
-		climberKd = new TunableNumber("Climber/kD", MotorConfigs.kD);
-		climberKs = new TunableNumber("Climber/kS", MotorConfigs.kS);
-		climberKa = new TunableNumber("Climber/kA", MotorConfigs.kA);
-		climberKv = new TunableNumber("Climber/kV", MotorConfigs.kV);
-		climberKg = new TunableNumber("Climber/kG", MotorConfigs.kG);
+		m_VoltageRequest.UpdateFreqHz = 0;
+		m_VoltageRequest.UseTimesync = true;
+
+		// climberKp = new TunableNumber("Climber/kP", MotorConfigs.kP);
+		// climberKi = new TunableNumber("Climber/kI", MotorConfigs.kI);
+		// climberKd = new TunableNumber("Climber/kD", MotorConfigs.kD);
+		// climberKs = new TunableNumber("Climber/kS", MotorConfigs.kS);
+		// climberKa = new TunableNumber("Climber/kA", MotorConfigs.kA);
+		// climberKv = new TunableNumber("Climber/kV", MotorConfigs.kV);
+		// climberKg = new TunableNumber("Climber/kG", MotorConfigs.kG);
 
 		config =
 				new Slot0Configs()
@@ -109,6 +123,11 @@ public class Climber extends SubsystemBase {
 						.withKG(MotorConfigs.kG)
 						.withGravityType(GravityTypeValue.Elevator_Static)
 						.withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
+
+		Timer.delay(5);
+
+		m_ClimberMotor1.setPosition(0);
+		m_ClimberMotor2.setPosition(0);
 	}
 
 	/**
@@ -145,21 +164,17 @@ public class Climber extends SubsystemBase {
 	}
 
 	public boolean isAtPosition(ClimberPositions position) {
-		if (m_SetpointPosition != position) {
-			return false;
-		} else {
-			return true;
-		}
+		return getPosition().isNear(position.Rotations, climberTolerance);
 	}
 
 	/** used to check climber height during auto */
-	public boolean isBelowPosition(ClimberPositions position, boolean isAlgae) {
+	public boolean isBelowPosition(ClimberPositions position) {
 		double currentPosition = getPosition().in(Rotations);
 		return currentPosition <= position.Rotations.in(Rotations);
 	}
 
 	// raise climber to specified position and hold
-	public Command positionCommand(ClimberPositions position, boolean isAlgae) {
+	public Command positionCommand(ClimberPositions position) {
 		return new InstantCommand(() -> setPosition(position), this)
 				.repeatedly()
 				.finallyDo(
@@ -176,34 +191,49 @@ public class Climber extends SubsystemBase {
 				.until(() -> isAtPosition(position));
 	}
 
+	public Command setStateCommand(ClimberState state) {
+		return new InstantCommand(() -> m_ClimberState = state, this)
+				.repeatedly()
+				.finallyDo(() -> m_ClimberState = ClimberState.HOLDING);
+	}
+
 	@Override
 	public void periodic() {
 
 		// convert climber position to rotations
-		double currentPosition = m_SetpointPosition.Rotations.in(Rotations);
+		double currentPosition = getPosition().in(Rotations);
 
-		double targetRotations = currentPosition; // new pivot subtracts rotations
+		double targetRotations =
+				m_SetpointPosition.Rotations.in(Rotations); // new pivot subtracts rotations
 
-		if (config.kP != climberKp.getNumber()
-				|| config.kI != climberKi.getNumber()
-				|| config.kD != climberKd.getNumber()
-				|| config.kS != climberKs.getNumber()
-				|| config.kA != climberKa.getNumber()
-				|| config.kV != climberKv.getNumber()
-				|| config.kG != climberKg.getNumber()) {
-			config.kP = climberKp.getNumber();
-			config.kI = climberKi.getNumber();
-			config.kD = climberKd.getNumber();
-			config.kS = climberKs.getNumber();
-			config.kA = climberKa.getNumber();
-			config.kV = climberKv.getNumber();
-			config.kG = climberKg.getNumber();
+		// if (config.kP != climberKp.getNumber()
+		// 		|| config.kI != climberKi.getNumber()
+		// 		|| config.kD != climberKd.getNumber()
+		// 		|| config.kS != climberKs.getNumber()
+		// 		|| config.kA != climberKa.getNumber()
+		// 		|| config.kV != climberKv.getNumber()
+		// 		|| config.kG != climberKg.getNumber()) {
+		// 	config.kP = climberKp.getNumber();
+		// 	config.kI = climberKi.getNumber();
+		// 	config.kD = climberKd.getNumber();
+		// 	config.kS = climberKs.getNumber();
+		// 	config.kA = climberKa.getNumber();
+		// 	config.kV = climberKv.getNumber();
+		// 	config.kG = climberKg.getNumber();
 
-			m_ClimberMotor1.getConfigurator().apply(config);
-			m_ClimberMotor2.getConfigurator().apply(config);
+		// 	m_ClimberMotor1.getConfigurator().apply(config);
+		// 	m_ClimberMotor2.getConfigurator().apply(config);
+		// }
+
+		if (m_ClimberState == ClimberState.HOLDING) {
+			m_ClimberMotor1.setControl(new StaticBrake());
+			m_ClimberMotor2.setControl(new StaticBrake());
+		} else if (m_ClimberState.voltage != null) {
+			m_ClimberMotor1.setControl(m_VoltageRequest.withOutput(m_ClimberState.voltage));
+			m_ClimberMotor2.setControl(m_FollowerRequest);
+		} else if (m_ClimberState == ClimberState.SETPOINT) {
+			m_ClimberMotor1.setControl(m_PositionRequest.withPosition(targetRotations));
+			m_ClimberMotor2.setControl(m_FollowerRequest);
 		}
-
-		m_ClimberMotor1.setControl(m_PositionRequest.withPosition(Rotations.of(targetRotations)));
-		m_ClimberMotor2.setControl(m_FollowerRequest);
 	}
 }

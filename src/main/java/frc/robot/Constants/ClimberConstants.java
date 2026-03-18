@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -18,6 +19,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Voltage;
 
 public class ClimberConstants {
 	// from the perspective of looking from the back of the robot forwards
@@ -28,6 +30,10 @@ public class ClimberConstants {
 	public static final Angle stowedPosition = Rotations.of(0);
 	public static final Angle upPosition = Rotations.of(0);
 	public static final Angle climbedPosition = Rotations.of(0);
+
+	public static final Voltage raisingVoltage = Volts.of(2);
+	public static final Voltage loweringVoltage = Volts.of(-2);
+	public static final Voltage holdingVoltage = Volts.of(0);
 
 	public static final Angle climberTolerance = Rotations.of(1);
 
@@ -46,7 +52,7 @@ public class ClimberConstants {
 		public static final Current supplyCurrentLowerLimit = Amps.of(30);
 		public static final Time supplyCurrentLowerTime = Seconds.of(0.5);
 
-		public static final Angle forwardLimit = Rotations.of(0);
+		public static final Angle forwardLimit = Rotations.of(100);
 		public static final Angle reverseLimit = Rotations.of(0);
 
 		public static final Frequency timeSyncFreq = Hertz.of(250);
