@@ -375,7 +375,9 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		return new InstantCommand(
 						() -> {
 							double[] output =
-									RobotContainer.getOperator().processedJoystickValuesPositionalRotation();
+									oneDriver
+											? RobotContainer.getOperator().processedJoystickValuesPositionalRotation()
+											: RobotContainer.getDriver().processedJoystickValuesPositionalRotation();
 							positionalRotationDrive(
 									new Translation2d(output[0], output[1]), Rotation2d.fromRadians(output[2]));
 						},

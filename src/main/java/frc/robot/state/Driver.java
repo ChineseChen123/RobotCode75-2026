@@ -62,7 +62,7 @@ public class Driver extends SubsystemBase {
 							: -1 * Math.pow(-val, translationJoystickExpo);
 				};
 		rightX = () -> MathUtil.applyDeadband(m_RightStick.getX(), stickDeadband);
-		rightY = () -> m_RightStick.getY();
+		rightY = () -> MathUtil.applyDeadband(m_RightStick.getY(), stickDeadband);
 	}
 
 	public Trigger getLeftButton(int button) {
@@ -89,6 +89,30 @@ public class Driver extends SubsystemBase {
 		DriverInput[0] *= maxVelocity.in(MetersPerSecond);
 		DriverInput[1] *= maxVelocity.in(MetersPerSecond);
 		DriverInput[2] *= maxAngularVelocity.in(RadiansPerSecond);
+
+		return DriverInput;
+	}
+
+	double lastJoystickAngle = 0;
+
+	public double[] processedJoystickValuesPositionalRotation() {
+		// Negation because joystick forward is negative
+		double[] DriverInput = processedJoystickValues();
+
+		// get normalized vector of rotation translation
+
+		double magnitude =
+				Math.sqrt(
+						Math.pow(rightX.getAsDouble(), 2)
+								+ Math.pow(rightY.getAsDouble(), 2));
+		if (magnitude > 0.1) {
+			double angle =
+					Math.atan2(rightY.getAsDouble(), rightX.getAsDouble());
+			DriverInput[2] = angle; // set rotation input to angle of right stick
+			lastJoystickAngle = angle; // update last joystick angle
+		} else {
+			DriverInput[2] = lastJoystickAngle; // if right stick is not significantly moved
+		}
 
 		return DriverInput;
 	}
