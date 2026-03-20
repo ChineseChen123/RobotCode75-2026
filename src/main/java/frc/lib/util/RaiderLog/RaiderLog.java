@@ -1,6 +1,7 @@
 package frc.lib.util.RaiderLog;
 
 import dev.doglog.DogLog;
+import dev.doglog.DogLogOptions;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -103,6 +104,9 @@ public class RaiderLog extends DogLog {
 
 		Logger.recordMetadata("ProjectName", "RoboRaiders2025");
 		DogLog.setEnabled(logMode != LogMode.COMP);
+		if (logMode == LogMode.COMP) {
+			DogLog.setOptions(new DogLogOptions().withNtPublish(false));
+		}
 
 		switch (logMode) {
 			case BASIC -> {

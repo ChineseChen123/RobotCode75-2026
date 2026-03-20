@@ -71,14 +71,20 @@ public class Limelight extends SubsystemBase {
 		}
 		minAmbiguity = Double.MAX_VALUE;
 		LimelightHelpers.RawFiducial[] detectedTags = mt2Estimate.rawFiducials;
+		double minDist = Double.MAX_VALUE;
 		for (LimelightHelpers.RawFiducial tag : detectedTags) {
 			minAmbiguity = Math.min(minAmbiguity, tag.ambiguity);
+			minDist = Math.min(minDist, tag.distToRobot);
 		}
 
 		// TODO figure out threshold
 		// if (minAmbiguity > minAmbiguityThreshold) {
 		// 	return null;
 		// }
+
+		if (minDist > 3) {
+			return null;
+		}
 
 		return mt2Estimate;
 	}

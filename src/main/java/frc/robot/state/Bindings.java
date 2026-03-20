@@ -24,7 +24,7 @@ public class Bindings {
 		Indexer m_Indexer = RobotContainer.getIndexer();
 		Intake m_Intake = RobotContainer.getIntake();
 		Turret m_Turret = RobotContainer.getTurret();
-		Climber m_Climber = RobotContainer.getClimber();
+		// Climber m_Climber = RobotContainer.getClimber();
 
 		// Swerve bindings
 		swerve.setDefaultCommand(swerve.teleopSwerveCommand());
@@ -43,6 +43,8 @@ public class Bindings {
 						m_Indexer.setStateCommandPersistent(IndexerStates.DEFAULT),
 						m_Shooter.setStateCommandPersistent(ShooterStates.DEFAULT),
 						m_Turret.setStateCommandPersistent(TurretStates.IDLE)));
+		
+		RobotStates.actionResetSubsystems.onTrue(new InstantCommand(() -> RobotContainer.resetSubsystems()));
 
 		// shoot
 		RobotStates.actionIndexerShoot
@@ -54,6 +56,10 @@ public class Bindings {
 		// intake
 		RobotStates.actionIntakeDown.whileTrue(m_Intake.setStateCommand(IntakeStates.INTAKING));
 
+		// RobotStates.actionIntakeStowToggle.toggleOnTrue(
+		// 	m_Turret.setStateCommand(TurretStates.STOWED).alongWith(m_Intake.setStateCommand(IntakeStates.STOWED))
+		// );
+
 		// aim turret (hold)
 		RobotStates.actionAimTurretHold.whileTrue(m_Turret.setStateCommand(TurretStates.SCORING));
 
@@ -61,8 +67,8 @@ public class Bindings {
 		RobotStates.actionAimTurretToggle.toggleOnTrue(m_Turret.setStateCommand(TurretStates.SCORING));
 
 		// climber
-		RobotStates.actionClimberUp.whileTrue(m_Climber.setStateCommand(ClimberState.RAISING));
-		RobotStates.actionClimberDown.whileTrue(m_Climber.setStateCommand(ClimberState.LOWERING));
+		// RobotStates.actionClimberUp.whileTrue(m_Climber.setStateCommand(ClimberState.RAISING));
+		// RobotStates.actionClimberDown.whileTrue(m_Climber.setStateCommand(ClimberState.LOWERING));
 	}
 
 	/** rebinds actions to match one driver controls */

@@ -88,9 +88,12 @@ public class RobotStates {
 	public static Trigger positionalRotationDrive =
 			m_Driver.getRightButton(trenchDriveButton).and(teleop);
 
+	public static Trigger actionResetSubsystems = m_Operator.start;
+
 	/* Intake actions */
 
 	public static Trigger actionIntakeDown = m_Operator.A.and(teleop);
+	public static Trigger actionIntakeStowToggle = m_Operator.downDpad.and(teleop);
 
 	/* Indexer actions */
 

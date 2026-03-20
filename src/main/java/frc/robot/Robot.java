@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -32,8 +33,8 @@ public class Robot extends LoggedRobot {
 		super(RobotConstants.loopTimeSecs);
 
 		// Set up logging
-		Importance minImportance = Importance.DEBUG;
-		LogMode logMode = LogMode.BASIC;
+		Importance minImportance = Importance.CRITICAL;
+		LogMode logMode = LogMode.COMP;
 		RaiderLog.init(minImportance, logMode);
 		if (logMode == LogMode.REPLAY) {
 			setUseTiming(false); // Allows simulation to run as fast as possible
@@ -42,7 +43,8 @@ public class Robot extends LoggedRobot {
 		m_robotContainer = new RobotContainer();
 
 		// Configure PhotonVision debug tab
-		PortForwarder.add(5800, "photon-cams26.local", 5801);
+		// PortForwarder.add(5800, "photon-cams26.local", 5801);
+		CameraServer.startAutomaticCapture();
 	}
 
 	@Override

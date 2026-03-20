@@ -186,8 +186,8 @@ public class ShooterTurretConstants {
 		public static final Angle turretStowAngle = Degrees.of(-90);
 
 		// at CW limit
-		public static final Angle encoder1ZeroPoint = Degrees.of(30.547);
-		public static final Angle encoder2ZeroPoint = Degrees.of(166.342);
+		public static final Angle encoder1ZeroPoint = Degrees.of(15.813);
+		public static final Angle encoder2ZeroPoint = Degrees.of(167.22);
 
 		// discrepancy threshold between encoders to accept solution
 		public static final Angle goodMatchTolerance = Degrees.of(10);

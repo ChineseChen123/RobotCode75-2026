@@ -85,6 +85,8 @@ public class Climber extends SubsystemBase {
 		m_ClimberMotor1 = new TalonFX(climberMotor1CANID, superstructureCANBusName);
 		m_ClimberMotor2 = new TalonFX(climberMotor2CANID, superstructureCANBusName);
 
+		m_ClimberState = ClimberState.HOLDING;
+
 		// initialize control requests
 		m_PositionRequest = new PositionTorqueCurrentFOC(0);
 		m_VoltageRequest = new VoltageOut(0);
@@ -153,8 +155,8 @@ public class Climber extends SubsystemBase {
 
 	/** return current position setpoint */
 	@Logged(key = "Climber State", importance = Importance.CRITICAL)
-	public ClimberPositions getState() {
-		return m_SetpointPosition;
+	public ClimberState getState() {
+		return m_ClimberState;
 	}
 
 	/** position as a double for logging */
