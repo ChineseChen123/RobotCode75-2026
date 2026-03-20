@@ -116,17 +116,17 @@ public class Intake extends SubsystemBase {
 	// ── Sensor / state accessors ────────────────────────────────────────────────
 
 	/** Return through-bore encoder position. */
-	@Logged(key = "Abs Encoder Position", importance = Importance.CRITICAL)
+	@Logged(key = "Abs Encoder Position", importance = Importance.DEBUG)
 	public double getThroughborePosition() {
 		return m_absoluteEncoder.get();
 	}
 
-	@Logged(key = "Pivot Motor Rotations", importance = Importance.CRITICAL)
+	@Logged(key = "Pivot Motor Rotations", importance = Importance.DEBUG)
 	public double getMotorRotations() {
 		return m_PivotMotor.getPosition().getValue().in(Rotations);
 	}
 
-	@Logged(key = "Intake Velocity", importance = Importance.CRITICAL)
+	@Logged(key = "Intake Velocity", importance = Importance.DEBUG)
 	public double getIntakeVelocity() {
 		return m_IntakeMotor.getVelocity().getValue().in(RotationsPerSecond);
 	}

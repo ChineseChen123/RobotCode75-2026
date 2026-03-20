@@ -60,11 +60,12 @@ public class ActionFactory {
 				return new ParallelRaceGroup(m_Shooter.shootXBallsCommand(8), new WaitCommand(3));
 			case 8:
 				return new SequentialCommandGroup(
-					m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT),
-					new WaitCommand(1),
-					m_Intake.setStateCommandPersistent(IntakeStates.INTAKING),
-					new WaitCommand(1)
-				).repeatedly().finallyDo(() -> m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT));
+								m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT),
+								new WaitCommand(1),
+								m_Intake.setStateCommandPersistent(IntakeStates.INTAKING),
+								new WaitCommand(1))
+						.repeatedly()
+						.finallyDo(() -> m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT));
 		}
 		return null;
 	}

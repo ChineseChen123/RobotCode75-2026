@@ -12,8 +12,6 @@ import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Shooter.ShooterStates;
 import frc.robot.subsystems.EndEffector.Turret;
 import frc.robot.subsystems.EndEffector.Turret.TurretStates;
-import frc.robot.subsystems.Endgame.Climber;
-import frc.robot.subsystems.Endgame.Climber.ClimberState;
 
 public class Bindings {
 
@@ -43,8 +41,9 @@ public class Bindings {
 						m_Indexer.setStateCommandPersistent(IndexerStates.DEFAULT),
 						m_Shooter.setStateCommandPersistent(ShooterStates.DEFAULT),
 						m_Turret.setStateCommandPersistent(TurretStates.IDLE)));
-		
-		RobotStates.actionResetSubsystems.onTrue(new InstantCommand(() -> RobotContainer.resetSubsystems()));
+
+		RobotStates.actionResetSubsystems.onTrue(
+				new InstantCommand(() -> RobotContainer.resetSubsystems()));
 
 		// shoot
 		RobotStates.actionIndexerShoot
@@ -57,7 +56,8 @@ public class Bindings {
 		RobotStates.actionIntakeDown.whileTrue(m_Intake.setStateCommand(IntakeStates.INTAKING));
 
 		// RobotStates.actionIntakeStowToggle.toggleOnTrue(
-		// 	m_Turret.setStateCommand(TurretStates.STOWED).alongWith(m_Intake.setStateCommand(IntakeStates.STOWED))
+		//
+		//	m_Turret.setStateCommand(TurretStates.STOWED).alongWith(m_Intake.setStateCommand(IntakeStates.STOWED))
 		// );
 
 		// aim turret (hold)

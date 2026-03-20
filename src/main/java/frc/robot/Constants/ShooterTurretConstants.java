@@ -79,11 +79,9 @@ public class ShooterTurretConstants {
 		public static final AngularVelocity minShootingAngularVelocity = RPM.of(2430);
 		public static final AngularVelocity maxShootingAngularVelocity = RPM.of(3800);
 
-
 		public static final class MotorConfigs {
 
 			public static final TalonFXConfiguration m_shooterMotorConfig = new TalonFXConfiguration();
-			public static final TalonFXConfiguration m_shooterMotor2Config = new TalonFXConfiguration();
 
 			// Neutral modes and inverts
 			public static final InvertedValue shooterMotorInverted = InvertedValue.Clockwise_Positive;

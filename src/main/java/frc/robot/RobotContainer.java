@@ -19,12 +19,11 @@ import frc.robot.state.Driver;
 import frc.robot.state.Operator;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Indexer;
+import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
 import frc.robot.subsystems.EndEffector.Intake;
+import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
 import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Turret;
-import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
-import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
-import frc.robot.subsystems.Endgame.Climber;
 import frc.robot.subsystems.Vision.Limelight;
 
 public class RobotContainer {

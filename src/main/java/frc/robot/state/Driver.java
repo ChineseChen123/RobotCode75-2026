@@ -102,12 +102,9 @@ public class Driver extends SubsystemBase {
 		// get normalized vector of rotation translation
 
 		double magnitude =
-				Math.sqrt(
-						Math.pow(rightX.getAsDouble(), 2)
-								+ Math.pow(rightY.getAsDouble(), 2));
+				Math.sqrt(Math.pow(rightX.getAsDouble(), 2) + Math.pow(rightY.getAsDouble(), 2));
 		if (magnitude > 0.1) {
-			double angle =
-					Math.atan2(rightY.getAsDouble(), rightX.getAsDouble());
+			double angle = Math.atan2(rightY.getAsDouble(), rightX.getAsDouble());
 			DriverInput[2] = angle; // set rotation input to angle of right stick
 			lastJoystickAngle = angle; // update last joystick angle
 		} else {

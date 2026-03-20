@@ -35,8 +35,7 @@ public class Shooter extends SubsystemBase {
 
 	public enum ShooterStates {
 		DEFAULT(defaultShooterSpeed),
-		SHOOTING(null),
-		REVERSING(reverseShooterSpeed);
+		SHOOTING(null);
 
 		public final AngularVelocity shooterSpeed;
 
@@ -96,7 +95,7 @@ public class Shooter extends SubsystemBase {
 		return currentShooterVelocity.in(RPM);
 	}
 
-	@Logged(key = "Shooter Wheel Velocity RPM", importance = Importance.CRITICAL)
+	@Logged(key = "Shooter Wheel Velocity RPM", importance = Importance.DEBUG)
 	public double getWheelVelocityRPM() {
 		return getMotorVelocityRPM() * shooterGearRatio;
 	}
@@ -220,11 +219,6 @@ public class Shooter extends SubsystemBase {
 			case DEFAULT:
 				m_ShooterMotor1.setControl(new CoastOut());
 				shooterTargetVelocity = RPM.of(0);
-				break;
-
-			case REVERSING:
-				m_ShooterMotor1.setControl(m_VelocityRequest.withVelocity(m_ShooterState.shooterSpeed));
-				shooterTargetVelocity = m_ShooterState.shooterSpeed;
 				break;
 		}
 

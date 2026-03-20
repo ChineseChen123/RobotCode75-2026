@@ -11,13 +11,11 @@ import static frc.robot.Constants.IntakeIndexConstants.IndexerConstants.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,10 +26,9 @@ import frc.lib.util.PeddieBounds;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.Constants.IntakeIndexConstants.IndexerConstants.MotorConfigs;
-import frc.robot.state.RobotStates;
 import frc.robot.Constants.RobotConstants;
-import frc.robot.Constants.ShooterTurretConstants;
 import frc.robot.Constants.ShooterTurretConstants.ShooterConstants;
+import frc.robot.state.RobotStates;
 
 public class Indexer extends SubsystemBase {
 
@@ -39,16 +36,13 @@ public class Indexer extends SubsystemBase {
 
 	public enum IndexerStates {
 		DEFAULT(defaultIndexerSpeed, defaultHopperSpeed),
-		READYTOSHOOT(defaultIndexerSpeed, runningHopperSpeed),
 		SHOOTING(shootingIndexerSpeed, runningHopperSpeed),
 		REVERSING(reverseIndexerSpeed, reverseHopperSpeed);
 
 		AngularVelocity indexerSpeed;
 		AngularVelocity hopperSpeed;
 
-		private IndexerStates(
-				AngularVelocity indexerSpeed,
-				AngularVelocity hopperSpeed) {
+		private IndexerStates(AngularVelocity indexerSpeed, AngularVelocity hopperSpeed) {
 			this.indexerSpeed = indexerSpeed;
 			this.hopperSpeed = hopperSpeed;
 		}
@@ -211,9 +205,17 @@ public class Indexer extends SubsystemBase {
 						? !(currentIndexerVelocity.abs(RotationsPerSecond) < 0.01)
 						: (currentIndexerVelocity.minus(m_IndexerState.indexerSpeed).abs(RotationsPerSecond)
 								< indexerSpeedThresholdRPS);
-		
+
 		Pose2d robotPose = RobotStates.robotPose.get();
-		runParallel = runParallel && robotPose.getTranslation().getDistance(PeddieBounds.getShootingTargetPose(robotPose).getTranslation().toTranslation2d()) > ShooterConstants.minShootingDistance.in(Meters);
+		runParallel =
+				runParallel
+						&& robotPose
+										.getTranslation()
+										.getDistance(
+												PeddieBounds.getShootingTargetPose(robotPose)
+														.getTranslation()
+														.toTranslation2d())
+								> ShooterConstants.minShootingDistance.in(Meters);
 
 		if (m_IndexerState == IndexerStates.SHOOTING && runParallel) {
 			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(runningParallelSpeed));
