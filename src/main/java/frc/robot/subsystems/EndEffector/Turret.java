@@ -150,12 +150,12 @@ public class Turret extends SubsystemBase {
 		return currentTurretVelocity;
 	}
 
-	@Logged(key = "Encoder 1 Position Deg No Offset", importance = Importance.DEBUG)
+	@Logged(key = "Encoder 1 Position Deg No Offset", importance = Importance.CRITICAL)
 	public double getEncoder1PositionDegrees() {
 		return m_TurretEncoder1.get() * 360.0;
 	}
 
-	@Logged(key = "Encoder 2 Position Deg No Offset", importance = Importance.DEBUG)
+	@Logged(key = "Encoder 2 Position Deg No Offset", importance = Importance.CRITICAL)
 	public double getEncoder2PositionDegrees() {
 		return m_TurretEncoder2.get() * 360.0;
 	}
@@ -345,7 +345,7 @@ public class Turret extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		if (resetState < 2 && getTurretVelocity().abs(RotationsPerSecond) < 0.005) {
+		if (resetState < 1 && getTurretVelocity().abs(RotationsPerSecond) < 0.005) {
 			resetMotorPosition();
 			if (resetState == 0) {
 				return;

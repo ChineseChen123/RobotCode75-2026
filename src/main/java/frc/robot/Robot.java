@@ -5,12 +5,17 @@
 package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.util.RaiderLog.RaiderLog;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.lib.util.RaiderLog.RaiderLog.LogMode;
 import frc.robot.Constants.RobotConstants;
+import frc.robot.state.DriverDashboard;
+import frc.robot.state.RobotStates;
+
 import org.littletonrobotics.junction.LoggedRobot;
 
 /**
@@ -43,13 +48,18 @@ public class Robot extends LoggedRobot {
 
 		// Configure PhotonVision debug tab
 		// PortForwarder.add(5800, "photon-cams26.local", 5801);
-		CameraServer.startAutomaticCapture();
+		// CameraServer.startAutomaticCapture();
 	}
 
 	@Override
 	public void robotPeriodic() {
 		CommandScheduler.getInstance().run();
 		RaiderLog.logAll();
+		DriverDashboard.update();
+		if (!RobotStates.isAllianceConfirmed && DriverStation.getAlliance().isPresent()) {
+			RobotStates.isAllianceConfirmed = true;
+			RobotStates.robotAlliance = DriverStation.getAlliance().get();
+		}
 	}
 
 	@Override

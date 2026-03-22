@@ -47,24 +47,22 @@ public class Bindings {
 
 		// shoot
 		RobotStates.actionIndexerShoot
-				.and(RobotStates.turretIsInDeadzone.negate())
+				// .and(RobotStates.turretIsInDeadzone.negate())
 				.whileTrue(m_Indexer.setStateCommand(IndexerStates.SHOOTING));
 
 		RobotStates.actionIndexerReverse.whileTrue(m_Indexer.setStateCommand(IndexerStates.REVERSING));
 
 		// intake
 		RobotStates.actionIntakeDown.whileTrue(m_Intake.setStateCommand(IntakeStates.INTAKING));
-
-		// RobotStates.actionIntakeStowToggle.toggleOnTrue(
-		//
-		//	m_Turret.setStateCommand(TurretStates.STOWED).alongWith(m_Intake.setStateCommand(IntakeStates.STOWED))
-		// );
+		RobotStates.actionStowIntake.whileTrue(m_Intake.setStateCommand(IntakeStates.STOWED));
 
 		// aim turret (hold)
 		RobotStates.actionAimTurretHold.whileTrue(m_Turret.setStateCommand(TurretStates.SCORING));
 
 		// aim turret (toggle)
 		RobotStates.actionAimTurretToggle.toggleOnTrue(m_Turret.setStateCommand(TurretStates.SCORING));
+
+		RobotStates.actionResetTurret.onTrue(new InstantCommand(() -> m_Turret.resetMotorPosition()));
 
 		// climber
 		// RobotStates.actionClimberUp.whileTrue(m_Climber.setStateCommand(ClimberState.RAISING));

@@ -39,7 +39,7 @@ public class IntakeIndexConstants {
 		// TODO figure out
 		public static final Angle pivotDownAngle = Rotations.of(-0.04);
 		public static final Angle pivotHalfwayAngle = Rotations.of(0.20);
-		public static final Angle pivotUpAngle = Rotations.of(0.4);
+		public static final Angle pivotUpAngle = Rotations.of(0.333);
 
 		public static final AngularVelocity defaultIntakeSpeed = RotationsPerSecond.of(0);
 		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(65);

@@ -1,10 +1,13 @@
 package frc.robot.state;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.Constants.IOConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
@@ -13,6 +16,8 @@ import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Turret;
 import frc.robot.subsystems.EndEffector.Turret.TurretStates;
+
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class RobotStates {
@@ -43,6 +48,9 @@ public class RobotStates {
 	public static final Supplier<Rotation2d> robotHeading = m_Swerve::getHeading;
 	public static final Supplier<ChassisSpeeds> fieldRelativeSpeeds =
 			m_Swerve::getFieldRelativeChassisSpeeds;
+
+	public static Alliance robotAlliance = DriverStation.Alliance.Blue;
+	public static boolean isAllianceConfirmed = false;
 
 	/** Robot pose info */
 	// public static final Trigger isInNeutralZone =
@@ -75,6 +83,8 @@ public class RobotStates {
 	public static final Trigger turretIsAligning =
 			new Trigger(() -> m_Turret.getTurretState() == TurretStates.SCORING);
 
+	public static final DoubleSupplier turretAngle = () -> m_Turret.getPositionFromMotor().in(Degrees);
+
 	// ── Actions ──────────────────────────────────────────────────────────────────
 
 	/** Swerve actions */
@@ -93,7 +103,7 @@ public class RobotStates {
 	/* Intake actions */
 
 	public static Trigger actionIntakeDown = m_Operator.A.and(teleop);
-	public static Trigger actionIntakeStowToggle = m_Operator.downDpad.and(teleop);
+	public static Trigger actionStowIntake = m_Operator.Y.and(teleop);
 
 	/* Indexer actions */
 
@@ -107,8 +117,9 @@ public class RobotStates {
 
 	/* Turret actions */
 
-	public static Trigger actionAimTurretHold = m_Operator.B.and(teleop);
+	public static Trigger actionAimTurretHold = m_Operator.downDpad.and(teleop);
 	public static Trigger actionAimTurretToggle = m_Operator.upDpad.and(teleop);
+	public static Trigger actionResetTurret = m_Operator.X.and(teleop);
 
 	/* Climber actions */
 

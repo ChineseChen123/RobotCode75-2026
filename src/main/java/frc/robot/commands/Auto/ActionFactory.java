@@ -61,9 +61,9 @@ public class ActionFactory {
 			case 8:
 				return new SequentialCommandGroup(
 								m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT),
-								new WaitCommand(1),
+								new WaitCommand(0.65),
 								m_Intake.setStateCommandPersistent(IntakeStates.INTAKING),
-								new WaitCommand(1))
+								new WaitCommand(0.65))
 						.repeatedly()
 						.finallyDo(() -> m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT));
 		}

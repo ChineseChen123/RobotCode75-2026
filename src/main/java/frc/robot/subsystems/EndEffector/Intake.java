@@ -162,12 +162,12 @@ public class Intake extends SubsystemBase {
 
 		updateTunables();
 
-		if (m_IntakeState == IntakeStates.STOWED && !RobotStates.turretIsStowed.getAsBoolean()) {
-			// panic!
-			System.out.println(
-					"Attempting to stow intake before turret is stowed... reverting to DEFAULT");
-			m_IntakeState = IntakeStates.DEFAULT;
-		}
+		// if (m_IntakeState == IntakeStates.STOWED && !RobotStates.turretIsStowed.getAsBoolean()) {
+		// 	// panic!
+		// 	System.out.println(
+		// 			"Attempting to stow intake before turret is stowed... reverting to DEFAULT");
+		// 	m_IntakeState = IntakeStates.DEFAULT;
+		// }
 
 		if (m_IntakeState.intakeSpeed.abs(RotationsPerSecond) > 0) {
 			m_IntakeMotor.setControl(m_IntakeRequest.withVelocity(m_IntakeState.intakeSpeed));

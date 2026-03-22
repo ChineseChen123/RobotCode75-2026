@@ -103,7 +103,6 @@ public class RaiderLog extends DogLog {
 		logMode = mode;
 
 		Logger.recordMetadata("ProjectName", "RoboRaiders2025");
-		DogLog.setEnabled(logMode != LogMode.COMP);
 		if (logMode == LogMode.COMP) {
 			DogLog.setOptions(new DogLogOptions().withNtPublish(false));
 		}
