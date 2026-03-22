@@ -57,13 +57,18 @@ public class ActionFactory {
 			case 6:
 				return m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT);
 			case 7:
-				return new ParallelRaceGroup(m_Shooter.shootXBallsCommand(8), new WaitCommand(3));
+				return new SequentialCommandGroup(
+						m_Turret.setStateCommandPersistent(TurretStates.SCORING),
+						m_Shooter.setStateCommandPersistent(ShooterStates.SHOOTING),
+						new WaitCommand(5),
+						m_Turret.setStateCommandPersistent(TurretStates.IDLE),
+						m_Shooter.setStateCommandPersistent(ShooterStates.DEFAULT));
 			case 8:
 				return new SequentialCommandGroup(
 								m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT),
-								new WaitCommand(0.65),
+								new WaitCommand(0.75),
 								m_Intake.setStateCommandPersistent(IntakeStates.INTAKING),
-								new WaitCommand(0.65))
+								new WaitCommand(0.75))
 						.repeatedly()
 						.finallyDo(() -> m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT));
 		}

@@ -82,9 +82,9 @@ public class Limelight extends SubsystemBase {
 		// 	return null;
 		// }
 
-		if (minDist > 3) {
-			return null;
-		}
+		// if (minDist > 3) {
+		// 	return null;
+		// }
 
 		return mt2Estimate;
 	}

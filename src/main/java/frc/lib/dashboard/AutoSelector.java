@@ -99,6 +99,7 @@ public class AutoSelector {
 		presetChooser.addOption("Mid Simple", Presets.midSimple);
 		presetChooser.addOption("Depot Side NZ + Feed", Presets.depotSideNZFeed);
 		presetChooser.addOption("Outpost Side NZ + Feed", Presets.outpostSideNZFeed);
+		presetChooser.addOption("Depot Side Shoot Preload + NZ", Presets.depotSideShoot8NZ);
 
 		// define auto factory for autos
 		choreoFactory =

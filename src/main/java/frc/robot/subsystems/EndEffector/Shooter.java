@@ -118,7 +118,7 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public boolean aboveTargetVelocity() {
-		return currentShooterVelocity.in(RPM) > shooterTargetVelocity.in(RPM);
+		return currentShooterVelocity.in(RPM) > (shooterTargetVelocity.in(RPM) - shooterVelocityTolerance);
 	}
 
 	public ShooterStates getShooterState() {
@@ -129,7 +129,7 @@ public class Shooter extends SubsystemBase {
 		m_ShooterState = state;
 	}
 
-	@Logged(key = "Shooter Shots Fired", importance = Importance.DEBUG)
+	@Logged(key = "Shooter Shots Fired", importance = Importance.CRITICAL)
 	public int getShotsFired() {
 		return shotsFired;
 	}
@@ -142,6 +142,12 @@ public class Shooter extends SubsystemBase {
 
 	/** Updates shooter target velocity from shooter physics. */
 	public void updateShooterTarget() {
+
+		if (!RobotStates.turretIsAligning.getAsBoolean() || (RobotStates.turretIsAligning.getAsBoolean() && RobotStates.actionAimTurretHold.getAsBoolean())) {
+			shooterTargetVelocity = minShootingAngularVelocity.plus(maxShootingAngularVelocity).div(2.0);
+			return;
+		}
+
 		Pose2d targetPose = PeddieBounds.getShootingTargetPose(RobotStates.robotPose.get()).toPose2d();
 
 		if (ShooterTurretConstants.useVirtualTarget) {
@@ -161,7 +167,7 @@ public class Shooter extends SubsystemBase {
 	private boolean bangbangShooting() {
 		updateShooterTarget();
 
-		boolean debouncedAtSetpoint = atSetpointDebouncer.calculate(atTargetVelocity());
+		boolean debouncedAtSetpoint = atSetpointDebouncer.calculate(aboveTargetVelocity());
 
 		if (debouncedAtSetpoint) {
 			m_ShooterMotor1.setControl(m_TorqueCurrentBangBang.withVelocity(shooterTargetVelocity));

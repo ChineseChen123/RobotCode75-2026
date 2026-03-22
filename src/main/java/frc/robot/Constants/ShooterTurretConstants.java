@@ -71,8 +71,8 @@ public class ShooterTurretConstants {
 		public static final Angle shooterAngleWithVertical = Degrees.of(25);
 		public static final Distance shooterHeight = Inches.of(19.5);
 
-		public static final double shooterRegressionA = 255.63148;
-		public static final double shooterRegressionB = 1851.47554;
+		public static final double shooterRegressionA = 254.63148;
+		public static final double shooterRegressionB = 1853.47554;
 		public static final double shooterRegressionC = 2.1;
 
 		public static final Distance minShootingDistance = Meters.of(2.263119);
@@ -184,10 +184,10 @@ public class ShooterTurretConstants {
 		public static final Angle turretStowAngle = Degrees.of(-90);
 
 		// at CW limit
-		public static final Angle encoder1ZeroPoint = Degrees.of(14.403);
-		public static final Angle encoder2ZeroPoint = Degrees.of(165.158);
+		public static final Angle encoder1ZeroPoint = Degrees.of(15.102);
+		public static final Angle encoder2ZeroPoint = Degrees.of(166.717);
 
-		// discrepancy threshold between encoders to accept solut 	ion
+		// discrepancy threshold between encoders to accept solution
 		public static final Angle goodMatchTolerance = Degrees.of(10);
 		public static final Angle acceptableMatchTolerance = Degrees.of(25);
 		// minimum difference between two possible solutions to avoid ambiguity

@@ -102,7 +102,7 @@ public class RaiderLog extends DogLog {
 		minImportance = level;
 		logMode = mode;
 
-		Logger.recordMetadata("ProjectName", "RoboRaiders2025");
+		Logger.recordMetadata("ProjectName", "RoboRaiders2026");
 		if (logMode == LogMode.COMP) {
 			DogLog.setOptions(new DogLogOptions().withNtPublish(false));
 		}
