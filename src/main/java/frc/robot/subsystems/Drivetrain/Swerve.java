@@ -2,6 +2,8 @@ package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.Constants.IOConstants.oneDriver;
+import static frc.robot.Constants.VisionConstants.useFomWeighting;
+import static frc.robot.Constants.VisionConstants.visionOdometryStdevs;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.Utils;
@@ -19,6 +21,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -34,9 +37,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
+import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.Drivetrain.controllers.AutoAlign;
 import frc.robot.subsystems.Drivetrain.controllers.ChezyController;
 import frc.robot.subsystems.Drivetrain.controllers.RotationController;
+import frc.robot.subsystems.Vision.Limelight;
 
 public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> implements Subsystem {
 
@@ -60,13 +66,27 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
 	private Pose2d samplePose = new Pose2d();
 
+	private Pose2d currentPose = new Pose2d();
+	private ChassisSpeeds currentFieldRelativeSpeeds = new ChassisSpeeds();
+	private Rotation2d currentHeading = new Rotation2d();
+
 	private final SwerveRequest.ApplyFieldSpeeds fieldRequest =
 			new SwerveRequest.ApplyFieldSpeeds()
 					.withDriveRequestType(DriveRequestType.OpenLoopVoltage)
 					.withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
+	private final SwerveRequest.ApplyFieldSpeeds closedLoopRequest =
+			new SwerveRequest.ApplyFieldSpeeds()
+					.withDriveRequestType(DriveRequestType.Velocity)
+					.withSteerRequestType(SteerRequestType.MotionMagicExpo);
+
 	private final SwerveRequest.ApplyRobotSpeeds robotRequest =
 			new SwerveRequest.ApplyRobotSpeeds()
+					.withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+					.withSteerRequestType(SteerRequestType.MotionMagicExpo);
+
+	private final SwerveRequest.FieldCentricFacingAngle positionSteerRequest =
+			new SwerveRequest.FieldCentricFacingAngle()
 					.withDriveRequestType(DriveRequestType.OpenLoopVoltage)
 					.withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
@@ -76,9 +96,13 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 					.withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
 	// ── Movement controllers ─────────────────────────────────────────────────────────
+	// private final PIDController xController = new PIDController(2.65, 0, 0);
+	// private final PIDController yController = new PIDController(3.9, 0, 0);
+	// private final PIDController rController = new PIDController(3.05, 0, 0);
+
 	private final PIDController xController = new PIDController(2.65, 0, 0);
 	private final PIDController yController = new PIDController(3.9, 0, 0);
-	private final PIDController rController = new PIDController(3.05, 0, 0);
+	private final PIDController rController = new PIDController(3.7, 0, 0);
 
 	private static final ChezyController m_ChezyController = new ChezyController();
 	private static final RotationController m_RotationController = new RotationController();
@@ -146,14 +170,40 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		setRobotRelative(speeds); // Apply robot request for consistent open-loop behavior
 	}
 
+	public void driveClosedLoop(Translation2d translation, double omega) {
+		final ChassisSpeeds speeds = new ChassisSpeeds(translation.getX(), translation.getY(), omega);
+
+		setFieldRelativeClosedLoop(speeds);
+	}
+
 	public void setFieldRelative(ChassisSpeeds speeds) {
 		setpointSpeeds = speeds;
 		setControl(fieldRequest.withSpeeds(speeds));
 	}
 
+	public void positionalRotationDrive(Translation2d translation, Rotation2d targetAngle) {
+		final ChassisSpeeds speeds =
+				fieldRelative
+						? ChassisSpeeds.fromFieldRelativeSpeeds(
+								translation.getX(), translation.getY(), 0, getHeading())
+						: new ChassisSpeeds(translation.getX(), translation.getY(), 0);
+
+		setpointSpeeds = speeds;
+		setControl(
+				positionSteerRequest
+						.withVelocityX(speeds.vxMetersPerSecond)
+						.withVelocityY(speeds.vyMetersPerSecond)
+						.withTargetDirection(targetAngle));
+	}
+
 	public void setRobotRelative(ChassisSpeeds speeds) {
 		setpointSpeeds = speeds;
 		setControl(robotRequest.withSpeeds(speeds));
+	}
+
+	public void setFieldRelativeClosedLoop(ChassisSpeeds speeds) {
+		setpointSpeeds = speeds;
+		setControl(closedLoopRequest.withSpeeds(speeds));
 	}
 
 	/** Convenience for toggling frame. */
@@ -194,7 +244,12 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	/** Current odometry pose. */
 	@Logged(key = "Pose", importance = Importance.CRITICAL)
 	public Pose2d getPose() {
-		return this.getState().Pose;
+		return currentPose;
+	}
+
+	@Logged(key = "Field Relative Chassis Speeds", importance = Importance.CRITICAL)
+	public ChassisSpeeds getFieldRelativeChassisSpeeds() {
+		return currentFieldRelativeSpeeds;
 	}
 
 	/** Reset odometry pose. */
@@ -243,6 +298,9 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
 	@Logged(key = "Pose Estimates", importance = Importance.DEBUG)
 	public Pose2d[] getEstimatedPosesFromCameras() {
+		if (estimatedPosesFromCameras == null) {
+			estimatedPosesFromCameras = new Pose2d[1];
+		}
 		return estimatedPosesFromCameras;
 	}
 
@@ -263,7 +321,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	/** Field heading from gyro (deg → Rotation2d). */
 	@Logged(key = "Heading", importance = Importance.CRITICAL)
 	public Rotation2d getHeading() {
-		return Rotation2d.fromDegrees(m_Pigeon2.getYaw(true).getValue().in(Degrees));
+		return currentHeading;
 	}
 
 	// ── Vision ───────────────────────────────────────────────────────────────────
@@ -289,6 +347,44 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 				.repeatedly();
 	}
 
+	public Command trenchAlignTeleopSwerveCommand() {
+		return new InstantCommand(
+						() -> {
+							AutoAlign.TrenchAlign.init();
+						},
+						this)
+				.andThen(
+						new InstantCommand(
+										() -> {
+											double[] output =
+													oneDriver
+															? RobotContainer.getOperator().processedJoystickValues()
+															: RobotContainer.getDriver().processedJoystickValues();
+											if (!AutoAlign.TrenchAlign.isFinished()) {
+												output[1] = AutoAlign.TrenchAlign.execute().vyMetersPerSecond;
+											} else {
+												output[1] = 0;
+											}
+											driveClosedLoop(new Translation2d(output[0], output[1]), output[2]);
+										},
+										this)
+								.repeatedly());
+	}
+
+	public Command positionRotationTeleopSwerveCommand() {
+		return new InstantCommand(
+						() -> {
+							double[] output =
+									oneDriver
+											? RobotContainer.getOperator().processedJoystickValuesPositionalRotation()
+											: RobotContainer.getDriver().processedJoystickValuesPositionalRotation();
+							positionalRotationDrive(
+									new Translation2d(output[0], output[1]), Rotation2d.fromRadians(output[2]));
+						},
+						this)
+				.repeatedly();
+	}
+
 	public Command resetHeadingCommand() {
 		double targetAngle = DriverStation.getAlliance().get() == Alliance.Blue ? 0 : 180;
 		return new InstantCommand(
@@ -297,6 +393,9 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 							setPose(
 									new Pose2d(
 											getPose().getX(), getPose().getY(), Rotation2d.fromDegrees(targetAngle)));
+							for (Limelight limelight : RobotContainer.getLimelights()) {
+								limelight.resetInternalIMU();
+							}
 						})
 				.repeatedly()
 				.until(() -> getPose().getRotation().getDegrees() == targetAngle)
@@ -308,6 +407,13 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	// ── WPILib lifecycle ─────────────────────────────────────────────────────────
+
+	public void updateCache() {
+		currentPose = this.getState().Pose;
+		currentFieldRelativeSpeeds =
+				ChassisSpeeds.fromRobotRelativeSpeeds(this.getState().Speeds, getHeading());
+		currentHeading = Rotation2d.fromDegrees(m_Pigeon2.getYaw(true).getValue().in(Degrees));
+	}
 
 	@Override
 	public void periodic() {
@@ -322,23 +428,49 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 							});
 		}
 
-		// if (!Utils.isSimulation()) {
-		// 	AprilTagCamera[] cameras = RobotContainer.getAprilTagCameras();
-		// 	if (estimatedPosesFromCameras == null || cameras.length != estimatedPosesFromCameras.length)
-		// {
-		// 		estimatedPosesFromCameras = new Pose2d[cameras.length];
-		// 	}
-		// 	for (int i = 0; i < cameras.length; i++) {
-		// 		cameras[i].updateHeading(getHeading());
-		// 		cameras[i].updatePoseEstimator(getPose());
-		// 		if (cameras[i].getEstimatedPose() != null) {
-		// 			addVisionMeasurement(
-		// 					cameras[i].getEstimatedPose().estimatedPose.toPose2d(),
-		// 					cameras[i].getEstimatedPose().timestampSeconds);
-		// 			estimatedPosesFromCameras[i] = cameras[i].getEstimatedPose().estimatedPose.toPose2d();
-		// 		}
-		// 	}
-		// }
+		updateCache();
+
+		if (!Utils.isSimulation()) {
+			Limelight[] limelights = RobotContainer.getLimelights();
+			if (estimatedPosesFromCameras == null
+					|| limelights.length != estimatedPosesFromCameras.length) {
+				estimatedPosesFromCameras = new Pose2d[limelights.length];
+			}
+			double firstTimestamp = Double.MAX_VALUE;
+
+			Pose2d fusedVisionPose = new Pose2d(0, 0, new Rotation2d());
+			double sumRecipFomSq = 0;
+
+			for (int i = 0; i < limelights.length; i++) {
+				LimelightHelpers.PoseEstimate estimate = limelights[i].getEstimatedPose();
+				if (estimate == null) continue;
+
+				if (!useFomWeighting) {
+					// TODO - variable vision x y stdevs based on FOM
+					setVisionMeasurementStdDevs(visionOdometryStdevs.plus(limelights[i].minAmbiguity() * 10));
+					addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
+					continue;
+				}
+
+				estimatedPosesFromCameras[i] = estimate.pose;
+				firstTimestamp = Math.min(firstTimestamp, estimate.timestampSeconds);
+				double fom = limelights[i].getFOM(estimate);
+
+				sumRecipFomSq += 1.0 / Math.pow(fom, 2);
+
+				Transform2d weightedPose =
+						new Transform2d(
+										estimatedPosesFromCameras[i].getTranslation(),
+										estimatedPosesFromCameras[i].getRotation())
+								.div(Math.pow(fom, 2));
+				fusedVisionPose = fusedVisionPose.plus(weightedPose);
+			}
+
+			if (useFomWeighting && sumRecipFomSq > 0) {
+				fusedVisionPose = fusedVisionPose.div(sumRecipFomSq);
+				addVisionMeasurement(fusedVisionPose, firstTimestamp);
+			}
+		}
 	}
 
 	// ── Internals ────────────────────────────────────────────────────────────────

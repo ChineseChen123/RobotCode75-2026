@@ -30,6 +30,11 @@ public class Driver extends SubsystemBase {
 	public Trigger[] leftButtons = new Trigger[16];
 	public Trigger[] rightButtons = new Trigger[16];
 
+	public DoubleSupplier leftX = () -> 0;
+	public DoubleSupplier leftY = () -> 0;
+	public DoubleSupplier rightX = () -> 0;
+	public DoubleSupplier rightY = () -> 0;
+
 	/** Creates a new Driver. */
 	public Driver(Joystick leftStick, Joystick rightStick) {
 		m_LeftStick = leftStick;
@@ -39,6 +44,25 @@ public class Driver extends SubsystemBase {
 			leftButtons[i] = new JoystickButton(leftStick, i + 1);
 			rightButtons[i] = new JoystickButton(rightStick, i + 1);
 		}
+
+		leftX =
+				() -> {
+					double val =
+							MathUtil.applyDeadband(m_LeftStick.getX() * translationStickMapValue, stickDeadband);
+					return val >= 0
+							? Math.pow(val, translationJoystickExpo)
+							: -1 * Math.pow(-val, translationJoystickExpo);
+				};
+		leftY =
+				() -> {
+					double val =
+							MathUtil.applyDeadband(m_LeftStick.getY() * translationStickMapValue, stickDeadband);
+					return val >= 0
+							? Math.pow(val, translationJoystickExpo)
+							: -1 * Math.pow(-val, translationJoystickExpo);
+				};
+		rightX = () -> MathUtil.applyDeadband(m_RightStick.getX(), stickDeadband);
+		rightY = () -> MathUtil.applyDeadband(m_RightStick.getY(), stickDeadband);
 	}
 
 	public Trigger getLeftButton(int button) {
@@ -49,43 +73,10 @@ public class Driver extends SubsystemBase {
 		return rightButtons[MathUtil.clamp(button, 1, 16) - 1];
 	}
 
-	/** applies deadbands and exponents to stick values */
-	public DoubleSupplier leftX() {
-		return () -> {
-			double val =
-					MathUtil.applyDeadband(m_LeftStick.getX() * translationStickMapValue, stickDeadband);
-			return val >= 0
-					? Math.pow(val, translationJoystickExpo)
-					: -1 * Math.pow(-val, translationJoystickExpo);
-		};
-	}
-
-	/** applies deadbands and exponents to stick values */
-	public DoubleSupplier leftY() {
-		return () -> {
-			double val =
-					MathUtil.applyDeadband(m_LeftStick.getY() * translationStickMapValue, stickDeadband);
-			return val >= 0
-					? Math.pow(val, translationJoystickExpo)
-					: -1 * Math.pow(-val, translationJoystickExpo);
-		};
-	}
-
-	/** applies deadband to stick values */
-	public DoubleSupplier rightX() {
-		return () -> MathUtil.applyDeadband(m_RightStick.getX(), stickDeadband);
-	}
-
-	public DoubleSupplier rightY() {
-		return () -> m_RightStick.getY();
-	}
-
 	/** returns array of all 3 processed joystick values (for two drivers) */
 	public double[] processedJoystickValues() {
 		// Negation because joystick forward is negative
-		double[] DriverInput = {
-			-leftY().getAsDouble(), -leftX().getAsDouble(), -rightX().getAsDouble()
-		};
+		double[] DriverInput = {-leftY.getAsDouble(), -leftX.getAsDouble(), -rightX.getAsDouble()};
 		boolean fieldRelative = RobotContainer.getSwerve().getFieldRelative();
 		if (!fieldRelative) {
 			DriverInput[0] *= 0.5;
@@ -98,6 +89,27 @@ public class Driver extends SubsystemBase {
 		DriverInput[0] *= maxVelocity.in(MetersPerSecond);
 		DriverInput[1] *= maxVelocity.in(MetersPerSecond);
 		DriverInput[2] *= maxAngularVelocity.in(RadiansPerSecond);
+
+		return DriverInput;
+	}
+
+	double lastJoystickAngle = 0;
+
+	public double[] processedJoystickValuesPositionalRotation() {
+		// Negation because joystick forward is negative
+		double[] DriverInput = processedJoystickValues();
+
+		// get normalized vector of rotation translation
+
+		double magnitude =
+				Math.sqrt(Math.pow(rightX.getAsDouble(), 2) + Math.pow(rightY.getAsDouble(), 2));
+		if (magnitude > 0.1) {
+			double angle = Math.atan2(rightY.getAsDouble(), rightX.getAsDouble());
+			DriverInput[2] = angle; // set rotation input to angle of right stick
+			lastJoystickAngle = angle; // update last joystick angle
+		} else {
+			DriverInput[2] = lastJoystickAngle; // if right stick is not significantly moved
+		}
 
 		return DriverInput;
 	}

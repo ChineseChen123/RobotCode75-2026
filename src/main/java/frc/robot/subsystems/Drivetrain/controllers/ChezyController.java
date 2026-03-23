@@ -38,7 +38,7 @@ public class ChezyController {
 					new TrapezoidProfile.Constraints(0.0, 0.0),
 					0.02);
 
-	private Translation2d lastSetpointTranslation;
+	private Translation2d lastSetpointTranslation = new Translation2d();
 	private double driveErrorAbs;
 	private double thetaErrorAbs;
 	private double ffMinRadius = 0.2, ffMaxRadius = 0.8;

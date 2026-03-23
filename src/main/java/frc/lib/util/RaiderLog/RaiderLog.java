@@ -1,6 +1,7 @@
 package frc.lib.util.RaiderLog;
 
 import dev.doglog.DogLog;
+import dev.doglog.DogLogOptions;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -101,8 +102,10 @@ public class RaiderLog extends DogLog {
 		minImportance = level;
 		logMode = mode;
 
-		Logger.recordMetadata("ProjectName", "RoboRaiders2025");
-		DogLog.setEnabled(logMode != LogMode.COMP);
+		Logger.recordMetadata("ProjectName", "RoboRaiders2026");
+		if (logMode == LogMode.COMP) {
+			DogLog.setOptions(new DogLogOptions().withNtPublish(false));
+		}
 
 		switch (logMode) {
 			case BASIC -> {
@@ -163,6 +166,7 @@ public class RaiderLog extends DogLog {
 			String key = "Telemetry/" + className + "/" + ann.key(); // e.g. "swerve/speed"
 			METHOD_ENTRIES.add(new MethodEntry(obj, m, key));
 		}
+		System.out.println(className + " registered");
 	}
 
 	/** update all logged inputs and outputs and push to log; call from robotPeriodic() */
@@ -198,7 +202,7 @@ public class RaiderLog extends DogLog {
 	}
 
 	/** log output to DogLog by type */
-	private static void logOutput(String key, Object value) {
+	public static void logOutput(String key, Object value) {
 		if (value instanceof Number) {
 			DogLog.log(key, ((Number) value).doubleValue());
 		} else if (value instanceof String) {

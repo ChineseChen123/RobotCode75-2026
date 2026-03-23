@@ -2,10 +2,7 @@ package frc.lib.dashboard;
 
 import choreo.Choreo;
 import choreo.auto.AutoFactory;
-import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEvent.Kind;
@@ -15,21 +12,16 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.RobotContainer;
+import frc.robot.commands.Auto.ActionFactory;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Map;
 
 /*
@@ -45,25 +37,41 @@ import java.util.Map;
  * Each word can contain one point and one action max
  *  - All points are strings of letters (case insensitive)
  *  - All actions are numbers
- * !!! The first word MUST be only one starting point (ST/SM/SB) without an action
- * Points are labeled according to position in Choreo/relative to processor
+ * !!! The first word MUST be only one starting point (SD/SM/SO) without an action
+ * Points are labeled according to whether they are closer to depot/outpost
  */
 
 /* ACTIONS
- *
+ * 1 - start shooter/turret aligning
+ * 2 - stop shooter/turret aligning
+ * 3 - start indexer
+ * 4 - stop indexer
+ * 5 - run intake
+ * 6 - stop intake
+ * 7 - shoot 8 preload
  */
 
 /* POINTS
+ * SD - start depot (3.6044533252716064, 7.642, 180)
+ * SM - start middle ()
+ * SO - start outpost (3.6044533252716064, 0.42545, 180)
  *
+ * D - depot ()
+ * O - outpost ()
+ * ND - depot side neutral zone ()
+ * NO - outpost side neutral zone ()
+ * TO - outpost side trench ()
+ * TD - depot side trench ()
+ *
+ * TWD - depot side tower ()
+ * TWO - outpost side tower ()
  */
 
 public class AutoSelector {
-	private List<Trajectory> m_trajectories = new ArrayList<>();
 	private Command m_autoCommand = Commands.runOnce(() -> {});
 	private Pose2d m_startPose;
-	private Field2d m_field;
-	private ActionFactory m_actionFactory;
-	private Swerve m_swerve;
+	private final ActionFactory m_actionFactory;
+	private final Swerve m_swerve;
 	private Map<String, Pose2d> m_startPositions;
 
 	private GenericEntry autoStringEntry;
@@ -71,7 +79,7 @@ public class AutoSelector {
 
 	private final SendableChooser<String> presetChooser;
 
-	private final AutoFactory factory;
+	public final AutoFactory choreoFactory;
 
 	public AutoSelector() {
 		NetworkTableInstance nt = NetworkTableInstance.getDefault();
@@ -80,52 +88,27 @@ public class AutoSelector {
 		feedbackEntry = table.getTopic("Feedback").getGenericEntry();
 		feedbackEntry.setString("Enter a command!");
 
-		m_field = new Field2d();
 		m_actionFactory = new ActionFactory();
 		m_swerve = RobotContainer.getSwerve();
 
 		// initialize presets
 		presetChooser = new SendableChooser<>();
 		presetChooser.setDefaultOption("Custom", "");
+		presetChooser.addOption("Outpost Side NZ + Outpost", Presets.outpostSideNZOutpost);
+		presetChooser.addOption("Depot Side NZ + Depot", Presets.depotSideNZDepot);
+		presetChooser.addOption("Mid Simple", Presets.midSimple);
+		presetChooser.addOption("Depot Side NZ + Feed", Presets.depotSideNZFeed);
+		presetChooser.addOption("Outpost Side NZ + Feed", Presets.outpostSideNZFeed);
+		presetChooser.addOption("Depot Side Shoot Preload + NZ", Presets.depotSideShoot8NZ);
 
 		// define auto factory for autos
-		factory =
+		choreoFactory =
 				new AutoFactory(
 						m_swerve::getPose, m_swerve::setPose, m_swerve::followSwerveSample, true, m_swerve);
 	}
 
-	/** unused: clear trajectories from dashboard field */
-	public void clearField() {
-		// for displaying; clears shuffleboard field
-		for (int i = 0; i < 100; i++) {
-			FieldObject2d obj = m_field.getObject("traj" + i);
-			obj.setTrajectory(new edu.wpi.first.math.trajectory.Trajectory());
-		}
-	}
-
-	/** unused, broken: draw trajectories on dashboard field */
-	private void drawPaths() {
-		// draws trajectory on shuffleboard field
-		clearField();
-		for (int i = 0; i < m_trajectories.size(); i++) {
-			Trajectory pathTraj = m_trajectories.get(i);
-			List<Pose2d> poses = Arrays.asList(pathTraj.getPoses());
-			edu.wpi.first.math.trajectory.Trajectory displayTraj =
-					TrajectoryGenerator.generateTrajectory(
-							poses, new TrajectoryConfig(AutoConstants.kMaxSpeed, AutoConstants.kMaxAcceleration));
-			m_field.getObject("traj" + i).setTrajectory(displayTraj);
-		}
-	}
-
-	/** clears all trajectories (including Choreo) */
-	public void clearAll() {
-		m_trajectories.clear();
-		clearField();
-	}
-
 	/** complete reset */
 	public void reset() {
-		clearAll();
 		autoStringEntry.setString("");
 		feedbackEntry.setString("Enter a command!");
 		m_autoCommand = Commands.runOnce(() -> {});
@@ -149,11 +132,10 @@ public class AutoSelector {
 		ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
 
 		autoTab.add("Enter Command", "").withSize(4, 1).withPosition(0, 0);
-		autoTab.add(m_field).withSize(6, 4).withPosition(4, 0);
 
 		autoTab.add(presetChooser).withSize(2, 1).withPosition(2, 2);
 
-		autoTab.addString("Feedback", () -> getFeedback()).withSize(4, 1).withPosition(0, 1);
+		autoTab.addString("Feedback", () -> getFeedback()).withSize(8, 1).withPosition(0, 1);
 
 		autoTab
 				.add("Generate", true)
@@ -202,17 +184,16 @@ public class AutoSelector {
 		String autoString = autoStringEntry.getString("");
 		String[] words = autoString.split(" ");
 
-		if (!m_startPositions.containsKey(words[0].toLowerCase())) {
-			setFeedback("Invalid start position");
-			return;
-		}
-		m_startPose = m_startPositions.get(words[0].toLowerCase());
+		// if (!m_startPositions.containsKey(words[0].toLowerCase())) {
+		// 	setFeedback("Invalid start position");
+		// 	return;
+		// }
+		// m_startPose = m_startPositions.get(words[0].toLowerCase());
 
 		SequentialCommandGroup sequential = new SequentialCommandGroup();
 		// feedback string with parsed commands
 		StringBuilder s = new StringBuilder();
 		boolean isOdometryReset = false;
-		m_trajectories.clear();
 
 		if (autoString.length() == 0) {
 			m_autoCommand = sequential;
@@ -222,7 +203,7 @@ public class AutoSelector {
 
 		String lastPose = "";
 		for (int i = 0; i < words.length; i++) {
-			ParallelRaceGroup parallelGroup = new ParallelRaceGroup();
+			Command parallelGroup = null;
 			// parse movement and actions separately in each word
 			StringBuilder pointString = new StringBuilder();
 			StringBuilder actionString = new StringBuilder();
@@ -238,19 +219,18 @@ public class AutoSelector {
 			String point = pointString.toString().toLowerCase();
 			int action = actionString.length() > 0 ? Integer.parseInt(actionString.toString()) : -1;
 
-			if (i == 0) {
+			if (lastPose == "" && point != "") {
 				lastPose = point;
 				continue;
 			}
 			if (point != "" && lastPose != "") {
 				try {
 					// m_trajectories.add(
-					//     new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "-" + point).get()));
-
+					//     new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "_" + point).get()));
+					// so sdo
 					// reset pose and gyro if not done yet
 					if (!isOdometryReset) {
-						// TODO: Use start pose to set gyro
-						var trajectory = Choreo.loadTrajectory("" + lastPose + "-" + point);
+						var trajectory = Choreo.loadTrajectory("" + lastPose + "_" + point);
 						sequential.addCommands(
 								Commands.runOnce(
 										() ->
@@ -260,12 +240,12 @@ public class AutoSelector {
 																.getInitialPose(DriverStation.getAlliance().get() == Alliance.Red)
 																.get()
 																.getRotation())),
-								factory.resetOdometry("" + lastPose + "-" + point));
+								choreoFactory.resetOdometry("" + lastPose + "_" + point));
 						isOdometryReset = true;
 					}
 
 					// generate movement command and add to group
-					parallelGroup.addCommands(factory.trajectoryCmd("" + lastPose + "-" + point));
+					parallelGroup = choreoFactory.trajectoryCmd("" + lastPose + "_" + point);
 					// if (DriverStation.getAlliance().get() == Alliance.Red) {
 					//   m_trajectories.set(
 					//       m_trajectories.size() - 1,
@@ -282,7 +262,13 @@ public class AutoSelector {
 			}
 			if (action != -1 && m_actionFactory.getCommand(action) != null) {
 				// convert action number into command and add to group
-				parallelGroup.addCommands(m_actionFactory.getCommand(action));
+				if (parallelGroup != null) {
+					// with movement, action ends when path ends
+					parallelGroup = parallelGroup.deadlineFor(m_actionFactory.getCommand(action));
+				} else {
+					// no movement - run action until done
+					parallelGroup = m_actionFactory.getCommand(action);
+				}
 				s.append(m_actionFactory.getName(action) + " ");
 			} else if (action != -1) {
 				setFeedback("Action Not Found: " + action);
@@ -292,8 +278,8 @@ public class AutoSelector {
 			sequential.addCommands(parallelGroup);
 			sequential.addCommands(new InstantCommand(() -> m_swerve.stopModules(), m_swerve));
 		}
+
 		setFeedback(s.toString());
-		drawPaths();
 		m_autoCommand = sequential;
 	}
 

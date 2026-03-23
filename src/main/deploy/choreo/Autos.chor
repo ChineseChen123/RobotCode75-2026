@@ -1,50 +1,205 @@
 {
  "name":"Autos",
- "version":1,
+ "version":2,
  "type":"Swerve",
  "variables":{
-  "expressions":{},
+  "expressions":{
+   "cruise_velo":{
+    "dimension":"LinVel",
+    "var":{
+     "exp":"2 m / s",
+     "val":2.0
+    }
+   },
+   "end_acc":{
+    "dimension":"LinAcc",
+    "var":{
+     "exp":"5 m / s ^ 2",
+     "val":5.0
+    }
+   },
+   "end_velo":{
+    "dimension":"LinVel",
+    "var":{
+     "exp":"1 m / s",
+     "val":1.0
+    }
+   },
+   "start_acc":{
+    "dimension":"LinAcc",
+    "var":{
+     "exp":"10 m / s ^ 2",
+     "val":10.0
+    }
+   }
+  },
   "poses":{
-   "Ht":{
+   "a_pose":{
     "x":{
-     "exp":"1.164362907409668 m",
-     "val":1.164362907409668
+     "exp":"2.1360738277435303 m",
+     "val":2.1360738277435303
     },
     "y":{
-     "exp":"7.188439846038818 m",
-     "val":7.188439846038818
+     "exp":"6.745790481567383 m",
+     "val":6.745790481567383
     },
     "heading":{
-     "exp":"-56 deg",
-     "val":-0.9773843811168246
+     "exp":"315 deg",
+     "val":5.497787143782138
     }
    },
-   "Sb":{
+   "b_pose":{
     "x":{
-     "exp":"7 m",
-     "val":7.0
+     "exp":"2.1360738277435303 m",
+     "val":2.1360738277435303
     },
     "y":{
-     "exp":"2.288 m",
-     "val":2.288
+     "exp":"1.32340952 m",
+     "val":1.32340952
     },
     "heading":{
-     "exp":"120 deg",
-     "val":2.0943951023931953
+     "exp":"45 deg",
+     "val":0.7853981633974483
     }
    },
-   "St":{
+   "c_pose":{
     "x":{
-     "exp":"7 m",
-     "val":7.0
+     "exp":"2.1293694972991943 m",
+     "val":2.1293694972991943
     },
     "y":{
-     "exp":"5.764 m",
-     "val":5.764
+     "exp":"sm_pose.y",
+     "val":4.03
     },
     "heading":{
-     "exp":"240 deg",
-     "val":4.1887902047863905
+     "exp":"0 deg",
+     "val":0.0
+    }
+   },
+   "d_pose":{
+    "x":{
+     "exp":"0.9 m",
+     "val":0.9
+    },
+    "y":{
+     "exp":"5.967445373535156 m",
+     "val":5.967445373535156
+    },
+    "heading":{
+     "exp":"0 deg",
+     "val":0.0
+    }
+   },
+   "nzd_pose":{
+    "x":{
+     "exp":"nzo_pose.x",
+     "val":7.717021942138672
+    },
+    "y":{
+     "exp":"8.02 m - nzo_pose.y",
+     "val":6.7556294393539424
+    },
+    "heading":{
+     "exp":"90 deg",
+     "val":1.5707963267948966
+    }
+   },
+   "nzo_pose":{
+    "x":{
+     "exp":"7.717021942138672 m",
+     "val":7.717021942138672
+    },
+    "y":{
+     "exp":"1.2643705606460571 m",
+     "val":1.2643705606460571
+    },
+    "heading":{
+     "exp":"-90 deg",
+     "val":-1.5707963267948966
+    }
+   },
+   "o_pose":{
+    "x":{
+     "exp":"0.7 m",
+     "val":0.7
+    },
+    "y":{
+     "exp":"0.6696164608001709 m",
+     "val":0.6696164608001709
+    },
+    "heading":{
+     "exp":"0 deg",
+     "val":0.0
+    }
+   },
+   "sd_pose":{
+    "x":{
+     "exp":"4.0392985343933105 m",
+     "val":4.0392985343933105
+    },
+    "y":{
+     "exp":"7.642 m",
+     "val":7.642
+    },
+    "heading":{
+     "exp":"180 deg",
+     "val":3.141592653589793
+    }
+   },
+   "sm_pose":{
+    "x":{
+     "exp":"3.55 m",
+     "val":3.55
+    },
+    "y":{
+     "exp":"4.03 m",
+     "val":4.03
+    },
+    "heading":{
+     "exp":"0 deg",
+     "val":0.0
+    }
+   },
+   "so_pose":{
+    "x":{
+     "exp":"sd_pose.x",
+     "val":4.0392985343933105
+    },
+    "y":{
+     "exp":"0.43 m",
+     "val":0.43
+    },
+    "heading":{
+     "exp":"180 deg",
+     "val":3.141592653589793
+    }
+   },
+   "td_pose":{
+    "x":{
+     "exp":"to_pose.x",
+     "val":4.344916343688965
+    },
+    "y":{
+     "exp":"7.57 m",
+     "val":7.57
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
+   "to_pose":{
+    "x":{
+     "exp":"4.344916343688965 m",
+     "val":4.344916343688965
+    },
+    "y":{
+     "exp":"0.5 m",
+     "val":0.5
+    },
+    "heading":{
+     "exp":"0 deg",
+     "val":0.0
     }
    }
   }
@@ -52,35 +207,35 @@
  "config":{
   "frontLeft":{
    "x":{
-    "exp":"11.375 in",
-    "val":0.288925
+    "exp":"11.09375 in",
+    "val":0.28178125
    },
    "y":{
-    "exp":"11.375 in",
-    "val":0.288925
+    "exp":"11.09375 in",
+    "val":0.28178125
    }
   },
   "backLeft":{
    "x":{
-    "exp":"-11.375 in",
-    "val":-0.288925
+    "exp":"-11.09375 in",
+    "val":-0.28178125
    },
    "y":{
-    "exp":"11.375 in",
-    "val":0.288925
+    "exp":"11.09375 in",
+    "val":0.28178125
    }
   },
   "mass":{
-   "exp":"115 lbs",
-   "val":52.16312255
+   "exp":"110 lbs",
+   "val":49.895160700000005
   },
   "inertia":{
-   "exp":"6 kg m ^ 2",
-   "val":6.0
+   "exp":"4.05733006 kg m ^ 2",
+   "val":4.05733006
   },
   "gearing":{
-   "exp":"6.75",
-   "val":6.75
+   "exp":"6.026785714285714",
+   "val":6.026785714285714
   },
   "radius":{
    "exp":"2 in",
@@ -95,21 +250,21 @@
    "val":1.55
   },
   "cof":{
-   "exp":"0.8",
-   "val":0.8
+   "exp":"2.255",
+   "val":2.255
   },
   "bumper":{
    "front":{
-    "exp":"17.5 in",
-    "val":0.4445
+    "exp":"16.75 in",
+    "val":0.42545
    },
    "side":{
-    "exp":"17.5 in",
-    "val":0.4445
+    "exp":"16.75 in",
+    "val":0.42545
    },
    "back":{
-    "exp":"17.5 in",
-    "val":0.4445
+    "exp":"16.75 in",
+    "val":0.42545
    }
   },
   "differentialTrackWidth":{
@@ -117,5 +272,11 @@
    "val":0.5588
   }
  },
- "generationFeatures":[]
+ "generationFeatures":[],
+ "codegen":{
+  "root":"..\\C:\\Users\\jiach\\Downloads\\RobotCode75-2026\\src\\main\\deploy\\choreo",
+  "genVars":true,
+  "genTrajData":true,
+  "useChoreoLib":true
+ }
 }
