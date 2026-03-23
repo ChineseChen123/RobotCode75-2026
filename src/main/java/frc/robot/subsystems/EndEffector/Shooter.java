@@ -84,8 +84,7 @@ public class Shooter extends SubsystemBase {
 		m_DutyCycleBangBang = new VelocityDutyCycle(RPM.of(0)).withEnableFOC(true);
 		m_TorqueCurrentBangBang = new VelocityTorqueCurrentFOC(RPM.of(0));
 
-		m_VelocityRequest.UpdateFreqHz = 0;
-		m_VelocityRequest.UseTimesync = true;
+		m_VelocityRequest.UpdateFreqHz = 50;
 	}
 
 	// ── Velocity / state accessors ───────────────────────────────────────────────

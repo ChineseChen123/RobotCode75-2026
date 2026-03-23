@@ -104,8 +104,9 @@ public class Indexer extends SubsystemBase {
 		m_HopperMotor.getConfigurator().apply(MotorConfigs.getHopperMotorConfig());
 		m_ParallelMotor.getConfigurator().apply(MotorConfigs.getParallelMotorConfig());
 
-		m_IndexerTorqueCurrent.UpdateFreqHz = 0;
-		m_IndexerTorqueCurrent.UseTimesync = true;
+		// m_IndexerTorqueCurrent.UpdateFreqHz = 0;
+		// m_IndexerTorqueCurrent.UseTimesync = true;
+		m_IndexerTorqueCurrent.UpdateFreqHz = 50;
 		m_HopperRequest.UpdateFreqHz = 0;
 		m_HopperRequest.UseTimesync = true;
 		m_ParallelRollerRequest.UpdateFreqHz = 0;

@@ -53,7 +53,7 @@ public class ShooterTurretConstants {
 
 		public static final double shooterVelocityTolerance = 150.0; // rpm
 
-		public static final Distance feedingDistPastBump = Meters.of(1);
+		public static final Distance feedingDistPastBump = Meters.of(2);
 
 		// Note that the flywheel MOI effective to the motors is multiplied by the gear ratio squared.
 		// <-- from recalc

@@ -125,7 +125,7 @@ public class ShooterPhysics {
 		double heightDiffMeters = heightOfTarget.in(Meters) - shooterHeight.in(Meters);
 
 		double launchAngleRad = shooterAngleWithVertical.in(Radians);
-		double sin = Math.sin(launchAngleRad);
+		double cos = Math.cos(launchAngleRad);
 		double tan = Math.tan(launchAngleRad);
 
 		double velocity =
@@ -133,7 +133,7 @@ public class ShooterPhysics {
 						9.8
 								* horizontalDistanceMeters
 								* horizontalDistanceMeters
-								/ (2 * sin * sin * (horizontalDistanceMeters * (1.0 / tan) - heightDiffMeters)));
+								/ (2 * cos * cos * (horizontalDistanceMeters * tan - heightDiffMeters)));
 
 		return MetersPerSecond.of(velocity);
 	}
@@ -155,7 +155,7 @@ public class ShooterPhysics {
 		double g = 386.09;
 
 		LinearVelocity yComponent =
-				projectileSpeed.times(Math.sin(shooterAngleWithVertical.in(Radians)));
+				projectileSpeed.times(Math.cos(shooterAngleWithVertical.in(Radians)));
 		double yComponentInchesPerSecond = yComponent.in(InchesPerSecond);
 		double heightDiffInches = targetPose.getMeasureZ().in(Inches) - shooterHeight.in(Inches);
 
@@ -177,8 +177,6 @@ public class ShooterPhysics {
 		if (!PeddieBounds.isInOwnZone(robotPose)) {
 			return originalTarget.toPose2d(); // TODO: unfade sotm
 		}
-
-		fieldRelativeSpeeds = fieldRelativeSpeeds.times(1.5);
 
 		// Compensate for system delay by projecting robot motion forward.
 		ChassisSpeeds robotRelativeSpeeds =
@@ -242,10 +240,12 @@ public class ShooterPhysics {
 			Time tofEstimateDragComp =
 					Seconds.of((1 - Math.exp(-tofEstimate.in(Seconds) * dragCoeff)) / dragCoeff);
 
+			Time unchoppedtofEstimateDragComp = Seconds.of((tofEstimate.in(Seconds) / 2.0 + 1 / dragCoeff) * (1 - Math.exp(-tofEstimate.in(Seconds) * dragCoeff)));
+
 			Translation2d targetTranslation =
 					new Translation2d(
-							MetersPerSecond.of(-turretVelocityX).times(tofEstimateDragComp),
-							MetersPerSecond.of(-turretVelocityY).times(tofEstimateDragComp));
+							MetersPerSecond.of(-turretVelocityX).times(unchoppedtofEstimateDragComp),
+							MetersPerSecond.of(-turretVelocityY).times(unchoppedtofEstimateDragComp));
 
 			virtualTargetPose =
 					originalTarget.plus(
