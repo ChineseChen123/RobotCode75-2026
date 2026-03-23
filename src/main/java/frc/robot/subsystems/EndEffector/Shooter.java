@@ -81,7 +81,7 @@ public class Shooter extends SubsystemBase {
 		m_VelocityRequest = new VelocityTorqueCurrentFOC(RPM.of(0));
 		m_FollowerRequest = new Follower(m_ShooterMotor1.getDeviceID(), MotorAlignmentValue.Opposed);
 
-		m_DutyCycleBangBang = new VelocityDutyCycle(RPM.of(0));
+		m_DutyCycleBangBang = new VelocityDutyCycle(RPM.of(0)).withEnableFOC(true);
 		m_TorqueCurrentBangBang = new VelocityTorqueCurrentFOC(RPM.of(0));
 
 		m_VelocityRequest.UpdateFreqHz = 0;
