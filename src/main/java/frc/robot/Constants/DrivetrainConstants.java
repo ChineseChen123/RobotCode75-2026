@@ -52,17 +52,6 @@ public final class DrivetrainConstants {
 			public static final double tD = 0.0;
 		}
 
-		// yolo controller only
-		public static final class VisionAlign {
-			public static final double xP = 0.0;
-			public static final double xI = 0.0;
-			public static final double xD = 0.0;
-
-			public static final double yP = 0.7;
-			public static final double yI = 0.0;
-			public static final double yD = 0.0;
-		}
-
 		// only applicable when robot is being controlled by a PID controller
 		public static final LinearVelocity maxVelocity = MetersPerSecond.of(1);
 		public static final LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(1);
