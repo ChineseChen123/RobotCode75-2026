@@ -240,7 +240,10 @@ public class ShooterPhysics {
 			Time tofEstimateDragComp =
 					Seconds.of((1 - Math.exp(-tofEstimate.in(Seconds) * dragCoeff)) / dragCoeff);
 
-			Time unchoppedtofEstimateDragComp = Seconds.of((tofEstimate.in(Seconds) / 2.0 + 1 / dragCoeff) * (1 - Math.exp(-tofEstimate.in(Seconds) * dragCoeff)));
+			Time unchoppedtofEstimateDragComp =
+					Seconds.of(
+							(tofEstimate.in(Seconds) / 2.0 + 1 / dragCoeff)
+									* (1 - Math.exp(-tofEstimate.in(Seconds) * dragCoeff)));
 
 			Translation2d targetTranslation =
 					new Translation2d(

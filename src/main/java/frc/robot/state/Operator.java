@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.robot.Constants.DrivetrainConstants.maxAngularVelocity;
 import static frc.robot.Constants.DrivetrainConstants.maxVelocity;
+import static frc.robot.Constants.DrivetrainConstants.speedClampMultiplier;
 import static frc.robot.Constants.IOConstants.stickDeadband;
 import static frc.robot.Constants.IOConstants.translationJoystickExpo;
 import static frc.robot.Constants.IOConstants.translationStickMapValue;
@@ -126,7 +127,7 @@ public class Operator extends SubsystemBase {
 	}
 
 	/** returns array of all 3 processed joystick values (for one driver) */
-	public double[] processedJoystickValues() {
+	public double[] processedJoystickValues(boolean speedClamp) {
 		// Negation because joystick forward is negative
 		double[] DriverInput = {
 			MathUtil.applyDeadband(-leftStickYProcessed.getAsDouble(), stickDeadband),
@@ -142,18 +143,19 @@ public class Operator extends SubsystemBase {
 			DriverInput[0] *= -1;
 			DriverInput[1] *= -1;
 		}
-		DriverInput[0] *= maxVelocity.in(MetersPerSecond);
-		DriverInput[1] *= maxVelocity.in(MetersPerSecond);
-		DriverInput[2] *= maxAngularVelocity.in(RadiansPerSecond);
+		DriverInput[0] *= maxVelocity.in(MetersPerSecond) * (speedClamp ? speedClampMultiplier : 1);
+		DriverInput[1] *= maxVelocity.in(MetersPerSecond) * (speedClamp ? speedClampMultiplier : 1);
+		DriverInput[2] *=
+				maxAngularVelocity.in(RadiansPerSecond) * (speedClamp ? speedClampMultiplier : 1);
 
 		return DriverInput;
 	}
 
 	double lastJoystickAngle = 0;
 
-	public double[] processedJoystickValuesPositionalRotation() {
+	public double[] processedJoystickValuesPositionalRotation(boolean speedClamp) {
 		// Negation because joystick forward is negative
-		double[] DriverInput = processedJoystickValues();
+		double[] DriverInput = processedJoystickValues(speedClamp);
 
 		// get normalized vector of rotation translation
 

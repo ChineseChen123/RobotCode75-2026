@@ -30,6 +30,7 @@ public class Bindings {
 		RobotStates.actionXStance.whileTrue(swerve.xStanceCommand());
 		RobotStates.actionRobotRelative.onChange(
 				new InstantCommand(() -> swerve.toggleFieldRelative()));
+		RobotStates.actionSpeedClamp.onChange(new InstantCommand(() -> swerve.toggleSpeedClamp()));
 		RobotStates.trenchAlignDrive.whileTrue(swerve.trenchAlignTeleopSwerveCommand());
 
 		RobotStates.positionalRotationDrive.whileTrue(swerve.positionRotationTeleopSwerveCommand());

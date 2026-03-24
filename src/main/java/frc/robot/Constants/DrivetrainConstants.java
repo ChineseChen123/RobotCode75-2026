@@ -174,6 +174,8 @@ public final class DrivetrainConstants {
 
 	public static final LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(3);
 
+	public static final double speedClampMultiplier = 0.25;
+
 	// radians per second
 	public static final AngularVelocity maxAngularVelocity =
 			RadiansPerSecond.of(

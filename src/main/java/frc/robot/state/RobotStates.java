@@ -16,7 +16,6 @@ import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Turret;
 import frc.robot.subsystems.EndEffector.Turret.TurretStates;
-
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -83,13 +82,16 @@ public class RobotStates {
 	public static final Trigger turretIsAligning =
 			new Trigger(() -> m_Turret.getTurretState() == TurretStates.SCORING);
 
-	public static final DoubleSupplier turretAngle = () -> m_Turret.getPositionFromMotor().in(Degrees);
+	public static final DoubleSupplier turretAngle =
+			() -> m_Turret.getPositionFromMotor().in(Degrees);
 
 	// ── Actions ──────────────────────────────────────────────────────────────────
 
 	/** Swerve actions */
 	public static Trigger actionRobotRelative =
 			m_Driver.getRightButton(robotRelativeButton).and(teleop);
+
+	public static Trigger actionSpeedClamp = m_Driver.getLeftButton(speedClampButton).and(teleop);
 
 	public static Trigger actionXStance = m_Driver.getRightButton(xstanceButton).and(teleop);
 	public static Trigger actionResetGyro = m_Driver.getLeftButton(resetHeadingButton).and(teleop);

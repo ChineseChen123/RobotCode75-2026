@@ -4,9 +4,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.util.RaiderLog.RaiderLog;
@@ -15,7 +13,6 @@ import frc.lib.util.RaiderLog.RaiderLog.LogMode;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.state.DriverDashboard;
 import frc.robot.state.RobotStates;
-
 import org.littletonrobotics.junction.LoggedRobot;
 
 /**

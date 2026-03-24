@@ -117,7 +117,8 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public boolean aboveTargetVelocity() {
-		return currentShooterVelocity.in(RPM) > (shooterTargetVelocity.in(RPM) - shooterVelocityTolerance);
+		return currentShooterVelocity.in(RPM)
+				> (shooterTargetVelocity.in(RPM) - shooterVelocityTolerance);
 	}
 
 	public ShooterStates getShooterState() {
@@ -142,7 +143,9 @@ public class Shooter extends SubsystemBase {
 	/** Updates shooter target velocity from shooter physics. */
 	public void updateShooterTarget() {
 
-		if (!RobotStates.turretIsAligning.getAsBoolean() || (RobotStates.turretIsAligning.getAsBoolean() && RobotStates.actionAimTurretHold.getAsBoolean())) {
+		if (!RobotStates.turretIsAligning.getAsBoolean()
+				|| (RobotStates.turretIsAligning.getAsBoolean()
+						&& RobotStates.actionAimTurretHold.getAsBoolean())) {
 			shooterTargetVelocity = minShootingAngularVelocity.plus(maxShootingAngularVelocity).div(2.0);
 			return;
 		}

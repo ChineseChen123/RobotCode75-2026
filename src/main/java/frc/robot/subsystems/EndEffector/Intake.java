@@ -27,7 +27,6 @@ import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.Constants.RobotConstants;
-import frc.robot.state.RobotStates;
 
 public class Intake extends SubsystemBase {
 

@@ -62,6 +62,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	// ── Control state ─────────────────────────────────────────────────────────────
 	// @Input(key = "Field Relative", importance = Importance.DEBUG)
 	private boolean fieldRelative = true;
+	private boolean speedClamp = false;
 
 	private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
 	private Pose2d samplePose = new Pose2d();
@@ -211,6 +212,10 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		fieldRelative = !fieldRelative;
 	}
 
+	public void toggleSpeedClamp() {
+		speedClamp = !speedClamp;
+	}
+
 	public boolean getFieldRelative() {
 		return fieldRelative;
 	}
@@ -339,8 +344,8 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 						() -> {
 							double[] output =
 									oneDriver
-											? RobotContainer.getOperator().processedJoystickValues()
-											: RobotContainer.getDriver().processedJoystickValues();
+											? RobotContainer.getOperator().processedJoystickValues(speedClamp)
+											: RobotContainer.getDriver().processedJoystickValues(speedClamp);
 							drive(new Translation2d(output[0], output[1]), output[2]);
 						},
 						this)
@@ -358,8 +363,8 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 										() -> {
 											double[] output =
 													oneDriver
-															? RobotContainer.getOperator().processedJoystickValues()
-															: RobotContainer.getDriver().processedJoystickValues();
+															? RobotContainer.getOperator().processedJoystickValues(speedClamp)
+															: RobotContainer.getDriver().processedJoystickValues(speedClamp);
 											if (!AutoAlign.TrenchAlign.isFinished()) {
 												output[1] = AutoAlign.TrenchAlign.execute().vyMetersPerSecond;
 											} else {
@@ -376,8 +381,10 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 						() -> {
 							double[] output =
 									oneDriver
-											? RobotContainer.getOperator().processedJoystickValuesPositionalRotation()
-											: RobotContainer.getDriver().processedJoystickValuesPositionalRotation();
+											? RobotContainer.getOperator()
+													.processedJoystickValuesPositionalRotation(speedClamp)
+											: RobotContainer.getDriver()
+													.processedJoystickValuesPositionalRotation(speedClamp);
 							positionalRotationDrive(
 									new Translation2d(output[0], output[1]), Rotation2d.fromRadians(output[2]));
 						},
