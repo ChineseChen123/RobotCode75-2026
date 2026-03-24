@@ -59,6 +59,7 @@ public class ShooterPhysics {
 	private static final SG5PointFilter shooterVelFilterY = new SG5PointFilter(loopTimeSecs);
 	private static final SG5PointFilter shooterVelFilterOmega = new SG5PointFilter(loopTimeSecs);
 
+	private static final double dragCorrectionFactor = 0.5;
 	private static final double dragCoeff = .45; // .37?
 
 	// ── Shooter speed / distance conversions ─────────────────────────────────────
@@ -237,12 +238,9 @@ public class ShooterPhysics {
 		for (int i = 0; i < iterations; i++) {
 			Time tofEstimate = calculateTimeToScore(turretPose, virtualTargetPose);
 
-			Time tofEstimateDragComp =
-					Seconds.of((1 - Math.exp(-tofEstimate.in(Seconds) * dragCoeff)) / dragCoeff);
-
 			Time unchoppedtofEstimateDragComp =
 					Seconds.of(
-							(tofEstimate.in(Seconds) / 2.0 + 1 / dragCoeff)
+							(tofEstimate.in(Seconds) / dragCorrectionFactor + 1 / dragCoeff)
 									* (1 - Math.exp(-tofEstimate.in(Seconds) * dragCoeff)));
 
 			Translation2d targetTranslation =
