@@ -59,7 +59,7 @@ public class ShooterPhysics {
 	private static final SG5PointFilter shooterVelFilterY = new SG5PointFilter(loopTimeSecs);
 	private static final SG5PointFilter shooterVelFilterOmega = new SG5PointFilter(loopTimeSecs);
 
-	private static final double dragCorrectionFactor = 0.5;
+	private static final double dragCorrectionFactor = 2;
 	private static final double dragCoeff = .45; // .37?
 
 	// ── Shooter speed / distance conversions ─────────────────────────────────────

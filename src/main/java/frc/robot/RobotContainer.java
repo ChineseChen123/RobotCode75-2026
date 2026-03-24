@@ -108,7 +108,7 @@ public class RobotContainer {
 		m_Intake.setState(IntakeStates.DEFAULT);
 		m_Indexer.setState(IndexerStates.DEFAULT);
 		m_Shooter.setState(Shooter.ShooterStates.DEFAULT);
-		m_Turret.setState(Turret.TurretStates.IDLE);
+		m_Turret.setState(Turret.TurretStates.SCORING);
 	}
 
 	// Methods to return instances of static subsystems
