@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.EndEffector;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.IntakeIndexConstants.IntakeConstants.*;
@@ -16,6 +17,7 @@ import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -26,7 +28,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
+import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.RobotConstants;
+import frc.robot.state.RobotStates;
 
 public class Intake extends SubsystemBase {
 
@@ -169,7 +173,17 @@ public class Intake extends SubsystemBase {
 		// }
 
 		if (m_IntakeState.intakeSpeed.abs(RotationsPerSecond) > 0) {
-			m_IntakeMotor.setControl(m_IntakeRequest.withVelocity(m_IntakeState.intakeSpeed));
+			AngularVelocity speed = m_IntakeState.intakeSpeed;
+			if (m_IntakeState == IntakeStates.INTAKING) {
+				ChassisSpeeds chassisSpeeds = RobotStates.fieldRelativeSpeeds.get();
+				speed =
+						speed.plus(
+								RotationsPerSecond.of(15)
+										.times(
+												Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond)
+														/ DrivetrainConstants.maxVelocity.in(MetersPerSecond)));
+			}
+			m_IntakeMotor.setControl(m_IntakeRequest.withVelocity(speed));
 		} else {
 			m_IntakeMotor.setControl(new CoastOut());
 		}

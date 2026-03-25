@@ -75,8 +75,8 @@ public class ShooterTurretConstants {
 		public static final double shooterRegressionB = 1853.47554;
 		public static final double shooterRegressionC = 2.1;
 
-		public static final Distance minShootingDistance = Meters.of(2.263119);
-		public static final AngularVelocity minShootingAngularVelocity = RPM.of(2430);
+		public static final Distance minShootingDistance = Meters.of(2.142);
+		public static final AngularVelocity minShootingAngularVelocity = RPM.of(2300);
 		public static final AngularVelocity maxShootingAngularVelocity = RPM.of(3800);
 
 		public static final class MotorConfigs {
@@ -154,7 +154,7 @@ public class ShooterTurretConstants {
 				config.Slot0.kD = 0.0;
 				config.Slot0.kV = 0.0;
 				config.Slot0.kA = 0.0;
-				// config.TorqueCurrent.PeakForwardTorqueCurrent = 100.0;
+				config.TorqueCurrent.PeakForwardTorqueCurrent = 100.0;
 				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
 				config.MotorOutput.PeakForwardDutyCycle = 1.0;
 				config.MotorOutput.PeakReverseDutyCycle = 0.0;

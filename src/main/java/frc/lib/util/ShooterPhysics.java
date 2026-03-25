@@ -125,7 +125,7 @@ public class ShooterPhysics {
 		double heightDiffMeters = heightOfTarget.in(Meters) - shooterHeight.in(Meters);
 
 		double launchAngleRad = shooterAngleWithVertical.in(Radians);
-		double cos = Math.cos(launchAngleRad);
+		double sin = Math.sin(launchAngleRad);
 		double tan = Math.tan(launchAngleRad);
 
 		double velocity =
@@ -133,7 +133,7 @@ public class ShooterPhysics {
 						9.8
 								* horizontalDistanceMeters
 								* horizontalDistanceMeters
-								/ (2 * cos * cos * (horizontalDistanceMeters * tan - heightDiffMeters)));
+								/ (2 * sin * sin * (horizontalDistanceMeters / tan - heightDiffMeters)));
 
 		return MetersPerSecond.of(velocity);
 	}

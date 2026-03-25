@@ -171,11 +171,7 @@ public class Shooter extends SubsystemBase {
 
 		boolean debouncedAtSetpoint = atSetpointDebouncer.calculate(aboveTargetVelocity());
 
-		if (debouncedAtSetpoint) {
-			m_ShooterMotor1.setControl(m_TorqueCurrentBangBang.withVelocity(shooterTargetVelocity));
-		} else {
-			m_ShooterMotor1.setControl(m_DutyCycleBangBang.withVelocity(shooterTargetVelocity));
-		}
+		m_ShooterMotor1.setControl(m_TorqueCurrentBangBang.withVelocity(shooterTargetVelocity));
 
 		return debouncedAtSetpoint;
 	}
