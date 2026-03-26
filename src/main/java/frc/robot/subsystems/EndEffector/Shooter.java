@@ -21,10 +21,12 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.PeddieBounds;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.lib.util.ShooterPhysics;
+import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.ShooterTurretConstants;
 import frc.robot.Constants.ShooterTurretConstants.ShooterConstants.MotorConfigs;
 import frc.robot.state.RobotStates;
@@ -70,6 +72,9 @@ public class Shooter extends SubsystemBase {
 	private int totalShotsFired = 0;
 	private int shotsFired = 0;
 
+	private TunableNumber shooterRPM;
+
+
 	/** Creates a new Shooter. */
 	public Shooter() {
 		m_ShooterMotor1 = new TalonFX(shooterMotor1CanID, superstructureCANBusName);
@@ -85,6 +90,11 @@ public class Shooter extends SubsystemBase {
 		m_TorqueCurrentBangBang = new VelocityTorqueCurrentFOC(RPM.of(0));
 
 		m_VelocityRequest.UpdateFreqHz = 50;
+
+		if (RobotConstants.TuningModes.tuneShooter) {
+			shooterRPM = new TunableNumber("Shooter RPM", 0);
+		}
+		
 	}
 
 	// ── Velocity / state accessors ───────────────────────────────────────────────
@@ -142,6 +152,11 @@ public class Shooter extends SubsystemBase {
 
 	/** Updates shooter target velocity from shooter physics. */
 	public void updateShooterTarget() {
+
+		if (RobotConstants.TuningModes.tuneShooter) {
+			shooterTargetVelocity = RPM.of(shooterRPM.getNumber());
+			return;
+		}
 
 		if (!RobotStates.turretIsAligning.getAsBoolean()
 				|| (RobotStates.turretIsAligning.getAsBoolean()

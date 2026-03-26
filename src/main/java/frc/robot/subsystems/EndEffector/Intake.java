@@ -24,13 +24,16 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.state.RobotStates;
+import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
 
 public class Intake extends SubsystemBase {
 
@@ -40,7 +43,9 @@ public class Intake extends SubsystemBase {
 		STOWED(pivotUpAngle, defaultIntakeSpeed),
 		DEFAULT(pivotHalfwayAngle, defaultIntakeSpeed),
 		INTAKING(pivotDownAngle, intakeRunningSpeed),
-		REVERSING(pivotDownAngle, intakeReversingSpeed);
+		REVERSING(pivotDownAngle, intakeReversingSpeed),
+		JIGGLINGUP(pivotJiggleAngleOne, intakeRunningSpeed),
+		JIGGLINGDOWN(pivotJiggleAngleTwo, intakeRunningSpeed);
 
 		Angle pivotPosition;
 		AngularVelocity intakeSpeed;
@@ -158,6 +163,16 @@ public class Intake extends SubsystemBase {
 
 	public Command setStateCommandPersistent(IntakeStates state) {
 		return new InstantCommand(() -> setState(state), this);
+	}
+
+	public Command jiggleCommand() {
+		return new SequentialCommandGroup(
+				setStateCommandPersistent(IntakeStates.JIGGLINGUP),
+				new WaitCommand(0.5),
+				setStateCommandPersistent(IntakeStates.JIGGLINGDOWN),
+				new WaitCommand(0.5))
+		.repeatedly()
+		.finallyDo(() -> setStateCommandPersistent(IntakeStates.DEFAULT));
 	}
 
 	@Override

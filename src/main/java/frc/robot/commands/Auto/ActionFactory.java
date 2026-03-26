@@ -63,13 +63,7 @@ public class ActionFactory {
 						m_Turret.setStateCommandPersistent(TurretStates.IDLE),
 						m_Shooter.setStateCommandPersistent(ShooterStates.DEFAULT));
 			case 8:
-				return new SequentialCommandGroup(
-								m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT),
-								new WaitCommand(0.75),
-								m_Intake.setStateCommandPersistent(IntakeStates.INTAKING),
-								new WaitCommand(0.75))
-						.repeatedly()
-						.finallyDo(() -> m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT));
+				return m_Intake.jiggleCommand();
 		}
 		return null;
 	}

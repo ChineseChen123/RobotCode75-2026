@@ -106,6 +106,7 @@ public class RobotStates {
 
 	public static Trigger actionIntakeDown = m_Operator.A.and(teleop);
 	public static Trigger actionStowIntake = m_Operator.Y.and(teleop);
+	public static Trigger actionJiggleIntake = m_Operator.B.and(teleop);
 
 	/* Indexer actions */
 

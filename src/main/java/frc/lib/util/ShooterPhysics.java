@@ -72,7 +72,7 @@ public class ShooterPhysics {
 
 		return RPM.of(
 				Math.min(
-						shooterRegressionA * distanceToTarget + shooterRegressionB,
+						shooterRegressionA * Math.sqrt(distanceToTarget - shooterRegressionC) + shooterRegressionB,
 						maxShootingAngularVelocity.in(RPM)));
 	}
 
@@ -87,7 +87,7 @@ public class ShooterPhysics {
 		// Handle max-speed clamp.
 		rpm = Math.min(rpm, maxShootingAngularVelocity.in(RPM));
 
-		return Meters.of((rpm - shooterRegressionB) / shooterRegressionA);
+		return Meters.of(Math.pow((rpm - shooterRegressionB) / shooterRegressionA, 2) + shooterRegressionC);
 	}
 
 	public static AngularVelocity calculateShooterSpeed(Pose2d robotPose, Pose2d targetPose) {

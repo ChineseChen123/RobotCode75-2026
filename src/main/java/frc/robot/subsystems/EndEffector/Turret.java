@@ -260,10 +260,10 @@ public class Turret extends SubsystemBase {
 		return turretTargetAngle.in(Degrees);
 	}
 
-	// @Logged(key = "Turret Distance", importance = Importance.DEBUG)
-	// public double getTurretDistance() {
-	// 	return getTurretPose().getTranslation().getDistance(getHubPose().getTranslation());
-	// }
+	@Logged(key = "Turret Distance", importance = Importance.DEBUG)
+	public double getTurretDistance() {
+		return getTurretPose().getTranslation().getDistance(getShootingTargetPose().getTranslation());
+	}
 
 	@Logged(key = "Turret Target Velocity DPS", importance = Importance.DEBUG)
 	public double getTurretTargetVelocityDPS() {

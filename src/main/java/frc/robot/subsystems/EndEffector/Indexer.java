@@ -138,6 +138,7 @@ public class Indexer extends SubsystemBase {
 		return currentIndexerVelocity.in(RotationsPerSecond);
 	}
 
+	@Logged(key = "Hopper Velocity", importance = Importance.DEBUG)
 	public double getHopperVelocityRPS() {
 		return currentHopperVelocity.in(RotationsPerSecond);
 	}
@@ -217,7 +218,7 @@ public class Indexer extends SubsystemBase {
 														.toTranslation2d())
 								> ShooterConstants.minShootingDistance.in(Meters);
 
-		if (m_IndexerState == IndexerStates.SHOOTING && runParallel) {
+		if (m_IndexerState == IndexerStates.SHOOTING) {
 			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(runningParallelSpeed));
 		} else {
 			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(reverseParallelSpeed));

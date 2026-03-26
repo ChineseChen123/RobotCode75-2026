@@ -39,6 +39,8 @@ public class IntakeIndexConstants {
 		// TODO figure out
 		public static final Angle pivotDownAngle = Rotations.of(-0.04);
 		public static final Angle pivotHalfwayAngle = Rotations.of(0.20);
+		public static final Angle pivotJiggleAngleOne = Rotations.of(0.3);
+		public static final Angle pivotJiggleAngleTwo = Rotations.of(0.12);
 		public static final Angle pivotUpAngle = Rotations.of(0.333);
 
 		public static final AngularVelocity defaultIntakeSpeed = RotationsPerSecond.of(0);
@@ -214,11 +216,11 @@ public class IntakeIndexConstants {
 		public static final AngularVelocity reverseIndexerSpeed = RotationsPerSecond.of(-15);
 
 		public static final AngularVelocity defaultHopperSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity runningHopperSpeed = RotationsPerSecond.of(35);
+		public static final AngularVelocity runningHopperSpeed = RotationsPerSecond.of(30);
 		public static final AngularVelocity reverseHopperSpeed = RotationsPerSecond.of(-15);
 
 		public static final AngularVelocity defaultParallelSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity runningParallelSpeed = RotationsPerSecond.of(45);
+		public static final AngularVelocity runningParallelSpeed = RotationsPerSecond.of(50);
 		public static final AngularVelocity reverseParallelSpeed = RotationsPerSecond.of(-10);
 
 		public static final double indexerSpeedThresholdRPS = 10;
@@ -257,11 +259,11 @@ public class IntakeIndexConstants {
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double indexerVelocityKP = 14;
+			public static final double indexerVelocityKP = 50;
 			public static final double indexerVelocityKI = 0.0;
 			public static final double indexerVelocityKD = 0.0;
 			public static final double indexerVelocityKS = 25;
-			public static final double indexerVelocityKV = 0.45;
+			public static final double indexerVelocityKV = 1.3;
 
 			public static final double hopperVelocityKP = 10;
 			public static final double hopperVelocityKI = 0.0;
