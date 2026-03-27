@@ -14,6 +14,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -198,8 +199,10 @@ public class Indexer extends SubsystemBase {
 		if (m_IndexerState.hopperSpeed.baseUnitMagnitude() == 0) {
 			m_HopperMotor.setControl(new CoastOut());
 		} else {
-			m_HopperMotor.setControl(m_HopperRequest.withVelocity(m_IndexerState.hopperSpeed));
+			m_HopperMotor.setControl(new VoltageOut(0).withOutput(Math.signum(m_IndexerState.hopperSpeed.in(RotationsPerSecond)) * 6));
 		}
+
+		// m_HopperMotor.setControl(m_HopperRequest.withVelocity(RotationsPerSecond.of(30)));
 
 		runParallel =
 				runParallel

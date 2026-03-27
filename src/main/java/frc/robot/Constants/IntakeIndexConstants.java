@@ -220,7 +220,7 @@ public class IntakeIndexConstants {
 		public static final AngularVelocity reverseHopperSpeed = RotationsPerSecond.of(-15);
 
 		public static final AngularVelocity defaultParallelSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity runningParallelSpeed = RotationsPerSecond.of(50);
+		public static final AngularVelocity runningParallelSpeed = RotationsPerSecond.of(20);
 		public static final AngularVelocity reverseParallelSpeed = RotationsPerSecond.of(-10);
 
 		public static final double indexerSpeedThresholdRPS = 10;

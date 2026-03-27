@@ -131,6 +131,7 @@ public class Shooter extends SubsystemBase {
 				> (shooterTargetVelocity.in(RPM) - shooterVelocityTolerance);
 	}
 
+	@Logged(key = "Shooter State", importance = Importance.DEBUG)
 	public ShooterStates getShooterState() {
 		return m_ShooterState;
 	}
