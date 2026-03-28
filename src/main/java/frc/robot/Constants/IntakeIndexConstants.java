@@ -225,6 +225,9 @@ public class IntakeIndexConstants {
 
 		public static final double indexerSpeedThresholdRPS = 10;
 
+		public static final Time timeOfForwardParallel = Seconds.of(2);
+		public static final Time timeOfBackwardParallel = Seconds.of(0.3);
+
 		public class MotorConfigs {
 			public static final TalonFXConfiguration m_IndexerMotorConfig = new TalonFXConfiguration();
 			public static final TalonFXConfiguration m_HopperMotorConfig = new TalonFXConfiguration();

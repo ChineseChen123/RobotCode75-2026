@@ -91,6 +91,9 @@ public class Shooter extends SubsystemBase {
 
 		m_VelocityRequest.UpdateFreqHz = 50;
 
+		m_TorqueCurrentBangBang.UpdateFreqHz = 0;
+		m_TorqueCurrentBangBang.UseTimesync = false;
+
 		if (RobotConstants.TuningModes.tuneShooter) {
 			shooterRPM = new TunableNumber("Shooter RPM", 0);
 		}
