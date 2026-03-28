@@ -7,6 +7,7 @@ package frc.robot.subsystems.EndEffector;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.Constants.IntakeIndexConstants.IndexerConstants.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
@@ -18,6 +19,8 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -88,6 +91,9 @@ public class Indexer extends SubsystemBase {
 
 	private boolean runParallel = false;
 
+	private boolean parallelRunningForward = false;
+	private Time timeParallelInDirection = Seconds.of(0);
+
 	private AngularVelocity currentIndexerVelocity = RotationsPerSecond.of(0);
 	private AngularVelocity currentHopperVelocity = RotationsPerSecond.of(0);
 	private AngularVelocity currentParallelVelocity = RotationsPerSecond.of(0);
@@ -107,10 +113,10 @@ public class Indexer extends SubsystemBase {
 		// m_IndexerTorqueCurrent.UpdateFreqHz = 0;
 		// m_IndexerTorqueCurrent.UseTimesync = true;
 		m_IndexerTorqueCurrent.UpdateFreqHz = 50;
-		m_HopperRequest.UpdateFreqHz = 0;
-		m_HopperRequest.UseTimesync = true;
-		m_ParallelRollerRequest.UpdateFreqHz = 0;
-		m_ParallelRollerRequest.UseTimesync = true;
+		m_HopperRequest.UpdateFreqHz = 50;
+		m_HopperRequest.UseTimesync = false;
+		m_ParallelRollerRequest.UpdateFreqHz = 50;
+		m_ParallelRollerRequest.UseTimesync = false;
 
 		indexerConfigs
 				.withKP(MotorConfigs.indexerVelocityKP)
@@ -221,8 +227,23 @@ public class Indexer extends SubsystemBase {
 														.toTranslation2d())
 								> ShooterConstants.minShootingDistance.in(Meters);
 
-		if (m_IndexerState == IndexerStates.SHOOTING) {
-			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(runningParallelSpeed));
+		if (m_IndexerState == IndexerStates.SHOOTING && runParallel) {
+
+			if (parallelRunningForward) {
+				if (timeParallelInDirection.gt(timeOfForwardParallel)) {
+					parallelRunningForward = false;
+					timeParallelInDirection = Seconds.of(0);
+				}
+			} else {
+				if (timeParallelInDirection.gt(timeOfBackwardParallel)) {
+					parallelRunningForward = true;
+					timeParallelInDirection = Seconds.of(0);
+				}
+			}
+
+			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(parallelRunningForward ? runningParallelSpeed : reverseParallelSpeed));
+		
+			timeParallelInDirection = timeParallelInDirection.plus(Seconds.of(RobotConstants.loopTimeSecs));
 		} else {
 			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(reverseParallelSpeed));
 		}
