@@ -55,9 +55,12 @@ public class ShooterPhysics {
 			LinearFilter.movingAverage((int) (0.1 / loopTimeSecs));
 	private static Angle lastTurretAngle = null;
 
-	private static final SG5PointFilter shooterVelFilterX = new SG5PointFilter(loopTimeSecs);
-	private static final SG5PointFilter shooterVelFilterY = new SG5PointFilter(loopTimeSecs);
-	private static final SG5PointFilter shooterVelFilterOmega = new SG5PointFilter(loopTimeSecs);
+	private static final SG5PointFilter shooterVelFilterXRR = new SG5PointFilter(loopTimeSecs);
+	private static final SG5PointFilter shooterVelFilterYRR = new SG5PointFilter(loopTimeSecs);
+	private static final SG5PointFilter shooterVelFilterOmegaRR = new SG5PointFilter(loopTimeSecs);
+	private static final SG5PointFilter shooterVelFilterXFR = new SG5PointFilter(loopTimeSecs);
+	private static final SG5PointFilter shooterVelFilterYFR = new SG5PointFilter(loopTimeSecs);
+	private static final SG5PointFilter shooterVelFilterOmegaFR = new SG5PointFilter(loopTimeSecs);
 
 	private static final double dragCorrectionFactor = 2;
 	private static final double dragCoeff = .45; // .37?
@@ -183,20 +186,25 @@ public class ShooterPhysics {
 		ChassisSpeeds robotRelativeSpeeds =
 				ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeSpeeds, robotPose.getRotation());
 
-		double vxAccel = shooterVelFilterX.updateDeriv(robotRelativeSpeeds.vxMetersPerSecond);
-		double vyAccel = shooterVelFilterY.updateDeriv(robotRelativeSpeeds.vyMetersPerSecond);
-		double omegaAccel =
-				shooterVelFilterOmega.updateDeriv(robotRelativeSpeeds.omegaRadiansPerSecond);
+		double vxAccelRR = shooterVelFilterXRR.updateDeriv(robotRelativeSpeeds.vxMetersPerSecond);
+		double vyAccelRR = shooterVelFilterYRR.updateDeriv(robotRelativeSpeeds.vyMetersPerSecond);
+		double omegaAccelRR =
+				shooterVelFilterOmegaRR.updateDeriv(robotRelativeSpeeds.omegaRadiansPerSecond);
+
+		double vxAccelFR = shooterVelFilterXFR.updateDeriv(fieldRelativeSpeeds.vxMetersPerSecond);
+		double vyAccelFR = shooterVelFilterYFR.updateDeriv(fieldRelativeSpeeds.vyMetersPerSecond);
+		double omegaAccelFR =
+				shooterVelFilterOmegaFR.updateDeriv(fieldRelativeSpeeds.omegaRadiansPerSecond);
 
 		robotPose =
 				robotPose.exp(
 						new Twist2d(
 								robotRelativeSpeeds.vxMetersPerSecond * phaseDelay
-										+ 0.5 * vxAccel * phaseDelay * phaseDelay,
+										+ 0.5 * vxAccelRR * phaseDelay * phaseDelay,
 								robotRelativeSpeeds.vyMetersPerSecond * phaseDelay
-										+ 0.5 * vyAccel * phaseDelay * phaseDelay,
+										+ 0.5 * vyAccelRR * phaseDelay * phaseDelay,
 								robotRelativeSpeeds.omegaRadiansPerSecond * phaseDelay
-										+ 0.5 * omegaAccel * phaseDelay * phaseDelay));
+										+ 0.5 * omegaAccelRR * phaseDelay * phaseDelay));
 
 		// Re-express target-relative motion and ignore lateral/rotational target motion.
 		Rotation2d targetFrame = virtualTargetPose.toPose2d().minus(robotPose).getRotation();
@@ -225,13 +233,13 @@ public class ShooterPhysics {
 
 		Rotation2d robotAngle = robotPose.getRotation();
 		double turretVelocityX =
-				fieldRelativeSpeeds.vxMetersPerSecond
-						- fieldRelativeSpeeds.omegaRadiansPerSecond
+				fieldRelativeSpeeds.vxMetersPerSecond + vxAccelFR * phaseDelay
+						- (fieldRelativeSpeeds.omegaRadiansPerSecond + omegaAccelFR * phaseDelay)
 								* (turretPositionOffset.getY() * robotAngle.getCos()
 										+ turretPositionOffset.getX() * robotAngle.getSin());
 		double turretVelocityY =
-				fieldRelativeSpeeds.vyMetersPerSecond
-						+ fieldRelativeSpeeds.omegaRadiansPerSecond
+				fieldRelativeSpeeds.vyMetersPerSecond + vyAccelFR * phaseDelay
+						+ (fieldRelativeSpeeds.omegaRadiansPerSecond + omegaAccelFR * phaseDelay)
 								* (turretPositionOffset.getX() * robotAngle.getCos()
 										- turretPositionOffset.getY() * robotAngle.getSin());
 
