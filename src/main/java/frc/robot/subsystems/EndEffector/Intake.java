@@ -172,7 +172,7 @@ public class Intake extends SubsystemBase {
 				setStateCommandPersistent(IntakeStates.JIGGLINGDOWN),
 				new WaitCommand(0.5))
 		.repeatedly()
-		.finallyDo(() -> setStateCommandPersistent(IntakeStates.DEFAULT));
+		.finallyDo(() -> setState(IntakeStates.DEFAULT));
 	}
 
 	@Override

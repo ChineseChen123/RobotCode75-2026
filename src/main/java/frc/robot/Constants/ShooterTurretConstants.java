@@ -71,8 +71,8 @@ public class ShooterTurretConstants {
 		public static final Angle shooterAngleWithVertical = Degrees.of(25);
 		public static final Distance shooterHeight = Inches.of(19.5);
 
-		public static final double shooterRegressionA = 982.17242;
-		public static final double shooterRegressionB = 744.10019;
+		public static final double shooterRegressionA = 982.17242 + 8;
+		public static final double shooterRegressionB = 744.10019 - 10;
 		public static final double shooterRegressionC = -0.126182;
 
 		public static final Distance minShootingDistance = Meters.of(2.13);
