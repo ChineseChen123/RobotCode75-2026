@@ -9,4 +9,6 @@ public class Presets {
 	public static final String depotSideNZFeed = "5 sd 1 nzd3 6";
 	public static final String outpostSideNZFeed = "5 so 1 nzo3 6";
 	public static final String depotSideShoot8NZ = "sd 7 5 nzd td1 3 8";
+	
+	public static final String depotSideNZFeedCorner = "5 sd 1 nzd3 cd 8";
 }

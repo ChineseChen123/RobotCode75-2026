@@ -31,6 +31,8 @@ public class FieldConstants {
 			new Pose2d(blueHub.getMeasureX(), Meters.of(5.465127944946289), Rotation2d.kZero);
 	public static final Pose2d blueBumpRight =
 			new Pose2d(blueHub.getMeasureX(), Meters.of(2.513244390487671), Rotation2d.kZero);
+	public static final Pose2d blueCornerDepot =
+			new Pose2d(Meters.of(0.828855574131012), Meters.of(7.3211541175842285), Rotation2d.kZero);
 
 	public static final Pose2d redBumpLeft =
 			new Pose2d(redHub.getMeasureX(), Meters.of(2.513244390487671), Rotation2d.kZero);
@@ -41,6 +43,7 @@ public class FieldConstants {
 			Feet.of(0); // like not left to right but like forward and back
 	public static final Distance bumpLength =
 			Feet.of(0); // like not left to right but like forward and back
+
 
 	// Trench Align
 	public static final double trenchY = 0.6683171391487122;
