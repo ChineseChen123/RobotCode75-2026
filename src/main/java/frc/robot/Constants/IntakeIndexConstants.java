@@ -32,7 +32,7 @@ public class IntakeIndexConstants {
 
 		public static final Angle pivotZeroPoint = Rotations.of(0);
 
-		public static final Angle pivotEncoderOffset = Rotations.of(0.453);
+		public static final Angle pivotEncoderOffset = Rotations.of(0.009);
 		public static final double pivotMotorToMechanismRatio = 1.0 / 48.0;
 		public static final double pivotToleranceAbsolute = 0.05; // rotations // TODO figure out
 
