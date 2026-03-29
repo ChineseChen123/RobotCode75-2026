@@ -36,8 +36,8 @@ public class ShooterTurretConstants {
 	public static final boolean useVirtualTarget = true;
 	public static final int virtualTargetSolveIterations = 24;
 
-	public static final double phaseDelay = 0.1;
-	public static final double additionalPhaseDelayShooterSpeeds = 0.08;
+	public static final double phaseDelay = 0.07;
+	public static final double additionalPhaseDelayShooterSpeeds = 0.05;
 
 	public class ShooterConstants {
 		// Kraken X60s

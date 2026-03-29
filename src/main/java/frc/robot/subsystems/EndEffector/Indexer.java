@@ -92,7 +92,7 @@ public class Indexer extends SubsystemBase {
 	private boolean runParallel = false;
 
 	private boolean parallelRunningForward = false;
-	private Time timeParallelInDirection = Seconds.of(0);
+	private double timeAtChangeSeconds = 0;
 
 	private AngularVelocity currentIndexerVelocity = RotationsPerSecond.of(0);
 	private AngularVelocity currentHopperVelocity = RotationsPerSecond.of(0);
@@ -231,24 +231,21 @@ public class Indexer extends SubsystemBase {
 		if (m_IndexerState == IndexerStates.SHOOTING && runParallel) {
 
 			if (parallelRunningForward) {
-				if (timeParallelInDirection.gt(timeOfForwardParallel)) {
+				if (Timer.getFPGATimestamp() - timeAtChangeSeconds > timeOfForwardParallel.in(Seconds)) {
 					parallelRunningForward = false;
-					timeParallelInDirection = Seconds.of(0);
+					timeAtChangeSeconds = Timer.getFPGATimestamp();
 				}
 			} else {
-				if (timeParallelInDirection.gt(timeOfBackwardParallel)) {
+				if (Timer.getFPGATimestamp() - timeAtChangeSeconds > timeOfBackwardParallel.in(Seconds)) {
 					parallelRunningForward = true;
-					timeParallelInDirection = Seconds.of(0);
+					timeAtChangeSeconds = Timer.getFPGATimestamp();
 				}
 			}
 
-			parallelRunningForward = true;
-
 			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(parallelRunningForward ? runningParallelSpeed : reverseParallelSpeed));
-		
-			timeParallelInDirection = timeParallelInDirection.plus(Seconds.of(RobotConstants.loopTimeSecs));
+			
 		} else {
-			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(reverseParallelSpeed));
+			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(defaultParallelSpeed));
 		}
 	}
 

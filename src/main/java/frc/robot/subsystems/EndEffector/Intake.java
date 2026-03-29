@@ -170,7 +170,7 @@ public class Intake extends SubsystemBase {
 				setStateCommandPersistent(IntakeStates.JIGGLINGUP),
 				new WaitCommand(0.5),
 				setStateCommandPersistent(IntakeStates.JIGGLINGDOWN),
-				new WaitCommand(0.5))
+				new WaitCommand(1))
 		.repeatedly()
 		.finallyDo(() -> setState(IntakeStates.DEFAULT));
 	}

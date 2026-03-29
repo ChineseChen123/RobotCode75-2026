@@ -38,9 +38,9 @@ public class IntakeIndexConstants {
 
 		// TODO figure out
 		public static final Angle pivotDownAngle = Rotations.of(-0.1);
-		public static final Angle pivotHalfwayAngle = Rotations.of(0.17);
-		public static final Angle pivotJiggleAngleOne = Rotations.of(0.25);
-		public static final Angle pivotJiggleAngleTwo = Rotations.of(0.1);
+		public static final Angle pivotHalfwayAngle = Rotations.of(0.12);
+		public static final Angle pivotJiggleAngleOne = Rotations.of(0.2);
+		public static final Angle pivotJiggleAngleTwo = Rotations.of(-0.1);
 		public static final Angle pivotUpAngle = Rotations.of(0.3);
 
 		public static final AngularVelocity defaultIntakeSpeed = RotationsPerSecond.of(0);
@@ -219,14 +219,14 @@ public class IntakeIndexConstants {
 		public static final AngularVelocity runningHopperSpeed = RotationsPerSecond.of(30);
 		public static final AngularVelocity reverseHopperSpeed = RotationsPerSecond.of(-15);
 
-		public static final AngularVelocity defaultParallelSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity runningParallelSpeed = RotationsPerSecond.of(20);
-		public static final AngularVelocity reverseParallelSpeed = RotationsPerSecond.of(-10);
+		public static final AngularVelocity defaultParallelSpeed = RotationsPerSecond.of(-10);
+		public static final AngularVelocity runningParallelSpeed = RotationsPerSecond.of(30);
+		public static final AngularVelocity reverseParallelSpeed = RotationsPerSecond.of(-20);
 
 		public static final double indexerSpeedThresholdRPS = 10;
 
 		public static final Time timeOfForwardParallel = Seconds.of(2);
-		public static final Time timeOfBackwardParallel = Seconds.of(0.3);
+		public static final Time timeOfBackwardParallel = Seconds.of(0.2);
 
 		public class MotorConfigs {
 			public static final TalonFXConfiguration m_IndexerMotorConfig = new TalonFXConfiguration();
