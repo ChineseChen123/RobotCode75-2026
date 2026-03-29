@@ -205,7 +205,8 @@ public class Indexer extends SubsystemBase {
 		if (m_IndexerState.hopperSpeed.baseUnitMagnitude() == 0) {
 			m_HopperMotor.setControl(new CoastOut());
 		} else {
-			m_HopperMotor.setControl(new VoltageOut(0).withOutput(Math.signum(m_IndexerState.hopperSpeed.in(RotationsPerSecond)) * 6));
+			// m_HopperMotor.setControl(new VoltageOut(0).withOutput(Math.signum(m_IndexerState.hopperSpeed.in(RotationsPerSecond)) * 6));
+			m_HopperMotor.setControl(m_HopperRequest.withVelocity(m_IndexerState.hopperSpeed));
 		}
 
 		// m_HopperMotor.setControl(m_HopperRequest.withVelocity(RotationsPerSecond.of(30)));
@@ -240,6 +241,8 @@ public class Indexer extends SubsystemBase {
 					timeParallelInDirection = Seconds.of(0);
 				}
 			}
+
+			parallelRunningForward = true;
 
 			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(parallelRunningForward ? runningParallelSpeed : reverseParallelSpeed));
 		

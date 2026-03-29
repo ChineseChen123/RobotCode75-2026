@@ -32,19 +32,19 @@ public class IntakeIndexConstants {
 
 		public static final Angle pivotZeroPoint = Rotations.of(0);
 
-		public static final Angle pivotEncoderOffset = Rotations.of(0.009);
+		public static final Angle pivotEncoderOffset = Rotations.of(0.500);
 		public static final double pivotMotorToMechanismRatio = 1.0 / 48.0;
 		public static final double pivotToleranceAbsolute = 0.05; // rotations // TODO figure out
 
 		// TODO figure out
-		public static final Angle pivotDownAngle = Rotations.of(-0.04);
-		public static final Angle pivotHalfwayAngle = Rotations.of(0.20);
-		public static final Angle pivotJiggleAngleOne = Rotations.of(0.3);
-		public static final Angle pivotJiggleAngleTwo = Rotations.of(0.12);
-		public static final Angle pivotUpAngle = Rotations.of(0.333);
+		public static final Angle pivotDownAngle = Rotations.of(-0.1);
+		public static final Angle pivotHalfwayAngle = Rotations.of(0.17);
+		public static final Angle pivotJiggleAngleOne = Rotations.of(0.25);
+		public static final Angle pivotJiggleAngleTwo = Rotations.of(0.1);
+		public static final Angle pivotUpAngle = Rotations.of(0.3);
 
 		public static final AngularVelocity defaultIntakeSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(65);
+		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(50);
 		public static final AngularVelocity intakeReversingSpeed = RotationsPerSecond.of(-30);
 
 		public static final class MotorConfigs {
