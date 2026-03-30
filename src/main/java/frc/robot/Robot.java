@@ -45,7 +45,7 @@ public class Robot extends LoggedRobot {
 		m_robotContainer = new RobotContainer();
 
 		// Configure PhotonVision debug tab
-	PortForwarder.add(5800, "photonvision.local", 5800);
+		PortForwarder.add(5800, "photonvision.local", 5800);
 		// CameraServer.startAutomaticCapture();
 	}
 

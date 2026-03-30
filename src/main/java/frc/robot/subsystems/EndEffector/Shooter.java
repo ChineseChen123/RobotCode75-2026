@@ -74,7 +74,6 @@ public class Shooter extends SubsystemBase {
 
 	private TunableNumber shooterRPM;
 
-
 	/** Creates a new Shooter. */
 	public Shooter() {
 		m_ShooterMotor1 = new TalonFX(shooterMotor1CanID, superstructureCANBusName);
@@ -97,7 +96,6 @@ public class Shooter extends SubsystemBase {
 		if (RobotConstants.TuningModes.tuneShooter) {
 			shooterRPM = new TunableNumber("Shooter RPM", 0);
 		}
-		
 	}
 
 	// ── Velocity / state accessors ───────────────────────────────────────────────

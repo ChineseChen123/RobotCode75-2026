@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.Hopper;
+import frc.robot.subsystems.EndEffector.Hopper.HopperStates;
 import frc.robot.subsystems.EndEffector.Indexer;
 import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
 import frc.robot.subsystems.EndEffector.Intake;
@@ -20,6 +22,7 @@ public class Bindings {
 		Swerve swerve = RobotContainer.getSwerve();
 		Shooter m_Shooter = RobotContainer.getShooter();
 		Indexer m_Indexer = RobotContainer.getIndexer();
+		Hopper m_Hopper = RobotContainer.getHopper();
 		Intake m_Intake = RobotContainer.getIntake();
 		Turret m_Turret = RobotContainer.getTurret();
 		// Climber m_Climber = RobotContainer.getClimber();
@@ -40,6 +43,7 @@ public class Bindings {
 		RobotStates.teleop.onTrue(
 				new ParallelCommandGroup(
 						m_Indexer.setStateCommandPersistent(IndexerStates.DEFAULT),
+						m_Hopper.setStateCommandPersistent(HopperStates.DEFAULT),
 						m_Shooter.setStateCommandPersistent(ShooterStates.DEFAULT),
 						m_Turret.setStateCommandPersistent(TurretStates.IDLE)));
 
@@ -49,9 +53,15 @@ public class Bindings {
 		// shoot
 		RobotStates.actionIndexerShoot
 				// .and(RobotStates.turretIsInDeadzone.negate())
-				.whileTrue(m_Indexer.setStateCommand(IndexerStates.SHOOTING));
+				.whileTrue(
+				new ParallelCommandGroup(
+						m_Indexer.setStateCommand(IndexerStates.SHOOTING),
+						m_Hopper.setStateCommand(HopperStates.SHOOTING)));
 
-		RobotStates.actionIndexerReverse.whileTrue(m_Indexer.setStateCommand(IndexerStates.REVERSING));
+		RobotStates.actionIndexerReverse.whileTrue(
+				new ParallelCommandGroup(
+						m_Indexer.setStateCommand(IndexerStates.REVERSING),
+						m_Hopper.setStateCommand(HopperStates.REVERSING)));
 
 		// intake
 		RobotStates.actionIntakeDown.whileTrue(m_Intake.setStateCommand(IntakeStates.INTAKING));

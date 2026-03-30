@@ -44,8 +44,8 @@ public class Intake extends SubsystemBase {
 		DEFAULT(pivotHalfwayAngle, defaultIntakeSpeed),
 		INTAKING(pivotDownAngle, intakeRunningSpeed),
 		REVERSING(pivotDownAngle, intakeReversingSpeed),
-		JIGGLINGUP(pivotJiggleAngleOne, intakeRunningSpeed),
-		JIGGLINGDOWN(pivotJiggleAngleTwo, intakeRunningSpeed);
+		JIGGLINGUP(pivotJiggleAngleOne, defaultIntakeSpeed),
+		JIGGLINGDOWN(pivotJiggleAngleTwo, defaultIntakeSpeed);
 
 		Angle pivotPosition;
 		AngularVelocity intakeSpeed;
@@ -167,12 +167,12 @@ public class Intake extends SubsystemBase {
 
 	public Command jiggleCommand() {
 		return new SequentialCommandGroup(
-				setStateCommandPersistent(IntakeStates.JIGGLINGUP),
-				new WaitCommand(0.5),
-				setStateCommandPersistent(IntakeStates.JIGGLINGDOWN),
-				new WaitCommand(1))
-		.repeatedly()
-		.finallyDo(() -> setState(IntakeStates.DEFAULT));
+						setStateCommandPersistent(IntakeStates.JIGGLINGUP),
+						new WaitCommand(0.5),
+						setStateCommandPersistent(IntakeStates.JIGGLINGDOWN),
+						new WaitCommand(1))
+				.repeatedly()
+				.finallyDo(() -> setState(IntakeStates.DEFAULT));
 	}
 
 	@Override

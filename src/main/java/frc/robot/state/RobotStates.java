@@ -13,6 +13,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.Indexer;
+import frc.robot.subsystems.EndEffector.Intake;
+import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
 import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Turret;
 import frc.robot.subsystems.EndEffector.Turret.TurretStates;
@@ -26,8 +29,8 @@ public class RobotStates {
 
 	public static final Swerve m_Swerve = RobotContainer.getSwerve();
 
-	// public static final Intake m_Intake = RobotContainer.getIntake();
-	// public static final Indexer m_Indexer = RobotContainer.getIndexer();
+	public static final Intake m_Intake = RobotContainer.getIntake();
+	public static final Indexer m_Indexer = RobotContainer.getIndexer();
 	public static final Shooter m_Shooter = RobotContainer.getShooter();
 	public static final Turret m_Turret = RobotContainer.getTurret();
 
@@ -61,13 +64,16 @@ public class RobotStates {
 	// 		new Trigger(() -> PeddieBounds.isInTrench(robotPose.get()));
 
 	/** Intake states */
-	// public static final Trigger isIntakeDown =
-	// 		new Trigger(() -> m_Intake.isAtPosition(IntakeStates.INTAKING));
+	public static final Trigger isIntakeDown =
+			new Trigger(() -> m_Intake.isAtPosition(IntakeStates.INTAKING));
 
 	// public static final Trigger isIntakeUp =
 	// 		new Trigger(() -> m_Intake.isAtPosition(IntakeStates.STOWED));
 
 	/** Indexer states */
+	public static final Trigger indexerAtSpeed = new Trigger(m_Indexer::isIndexerUpToSpeed);
+
+	public static final Trigger indexerRunning = new Trigger(m_Indexer::isIndexerRunning);
 
 	/** Shooter states */
 	public static final Trigger shooterAtSpeed = new Trigger(m_Shooter::atTargetVelocity);

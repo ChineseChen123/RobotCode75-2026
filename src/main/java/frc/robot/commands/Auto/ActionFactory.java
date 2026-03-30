@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.Hopper;
+import frc.robot.subsystems.EndEffector.Hopper.HopperStates;
 import frc.robot.subsystems.EndEffector.Indexer;
 import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
 import frc.robot.subsystems.EndEffector.Intake;
@@ -25,6 +27,7 @@ public class ActionFactory {
 	private Shooter m_Shooter;
 	private Intake m_Intake;
 	private Indexer m_Indexer;
+	private Hopper m_Hopper;
 	private Turret m_Turret;
 
 	public ActionFactory() {
@@ -32,6 +35,7 @@ public class ActionFactory {
 		m_Shooter = RobotContainer.getShooter();
 		m_Intake = RobotContainer.getIntake();
 		m_Indexer = RobotContainer.getIndexer();
+		m_Hopper = RobotContainer.getHopper();
 		m_Turret = RobotContainer.getTurret();
 	}
 
@@ -47,9 +51,13 @@ public class ActionFactory {
 						m_Shooter.setStateCommandPersistent(ShooterStates.DEFAULT),
 						m_Turret.setStateCommandPersistent(TurretStates.IDLE));
 			case 3:
-				return m_Indexer.setStateCommandPersistent(IndexerStates.SHOOTING);
+				return new ParallelCommandGroup(
+						m_Indexer.setStateCommandPersistent(IndexerStates.SHOOTING),
+						m_Hopper.setStateCommandPersistent(HopperStates.SHOOTING));
 			case 4:
-				return m_Indexer.setStateCommandPersistent(IndexerStates.DEFAULT);
+				return new ParallelCommandGroup(
+						m_Indexer.setStateCommandPersistent(IndexerStates.DEFAULT),
+						m_Hopper.setStateCommandPersistent(HopperStates.DEFAULT));
 
 			case 5:
 				return m_Intake.setStateCommandPersistent(IntakeStates.INTAKING);

@@ -126,8 +126,6 @@ public class PeddieBounds {
 		return cornerOutpost;
 	}
 
-
-
 	public static Pose2d getOptimalFeedPose(Pose2d currentPose) {
 		// TODO: this does NOT take into account the hub
 		// im just too lazy to do this rn but basically need to find where ball might clip corner of hub
@@ -206,7 +204,7 @@ public class PeddieBounds {
 	public static Pose3d getShootingTargetPose(Pose2d pose) {
 		if (isInOwnZone(pose)) return onBlueAlliance() ? FieldConstants.blueHub : FieldConstants.redHub;
 		if (DriverStation.isAutonomous()) return new Pose3d(getNearestCorner(pose));
-		 
+
 		Pose3d bump = new Pose3d(getNearestBump(pose));
 		bump =
 				new Pose3d(

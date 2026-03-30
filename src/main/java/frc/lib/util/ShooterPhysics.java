@@ -75,7 +75,8 @@ public class ShooterPhysics {
 
 		return RPM.of(
 				Math.min(
-						shooterRegressionA * Math.sqrt(distanceToTarget - shooterRegressionC) + shooterRegressionB,
+						shooterRegressionA * Math.sqrt(distanceToTarget - shooterRegressionC)
+								+ shooterRegressionB,
 						maxShootingAngularVelocity.in(RPM)));
 	}
 
@@ -90,7 +91,8 @@ public class ShooterPhysics {
 		// Handle max-speed clamp.
 		rpm = Math.min(rpm, maxShootingAngularVelocity.in(RPM));
 
-		return Meters.of(Math.pow((rpm - shooterRegressionB) / shooterRegressionA, 2) + shooterRegressionC);
+		return Meters.of(
+				Math.pow((rpm - shooterRegressionB) / shooterRegressionA, 2) + shooterRegressionC);
 	}
 
 	public static AngularVelocity calculateShooterSpeed(Pose2d robotPose, Pose2d targetPose) {
@@ -233,12 +235,14 @@ public class ShooterPhysics {
 
 		Rotation2d robotAngle = robotPose.getRotation();
 		double turretVelocityX =
-				fieldRelativeSpeeds.vxMetersPerSecond + vxAccelFR * phaseDelay
+				fieldRelativeSpeeds.vxMetersPerSecond
+						+ vxAccelFR * phaseDelay
 						- (fieldRelativeSpeeds.omegaRadiansPerSecond + omegaAccelFR * phaseDelay)
 								* (turretPositionOffset.getY() * robotAngle.getCos()
 										+ turretPositionOffset.getX() * robotAngle.getSin());
 		double turretVelocityY =
-				fieldRelativeSpeeds.vyMetersPerSecond + vyAccelFR * phaseDelay
+				fieldRelativeSpeeds.vyMetersPerSecond
+						+ vyAccelFR * phaseDelay
 						+ (fieldRelativeSpeeds.omegaRadiansPerSecond + omegaAccelFR * phaseDelay)
 								* (turretPositionOffset.getX() * robotAngle.getCos()
 										- turretPositionOffset.getY() * robotAngle.getSin());
