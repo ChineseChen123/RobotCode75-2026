@@ -65,7 +65,7 @@ public class RobotStates {
 
 	/** Intake states */
 	public static final Trigger isIntakeDown =
-			new Trigger(() -> m_Intake.isAtPosition(IntakeStates.INTAKING));
+			new Trigger(() -> m_Intake.getIntakeState() == IntakeStates.INTAKING);
 
 	// public static final Trigger isIntakeUp =
 	// 		new Trigger(() -> m_Intake.isAtPosition(IntakeStates.STOWED));
@@ -113,6 +113,7 @@ public class RobotStates {
 	public static Trigger actionIntakeDown = m_Operator.A.and(teleop);
 	public static Trigger actionStowIntake = m_Operator.Y.and(teleop);
 	public static Trigger actionJiggleIntake = m_Operator.B.and(teleop);
+	public static Trigger actionReverseIntake = m_Operator.leftBumper.and(teleop);
 
 	/* Indexer actions */
 

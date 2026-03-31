@@ -72,6 +72,11 @@ public class ActionFactory {
 						m_Shooter.setStateCommandPersistent(ShooterStates.DEFAULT));
 			case 8:
 				return m_Intake.jiggleCommand();
+			case 9:
+				return new ParallelCommandGroup(
+					new WaitCommand(1.5),
+					m_Intake.setStateCommandPersistent(IntakeStates.INTAKING)
+				);
 		}
 		return null;
 	}
@@ -95,6 +100,8 @@ public class ActionFactory {
 				return "Shoot Preload";
 			case 8:
 				return "Intake Agitate";
+			case 9:
+				return "Delayed Start Intaking";
 		}
 		return null;
 	}

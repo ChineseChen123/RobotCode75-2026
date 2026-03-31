@@ -5,6 +5,7 @@ import static frc.robot.Constants.IOConstants.turretDeadzoneColor;
 import static frc.robot.Constants.IOConstants.turretHoldAlignColor;
 import static frc.robot.Constants.IOConstants.turretToggleAlignColor;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -15,47 +16,47 @@ public class DriverDashboard {
 
 	public static void update() {
 
-		// if (!gameDataReceived && RobotStates.teleop.getAsBoolean()) {
-		// 	String gameData = DriverStation.getGameSpecificMessage();
-		// 	if (gameData.length() > 0) {
-		// 		gameDataReceived = true;
-		// 		inactiveFirst =
-		// 				(gameData.charAt(0) == 'R'
-		// 								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Red)
-		// 						|| (gameData.charAt(0) == 'B'
-		// 								&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
-		// 	}
-		// }
+		if (!gameDataReceived && RobotStates.teleop.getAsBoolean()) {
+			String gameData = DriverStation.getGameSpecificMessage();
+			if (gameData.length() > 0) {
+				gameDataReceived = true;
+				inactiveFirst =
+						(gameData.charAt(0) == 'R'
+										&& DriverStation.getAlliance().get() == DriverStation.Alliance.Red)
+								|| (gameData.charAt(0) == 'B'
+										&& DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
+			}
+		}
 
 		SmartDashboard.putNumber("Battery Voltage", RobotController.getBatteryVoltage());
 
-		// double matchTime = DriverStation.getMatchTime();
+		double matchTime = DriverStation.getMatchTime();
 
-		// if (matchTime > 130) {
-		// 	// Transition, hub always active
-		// 	SmartDashboard.putBoolean("Active Hub", true);
-		// 	SmartDashboard.putNumber("Phase Time Remaining", matchTime - 130);
-		// } else if (matchTime > 105) {
-		// 	// Shift 1
-		// 	SmartDashboard.putBoolean("Active Hub", !inactiveFirst);
-		// 	SmartDashboard.putNumber("Phase Time Remaining", matchTime - 105);
-		// } else if (matchTime > 80) {
-		// 	// Shift 2
-		// 	SmartDashboard.putBoolean("Active Hub", inactiveFirst);
-		// 	SmartDashboard.putNumber("Phase Time Remaining", matchTime - 80);
-		// } else if (matchTime > 55) {
-		// 	// Shift 3
-		// 	SmartDashboard.putBoolean("Active Hub", !inactiveFirst);
-		// 	SmartDashboard.putNumber("Phase Time Remaining", matchTime - 55);
-		// } else if (matchTime > 30) {
-		// 	// Shift 4
-		// 	SmartDashboard.putBoolean("Active Hub", inactiveFirst);
-		// 	SmartDashboard.putNumber("Phase Time Remaining", matchTime - 30);
-		// } else {
-		// 	// End game, hub always active.
-		// 	SmartDashboard.putBoolean("Active Hub", true);
-		// 	SmartDashboard.putNumber("Phase Time Remaining", matchTime);
-		// }
+		if (matchTime > 130) {
+			// Transition, hub always active
+			SmartDashboard.putBoolean("Active Hub", true);
+			SmartDashboard.putNumber("Phase Time Remaining", matchTime - 130);
+		} else if (matchTime > 105) {
+			// Shift 1
+			SmartDashboard.putBoolean("Active Hub", !inactiveFirst);
+			SmartDashboard.putNumber("Phase Time Remaining", matchTime - 105);
+		} else if (matchTime > 80) {
+			// Shift 2
+			SmartDashboard.putBoolean("Active Hub", inactiveFirst);
+			SmartDashboard.putNumber("Phase Time Remaining", matchTime - 80);
+		} else if (matchTime > 55) {
+			// Shift 3
+			SmartDashboard.putBoolean("Active Hub", !inactiveFirst);
+			SmartDashboard.putNumber("Phase Time Remaining", matchTime - 55);
+		} else if (matchTime > 30) {
+			// Shift 4
+			SmartDashboard.putBoolean("Active Hub", inactiveFirst);
+			SmartDashboard.putNumber("Phase Time Remaining", matchTime - 30);
+		} else {
+			// End game, hub always active.
+			SmartDashboard.putBoolean("Active Hub", true);
+			SmartDashboard.putNumber("Phase Time Remaining", matchTime);
+		}
 
 		if (!RobotStates.turretIsAligning.getAsBoolean()) {
 			SmartDashboard.putString("Turret Status", turretAlignInactiveColor.toHexString());

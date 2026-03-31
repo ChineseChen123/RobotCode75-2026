@@ -81,11 +81,11 @@ public class RobotContainer {
 		RaiderLog.register("Swerve", m_Swerve);
 		RaiderLog.register("Shooter", m_Shooter);
 		RaiderLog.register("Turret", m_Turret);
-		// RaiderLog.register("Limelight TR", m_LimelightTR);
-		// RaiderLog.register("Limelight TL", m_LimelightTL);
+		RaiderLog.register("Limelight TR", m_LimelightTR);
+		RaiderLog.register("Limelight TL", m_LimelightTL);
 		RaiderLog.register("Indexer", m_Indexer);
-		RaiderLog.register("Hopper", m_Hopper);
-		RaiderLog.register("Intake", m_Intake);
+		// RaiderLog.register("Hopper", m_Hopper);
+		// RaiderLog.register("Intake", m_Intake);
 		// RaiderLog.register("Climber", m_Climber);
 	}
 
@@ -113,7 +113,7 @@ public class RobotContainer {
 		m_Indexer.setState(IndexerStates.DEFAULT);
 		m_Hopper.setState(HopperStates.DEFAULT);
 		m_Shooter.setState(Shooter.ShooterStates.DEFAULT);
-		m_Turret.setState(Turret.TurretStates.SCORING);
+		m_Turret.setState(Turret.TurretStates.IDLE);
 	}
 
 	// Methods to return instances of static subsystems

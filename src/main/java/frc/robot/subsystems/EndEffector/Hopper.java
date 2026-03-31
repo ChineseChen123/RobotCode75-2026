@@ -138,7 +138,6 @@ public class Hopper extends SubsystemBase {
 		updateCache();
 		updateTunables();
 
-
 		runParallel =
 				runParallel
 						? !RobotStates.indexerRunning.getAsBoolean()
@@ -175,17 +174,23 @@ public class Hopper extends SubsystemBase {
 			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(defaultParallelSpeed));
 		}
 
-		if (m_HopperState.hopperSpeed.baseUnitMagnitude() == 0 && !RobotStates.isIntakeDown.getAsBoolean()) {
-			m_HopperMotor.setControl(new CoastOut());
+		if (m_HopperState.hopperSpeed.baseUnitMagnitude() == 0) {
+			if (RobotStates.isIntakeDown.getAsBoolean()) {
+				m_HopperMotor.setControl(m_HopperRequest.withVelocity(runningHopperSpeed));
+			} else {
+				m_HopperMotor.setControl(new CoastOut());
+			}
 		} else {
 			if (m_HopperState == HopperStates.SHOOTING && runParallel) {
-				m_HopperMotor.setControl(m_HopperRequest.withVelocity(parallelRunningForward ? m_HopperState.hopperSpeed : m_HopperState.hopperSpeed.unaryMinus()));
+				m_HopperMotor.setControl(
+						m_HopperRequest.withVelocity(
+								parallelRunningForward
+										? m_HopperState.hopperSpeed
+										: m_HopperState.hopperSpeed.unaryMinus()));
 			} else {
 				m_HopperMotor.setControl(m_HopperRequest.withVelocity(m_HopperState.hopperSpeed));
 			}
 		}
-
-
 	}
 
 	public void initTunables() {

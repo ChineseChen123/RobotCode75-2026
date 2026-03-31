@@ -67,6 +67,7 @@ public class Bindings {
 		RobotStates.actionIntakeDown.whileTrue(m_Intake.setStateCommand(IntakeStates.INTAKING));
 		RobotStates.actionStowIntake.whileTrue(m_Intake.setStateCommand(IntakeStates.STOWED));
 		RobotStates.actionJiggleIntake.whileTrue(m_Intake.jiggleCommand());
+		RobotStates.actionReverseIntake.whileTrue(m_Intake.setStateCommand(IntakeStates.REVERSING));
 
 		// aim turret (hold)
 		RobotStates.actionAimTurretHold.whileTrue(m_Turret.setStateCommand(TurretStates.SCORING));
