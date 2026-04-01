@@ -74,9 +74,7 @@ public class ActionFactory {
 				return m_Intake.jiggleCommand();
 			case 9:
 				return new ParallelCommandGroup(
-					new WaitCommand(1.5),
-					m_Intake.setStateCommandPersistent(IntakeStates.INTAKING)
-				);
+						new WaitCommand(1.5), m_Intake.setStateCommandPersistent(IntakeStates.INTAKING));
 		}
 		return null;
 	}
