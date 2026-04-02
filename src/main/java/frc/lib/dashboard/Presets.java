@@ -15,4 +15,6 @@ public class Presets {
 
 	public static final String depotSideDoubleSwipe = "sd nzddsa9 6 tdds1 3 10 4 2 nzddsb9 6 tdds1 3 8";
 	public static final String outpostSideDoubleSwipe = "so nzo9 to1 3 o8 6 10 4 2 nzo9 to1 3 o8 8";
+
+	public static final String outpostSideClimb = "so b1 3 b o8 8 two11 12";
 }

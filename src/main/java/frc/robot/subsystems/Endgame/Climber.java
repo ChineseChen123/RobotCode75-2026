@@ -139,6 +139,7 @@ public class Climber extends SubsystemBase {
 	 */
 	public void setPosition(ClimberPositions position) {
 		m_SetpointPosition = position;
+		m_ClimberState = ClimberState.SETPOINT;
 	}
 
 	/** return position in rotations from home (bottom) */

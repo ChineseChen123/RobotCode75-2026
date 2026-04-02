@@ -16,6 +16,8 @@ import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Shooter.ShooterStates;
 import frc.robot.subsystems.EndEffector.Turret;
 import frc.robot.subsystems.EndEffector.Turret.TurretStates;
+import frc.robot.subsystems.Endgame.Climber;
+import frc.robot.subsystems.Endgame.Climber.ClimberPositions;
 
 /*
  * Each command used in auto selector needs to be a separate object
@@ -29,6 +31,7 @@ public class ActionFactory {
 	private Indexer m_Indexer;
 	private Hopper m_Hopper;
 	private Turret m_Turret;
+	private Climber m_Climber;
 
 	public ActionFactory() {
 		m_Swerve = RobotContainer.getSwerve();
@@ -37,6 +40,7 @@ public class ActionFactory {
 		m_Indexer = RobotContainer.getIndexer();
 		m_Hopper = RobotContainer.getHopper();
 		m_Turret = RobotContainer.getTurret();
+		m_Climber = RobotContainer.getClimber();
 	}
 
 	/** returns command associated with action number */
@@ -77,6 +81,12 @@ public class ActionFactory {
 						new WaitCommand(1.5), m_Intake.setStateCommandPersistent(IntakeStates.INTAKING));
 			case 10:
 				return new WaitCommand(4);
+			case 11:
+                return m_Climber.positionCommandUntilDone(Climber.ClimberPositions.UP);
+            case 12:
+                return m_Climber.positionCommandUntilDone(Climber.ClimberPositions.CLIMBED);
+            case 13:
+                return m_Climber.positionCommandUntilDone(Climber.ClimberPositions.STOW);
 		}
 		return null;
 	}
@@ -104,6 +114,12 @@ public class ActionFactory {
 				return "Delayed Start Intaking";
 			case 10:
 				return "Wait 5s";
+			case 11:
+                return "Climber Up";
+            case 12:
+                return "Climb";
+            case 13:
+                return "Stow Climber";
 		}
 		return null;
 	}

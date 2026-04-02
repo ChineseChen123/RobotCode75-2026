@@ -27,6 +27,7 @@ import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
 import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Turret;
 import frc.robot.subsystems.Vision.Limelight;
+import frc.robot.subsystems.Endgame.Climber;
 
 public class RobotContainer {
 
@@ -51,7 +52,7 @@ public class RobotContainer {
 
 	public static final Turret m_Turret = new Turret();
 
-	// public static final Climber m_Climber = new Climber();
+	public static final Climber m_Climber = new Climber();
 
 	// Cameras
 	public static final Limelight m_LimelightTL = new Limelight(topLeftLLName, topLeftLLPose);
@@ -143,9 +144,9 @@ public class RobotContainer {
 		return m_Turret;
 	}
 
-	// public static Climber getClimber() {
-	// 	return m_Climber;
-	// }
+	public static Climber getClimber() {
+		return m_Climber;
+	}
 
 	public static Limelight[] getLimelights() {
 		return new Limelight[] {m_LimelightTL, m_LimelightTR};
