@@ -5,7 +5,6 @@ import static frc.robot.Constants.IOConstants.oneDriver;
 import static frc.robot.Constants.VisionConstants.useFomWeighting;
 import static frc.robot.Constants.VisionConstants.visionOdometryStdevs;
 
-import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -17,7 +16,10 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,6 +34,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -69,6 +73,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
 	private Pose2d currentPose = new Pose2d();
 	private ChassisSpeeds currentFieldRelativeSpeeds = new ChassisSpeeds();
+	private double currentSpeedMagnitude = 0;
 	private Rotation2d currentHeading = new Rotation2d();
 
 	private final SwerveRequest.ApplyFieldSpeeds fieldRequest =
@@ -257,6 +262,10 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		return currentFieldRelativeSpeeds;
 	}
 
+	public double getSpeedMagnitude() {
+		return currentSpeedMagnitude;
+	}
+
 	/** Reset odometry pose. */
 	public void setPose(Pose2d pose) {
 		this.resetPose(pose);
@@ -419,6 +428,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		currentPose = this.getState().Pose;
 		currentFieldRelativeSpeeds =
 				ChassisSpeeds.fromRobotRelativeSpeeds(this.getState().Speeds, getHeading());
+		currentSpeedMagnitude = Math.hypot(currentFieldRelativeSpeeds.vxMetersPerSecond, currentFieldRelativeSpeeds.vyMetersPerSecond);
 		currentHeading = Rotation2d.fromDegrees(m_Pigeon2.getYaw(true).getValue().in(Degrees));
 	}
 
@@ -453,8 +463,8 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 				if (estimate == null) continue;
 
 				if (!useFomWeighting) {
-					// TODO - variable vision x y stdevs based on FOM
-					setVisionMeasurementStdDevs(visionOdometryStdevs.plus(limelights[i].minAmbiguity() * 10));
+					double stdev = limelights[i].getStdev(estimate);
+					setVisionMeasurementStdDevs(VecBuilder.fill(stdev, stdev, 100));
 					addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
 					continue;
 				}

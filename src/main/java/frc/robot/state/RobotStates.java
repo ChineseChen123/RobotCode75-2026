@@ -50,6 +50,7 @@ public class RobotStates {
 	public static final Supplier<Rotation2d> robotHeading = m_Swerve::getHeading;
 	public static final Supplier<ChassisSpeeds> fieldRelativeSpeeds =
 			m_Swerve::getFieldRelativeChassisSpeeds;
+	public static final Supplier<Double> robotSpeedMagnitude = m_Swerve::getSpeedMagnitude;
 
 	public static Alliance robotAlliance = DriverStation.Alliance.Blue;
 	public static boolean isAllianceConfirmed = false;

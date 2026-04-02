@@ -190,12 +190,11 @@ public class Intake extends SubsystemBase {
 		if (m_IntakeState.intakeSpeed.abs(RotationsPerSecond) > 0) {
 			AngularVelocity speed = m_IntakeState.intakeSpeed;
 			if (m_IntakeState == IntakeStates.INTAKING) {
-				ChassisSpeeds chassisSpeeds = RobotStates.fieldRelativeSpeeds.get();
 				speed =
 						speed.plus(
 								RotationsPerSecond.of(15)
 										.times(
-												Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond)
+												RobotStates.robotSpeedMagnitude.get()
 														/ DrivetrainConstants.maxVelocity.in(MetersPerSecond)));
 			}
 			m_IntakeMotor.setControl(m_IntakeRequest.withVelocity(speed));

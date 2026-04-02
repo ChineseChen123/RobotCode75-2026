@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.robot.Constants.VisionConstants.*;
 
+import java.util.Arrays;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -111,10 +113,7 @@ public class Limelight extends SubsystemBase {
 
 		double fom = 0;
 
-		double linearSpeed =
-				Math.hypot(
-						RobotStates.fieldRelativeSpeeds.get().vxMetersPerSecond,
-						RobotStates.fieldRelativeSpeeds.get().vyMetersPerSecond);
+		double linearSpeed = RobotStates.robotSpeedMagnitude.get();
 		fom += 0.5 * linearSpeed / DrivetrainConstants.maxVelocity.in(MetersPerSecond);
 
 		double angularSpeed = RobotStates.fieldRelativeSpeeds.get().omegaRadiansPerSecond;
@@ -125,6 +124,12 @@ public class Limelight extends SubsystemBase {
 		fom += 4 * minAmbiguity;
 
 		return fom / pose.tagCount;
+	}
+
+	public double getStdev(LimelightHelpers.PoseEstimate estimate) {
+		return estimate != null && estimate.rawFiducials.length > 0 ? 
+            2 + Math.pow(Arrays.stream(estimate.rawFiducials).mapToDouble(fiducial -> fiducial.distToCamera).min().getAsDouble(),2) / estimate.tagCount : 
+            Double.MAX_VALUE;
 	}
 
 	public void setCooling(boolean cooling) {
