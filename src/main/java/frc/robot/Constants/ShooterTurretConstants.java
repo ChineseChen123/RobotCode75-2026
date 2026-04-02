@@ -14,6 +14,7 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+import static frc.robot.Constants.ShooterTurretConstants.ShooterConstants.minShootingDistance;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -29,6 +30,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
+import frc.lib.util.LinearInterpolationMap;
 
 /** Add your docs here. */
 public class ShooterTurretConstants {
@@ -71,13 +73,20 @@ public class ShooterTurretConstants {
 		public static final Angle shooterAngleWithVertical = Degrees.of(25);
 		public static final Distance shooterHeight = Inches.of(19.5);
 
-		public static final double shooterRegressionA = 982.17242 + 8;
-		public static final double shooterRegressionB = 744.10019 - 10;
-		public static final double shooterRegressionC = -0.126182;
-
-		public static final Distance minShootingDistance = Meters.of(2.13);
-		public static final AngularVelocity minShootingAngularVelocity = RPM.of(2220);
+		public static final Distance minShootingDistance = Meters.of(2.058);
+		public static final AngularVelocity minShootingAngularVelocity = RPM.of(2026);
 		public static final AngularVelocity maxShootingAngularVelocity = RPM.of(3800);
+		public static final LinearInterpolationMap distanceToRPMMap =
+			new LinearInterpolationMap()
+					.add(minShootingDistance.in(Meters), minShootingAngularVelocity.in(RPM))
+					.add(2.418, 2150)
+					.add(2.88, 2280)
+					.add(3.07, 2350)
+					.add(3.365, 2425)
+					.add(3.855, 2550)
+					.add(4.24, 2650)
+					.add(4.68, 2815)
+					.add(5.26, 3000);
 
 		public static final class MotorConfigs {
 

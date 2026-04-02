@@ -65,18 +65,6 @@ public class ShooterPhysics {
 	private static final double dragCorrectionFactor = 1.5;
 	private static final double dragCoeff = .45; // .37?
 
-	private static final LinearInterpolationMap distanceToRPMMap =
-			new LinearInterpolationMap()
-					.add(2.058, 2026)
-					.add(2.418, 2150)
-					.add(2.88, 2280)
-					.add(3.07, 2350)
-					.add(3.365, 2425)
-					.add(3.855, 2550)
-					.add(4.24, 2650)
-					.add(4.68, 2815)
-					.add(5.26, 3000);
-
 	// ── Shooter speed / distance conversions ─────────────────────────────────────
 
 	public static AngularVelocity distanceToWheelAngularVelocity(double distanceToTarget) {
@@ -175,8 +163,8 @@ public class ShooterPhysics {
 		double secondsToScore =
 				(yComponentInchesPerSecond
 								+ Math.sqrt(
-										yComponentInchesPerSecond * yComponentInchesPerSecond
-												+ 2 * g * heightDiffInches))
+										Math.max(yComponentInchesPerSecond * yComponentInchesPerSecond
+												- 2 * g * heightDiffInches, 0)))
 						/ g;
 
 		return Seconds.of(secondsToScore);
