@@ -127,6 +127,10 @@ public class Limelight extends SubsystemBase {
 		return fom / pose.tagCount;
 	}
 
+	public void setCooling(boolean cooling) {
+		LimelightHelpers.SetThrottle(llName, cooling ? 200 : 0);
+	}
+
 	@Override
 	public void periodic() {
 		updateIMU();

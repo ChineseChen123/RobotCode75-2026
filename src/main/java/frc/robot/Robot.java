@@ -14,6 +14,8 @@ import frc.lib.util.RaiderLog.RaiderLog.LogMode;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.state.DriverDashboard;
 import frc.robot.state.RobotStates;
+import frc.robot.subsystems.Vision.Limelight;
+
 import org.littletonrobotics.junction.LoggedRobot;
 
 /**
@@ -62,6 +64,11 @@ public class Robot extends LoggedRobot {
 
 	@Override
 	public void autonomousInit() {
+
+		for (Limelight limelight : RobotContainer.getLimelights()) {
+			limelight.setCooling(false);
+		}
+
 		m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
 		if (m_autonomousCommand != null) {
@@ -74,6 +81,11 @@ public class Robot extends LoggedRobot {
 
 	@Override
 	public void teleopInit() {
+
+		for (Limelight limelight : RobotContainer.getLimelights()) {
+			limelight.setCooling(false);
+		}
+
 		if (m_autonomousCommand != null) {
 			CommandScheduler.getInstance().cancel(m_autonomousCommand);
 		}
@@ -82,13 +94,17 @@ public class Robot extends LoggedRobot {
 	}
 
 	@Override
-	public void disabledInit() {}
+	public void teleopPeriodic() {}
+
+	@Override
+	public void disabledInit() {
+		for (Limelight limelight : RobotContainer.getLimelights()) {
+			limelight.setCooling(true);
+		}
+	}
 
 	@Override
 	public void disabledPeriodic() {}
-
-	@Override
-	public void teleopPeriodic() {}
 
 	@Override
 	public void testInit() {
