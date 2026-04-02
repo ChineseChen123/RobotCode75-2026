@@ -127,8 +127,10 @@ public class Limelight extends SubsystemBase {
 	}
 
 	public double getStdev(LimelightHelpers.PoseEstimate estimate) {
+		double linearSpeed = RobotStates.robotSpeedMagnitude.get();
 		return estimate != null && estimate.rawFiducials.length > 0 ? 
-            2 + Math.pow(Arrays.stream(estimate.rawFiducials).mapToDouble(fiducial -> fiducial.distToCamera).min().getAsDouble(),2) / estimate.tagCount : 
+            2 + Math.pow(Arrays.stream(estimate.rawFiducials).mapToDouble(fiducial -> fiducial.distToCamera).min().getAsDouble(),2) / estimate.tagCount
+				+ (linearSpeed > 2 ? Math.pow(linearSpeed, 2) : 2 * linearSpeed) : 
             Double.MAX_VALUE;
 	}
 
