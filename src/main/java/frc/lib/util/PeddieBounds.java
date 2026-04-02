@@ -208,7 +208,7 @@ public class PeddieBounds {
 		Pose3d bump = new Pose3d(getNearestBump(pose));
 		bump =
 				new Pose3d(
-						bump.getMeasureX(), bump.getMeasureY(), blueHub.getMeasureZ(), bump.getRotation());
+						bump.getMeasureX(), bump.getMeasureY(), Meters.of(0), bump.getRotation());
 		return bump;
 	}
 

@@ -187,9 +187,9 @@ public class ShooterPhysics {
 		Pose3d virtualTargetPose = PeddieBounds.getShootingTargetPose(robotPose);
 		Pose3d originalTarget = virtualTargetPose;
 
-		if (!PeddieBounds.isInOwnZone(robotPose)) {
-			return originalTarget.toPose2d(); // TODO: unfade sotm
-		}
+		// if (!PeddieBounds.isInOwnZone(robotPose)) {
+		// 	return originalTarget.toPose2d(); // TODO: unfade sotm
+		// }
 
 		// Compensate for system delay by projecting robot motion forward.
 		ChassisSpeeds robotRelativeSpeeds =
