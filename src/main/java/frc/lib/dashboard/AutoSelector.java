@@ -100,6 +100,8 @@ public class AutoSelector {
 		presetChooser.addOption("Depot Side NZ + Feed", Presets.depotSideNZFeed);
 		presetChooser.addOption("Outpost Side NZ + Feed", Presets.outpostSideNZFeed);
 		presetChooser.addOption("Depot Side Shoot Preload + NZ", Presets.depotSideShoot8NZ);
+		presetChooser.addOption("Depot Side Double Swipe", Presets.depotSideDoubleSwipe);
+		presetChooser.addOption("Outpost Side Double Swipe", Presets.outpostSideDoubleSwipe);
 
 		// define auto factory for autos
 		choreoFactory =

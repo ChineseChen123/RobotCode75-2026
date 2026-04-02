@@ -44,8 +44,8 @@ public class Intake extends SubsystemBase {
 		DEFAULT(pivotHalfwayAngle, defaultIntakeSpeed),
 		INTAKING(pivotDownAngle, intakeRunningSpeed),
 		REVERSING(pivotDownAngle, intakeReversingSpeed),
-		JIGGLINGUP(pivotJiggleAngleOne, defaultIntakeSpeed),
-		JIGGLINGDOWN(pivotJiggleAngleTwo, defaultIntakeSpeed);
+		JIGGLINGUP(pivotJiggleAngleOne, intakeRunningSpeed),
+		JIGGLINGDOWN(pivotJiggleAngleTwo, intakeRunningSpeed);
 
 		Angle pivotPosition;
 		AngularVelocity intakeSpeed;
@@ -196,6 +196,9 @@ public class Intake extends SubsystemBase {
 										.times(
 												RobotStates.robotSpeedMagnitude.get()
 														/ DrivetrainConstants.maxVelocity.in(MetersPerSecond)));
+			}
+			if (RobotStates.auto.getAsBoolean()) {
+				speed = RotationsPerSecond.of(80);
 			}
 			m_IntakeMotor.setControl(m_IntakeRequest.withVelocity(speed));
 		} else {

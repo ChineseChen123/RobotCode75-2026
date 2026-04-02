@@ -75,6 +75,8 @@ public class ActionFactory {
 			case 9:
 				return new ParallelCommandGroup(
 						new WaitCommand(1.5), m_Intake.setStateCommandPersistent(IntakeStates.INTAKING));
+			case 10:
+				return new WaitCommand(4);
 		}
 		return null;
 	}
@@ -100,6 +102,8 @@ public class ActionFactory {
 				return "Intake Agitate";
 			case 9:
 				return "Delayed Start Intaking";
+			case 10:
+				return "Wait 5s";
 		}
 		return null;
 	}

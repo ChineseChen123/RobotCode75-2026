@@ -155,7 +155,7 @@ public class Shooter extends SubsystemBase {
 	/** Updates shooter target velocity from shooter physics. */
 	public void updateShooterTarget() {
 
-		if (RobotConstants.TuningModes.tuneShooter) {
+		if (RobotConstants.TuningModes.tuneShooter && shooterRPM.getNumber() != -1) {
 			shooterTargetVelocity = RPM.of(shooterRPM.getNumber());
 			return;
 		}

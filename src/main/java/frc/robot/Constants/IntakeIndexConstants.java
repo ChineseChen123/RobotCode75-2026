@@ -223,6 +223,8 @@ public class IntakeIndexConstants {
 		public static final AngularVelocity runningParallelSpeed = RotationsPerSecond.of(30);
 		public static final AngularVelocity reverseParallelSpeed = RotationsPerSecond.of(-20);
 
+		public static final Current parallelJamCurrent = Amps.of(12);
+
 		public static final double indexerSpeedThresholdRPS = 10;
 
 		public static final Time timeOfForwardParallel = Seconds.of(2);

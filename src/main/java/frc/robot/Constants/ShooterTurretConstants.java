@@ -84,7 +84,8 @@ public class ShooterTurretConstants {
 					.add(3.07, 2350)
 					.add(3.365, 2425)
 					.add(3.855, 2550)
-					.add(4.24, 2650)
+					.add(4.00, 2640)
+					.add(4.24, 2680)
 					.add(4.68, 2815)
 					.add(5.26, 3000);
 

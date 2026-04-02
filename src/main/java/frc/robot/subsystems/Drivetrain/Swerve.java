@@ -43,6 +43,7 @@ import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
+import frc.robot.state.RobotStates;
 import frc.robot.subsystems.Drivetrain.controllers.AutoAlign;
 import frc.robot.subsystems.Drivetrain.controllers.ChezyController;
 import frc.robot.subsystems.Drivetrain.controllers.RotationController;
@@ -203,6 +204,11 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	public void setRobotRelative(ChassisSpeeds speeds) {
+		if (!fieldRelative) {
+			speeds = new ChassisSpeeds(
+				-speeds.vxMetersPerSecond, -speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond
+			);
+		}
 		setpointSpeeds = speeds;
 		setControl(robotRequest.withSpeeds(speeds));
 	}
@@ -213,6 +219,12 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	/** Convenience for toggling frame. */
+
+	public void resetToggles() {
+		fieldRelative = true;
+		speedClamp = false;
+	}
+
 	public void toggleFieldRelative() {
 		fieldRelative = !fieldRelative;
 	}
@@ -447,7 +459,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
 		updateCache();
 
-		if (!Utils.isSimulation()) {
+		if (!Utils.isSimulation() && !RobotStates.auto.getAsBoolean()) {
 			Limelight[] limelights = RobotContainer.getLimelights();
 			if (estimatedPosesFromCameras == null
 					|| limelights.length != estimatedPosesFromCameras.length) {

@@ -7,6 +7,7 @@ package frc.robot.subsystems.EndEffector;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Amps;
 import static frc.robot.Constants.IntakeIndexConstants.IndexerConstants.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
@@ -14,6 +15,8 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Timer;
@@ -66,6 +69,7 @@ public class Hopper extends SubsystemBase {
 	private boolean runParallel = false;
 	private boolean parallelRunningForward = false;
 	private double timeAtChangeSeconds = 0;
+	private Debouncer parallelJamDebouncer = new Debouncer(timeOfBackwardParallel.in(Seconds), Debouncer.DebounceType.kFalling);
 
 	private AngularVelocity currentHopperVelocity = RotationsPerSecond.of(0);
 	private AngularVelocity currentParallelVelocity = RotationsPerSecond.of(0);
@@ -107,6 +111,11 @@ public class Hopper extends SubsystemBase {
 	@Logged(key = "Parallel Roller Velocity", importance = Importance.DEBUG)
 	public double getParallelVelocityRPS() {
 		return currentParallelVelocity.in(RotationsPerSecond);
+	}
+
+	@Logged(key = "Parallel Roller Current", importance = Importance.DEBUG)
+	public double getParallelCurrent() {
+		return m_ParallelMotor.getStatorCurrent(true).getValueAsDouble();
 	}
 
 	@Logged(key = "Hopper State", importance = Importance.DEBUG)
@@ -155,17 +164,19 @@ public class Hopper extends SubsystemBase {
 								> ShooterConstants.minShootingDistance.in(Meters);
 
 		if (m_HopperState == HopperStates.SHOOTING && runParallel) {
-			if (parallelRunningForward) {
-				if (Timer.getFPGATimestamp() - timeAtChangeSeconds > timeOfForwardParallel.in(Seconds)) {
-					parallelRunningForward = false;
-					timeAtChangeSeconds = Timer.getFPGATimestamp();
-				}
-			} else {
-				if (Timer.getFPGATimestamp() - timeAtChangeSeconds > timeOfBackwardParallel.in(Seconds)) {
-					parallelRunningForward = true;
-					timeAtChangeSeconds = Timer.getFPGATimestamp();
-				}
-			}
+			// if (parallelRunningForward) {
+			// 	if (Timer.getFPGATimestamp() - timeAtChangeSeconds > timeOfForwardParallel.in(Seconds)) {
+			// 		parallelRunningForward = false;
+			// 		timeAtChangeSeconds = Timer.getFPGATimestamp();
+			// 	}
+			// } else {
+			// 	if (Timer.getFPGATimestamp() - timeAtChangeSeconds > timeOfBackwardParallel.in(Seconds)) {
+			// 		parallelRunningForward = true;
+			// 		timeAtChangeSeconds = Timer.getFPGATimestamp();
+			// 	}
+			// }
+
+			parallelRunningForward = parallelJamDebouncer.calculate(getParallelCurrent() < parallelJamCurrent.in(Amps));
 
 			m_ParallelMotor.setControl(
 					m_ParallelRollerRequest.withVelocity(
