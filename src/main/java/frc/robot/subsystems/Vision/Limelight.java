@@ -9,8 +9,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.robot.Constants.VisionConstants.*;
 
-import java.util.Arrays;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,6 +17,7 @@ import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.LimelightHelpers;
 import frc.robot.state.RobotStates;
+import java.util.Arrays;
 
 public class Limelight extends SubsystemBase {
 
@@ -129,11 +128,18 @@ public class Limelight extends SubsystemBase {
 	public double getStdev(LimelightHelpers.PoseEstimate estimate) {
 		double linearSpeed = RobotStates.robotSpeedMagnitude.get();
 		double rotationalSpeed = RobotStates.fieldRelativeSpeeds.get().omegaRadiansPerSecond;
-		return estimate != null && estimate.rawFiducials.length > 0 ? 
-            1 + Math.pow(Arrays.stream(estimate.rawFiducials).mapToDouble(fiducial -> fiducial.distToCamera).min().getAsDouble(),2) / estimate.tagCount
-				+ (linearSpeed > 2 ? Math.pow(linearSpeed, 2) : 2 * linearSpeed)
-				+ 10 * rotationalSpeed : 
-            Double.MAX_VALUE;
+		return estimate != null && estimate.rawFiducials.length > 0
+				? 1
+						+ Math.pow(
+										Arrays.stream(estimate.rawFiducials)
+												.mapToDouble(fiducial -> fiducial.distToCamera)
+												.min()
+												.getAsDouble(),
+										2)
+								/ estimate.tagCount
+						+ (linearSpeed > 2 ? Math.pow(linearSpeed, 2) : 2 * linearSpeed)
+						+ 10 * rotationalSpeed
+				: Double.MAX_VALUE;
 	}
 
 	public void setCooling(boolean cooling) {

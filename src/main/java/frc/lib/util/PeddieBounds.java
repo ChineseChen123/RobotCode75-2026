@@ -206,9 +206,7 @@ public class PeddieBounds {
 		if (DriverStation.isAutonomous()) return new Pose3d(getNearestCorner(pose));
 
 		Pose3d bump = new Pose3d(getNearestBump(pose));
-		bump =
-				new Pose3d(
-						bump.getMeasureX(), bump.getMeasureY(), Meters.of(0), bump.getRotation());
+		bump = new Pose3d(bump.getMeasureX(), bump.getMeasureY(), Meters.of(0), bump.getRotation());
 		return bump;
 	}
 

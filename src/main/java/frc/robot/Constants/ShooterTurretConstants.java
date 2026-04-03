@@ -77,17 +77,19 @@ public class ShooterTurretConstants {
 		public static final AngularVelocity minShootingAngularVelocity = RPM.of(2026);
 		public static final AngularVelocity maxShootingAngularVelocity = RPM.of(3800);
 		public static final LinearInterpolationMap distanceToRPMMap =
-			new LinearInterpolationMap()
-					.add(minShootingDistance.in(Meters), minShootingAngularVelocity.in(RPM))
-					.add(2.418, 2150)
-					.add(2.88, 2280)
-					.add(3.07, 2350)
-					.add(3.365, 2425)
-					.add(3.855, 2550)
-					.add(4.00, 2640)
-					.add(4.24, 2680)
-					.add(4.68, 2815)
-					.add(5.26, 3000);
+				new LinearInterpolationMap()
+						.add(minShootingDistance.in(Meters), minShootingAngularVelocity.in(RPM))
+						.add(2.418, 2150)
+						.add(2.88, 2280)
+						.add(3.07, 2350)
+						.add(3.365, 2425)
+						.add(3.855, 2550)
+						.add(4.00, 2640)
+						.add(4.24, 2680)
+						.add(4.68, 2815)
+						.add(5.26, 3000);
+
+		public static final double velocityAdjustmentDeltaRPM = 10;
 
 		public static final class MotorConfigs {
 

@@ -40,23 +40,18 @@ public class Bindings {
 
 		RobotStates.actionShoot.whileTrue(m_Shooter.setStateCommand(ShooterStates.SHOOTING));
 
-		RobotStates.teleop.onTrue(
-				new ParallelCommandGroup(
-						m_Indexer.setStateCommandPersistent(IndexerStates.DEFAULT),
-						m_Hopper.setStateCommandPersistent(HopperStates.DEFAULT),
-						m_Shooter.setStateCommandPersistent(ShooterStates.DEFAULT),
-						m_Turret.setStateCommandPersistent(TurretStates.IDLE)));
-
-		RobotStates.actionResetSubsystems.onTrue(
-				new InstantCommand(() -> RobotContainer.resetSubsystems()));
+		RobotStates.actionDecrementShooter.onTrue(
+				new InstantCommand(() -> m_Shooter.decrementAdjustment()));
+		RobotStates.actionIncrementShooter.onTrue(
+				new InstantCommand(() -> m_Shooter.incrementAdjustment()));
 
 		// shoot
 		RobotStates.actionIndexerShoot
 				.and(RobotStates.turretIsInDeadzone.negate())
 				.whileTrue(
-				new ParallelCommandGroup(
-						m_Indexer.setStateCommand(IndexerStates.SHOOTING),
-						m_Hopper.setStateCommand(HopperStates.SHOOTING)));
+						new ParallelCommandGroup(
+								m_Indexer.setStateCommand(IndexerStates.SHOOTING),
+								m_Hopper.setStateCommand(HopperStates.SHOOTING)));
 
 		RobotStates.actionIndexerReverse.whileTrue(
 				new ParallelCommandGroup(

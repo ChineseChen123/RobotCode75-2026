@@ -66,6 +66,8 @@ public class Shooter extends SubsystemBase {
 	private AngularVelocity shooterTargetVelocity = RPM.of(0);
 	private AngularVelocity currentShooterVelocity = RPM.of(0);
 
+	private double velocityAdjustmentRPM = 0;
+
 	private final Debouncer atSetpointDebouncer = new Debouncer(0.025, DebounceType.kFalling);
 	private boolean lastAtSetpoint = false;
 
@@ -146,6 +148,18 @@ public class Shooter extends SubsystemBase {
 		return shotsFired;
 	}
 
+	public AngularVelocity getVelocityAdjustment() {
+		return RPM.of(velocityAdjustmentRPM);
+	}
+
+	public void incrementAdjustment() {
+		velocityAdjustmentRPM += velocityAdjustmentDeltaRPM;
+	}
+
+	public void decrementAdjustment() {
+		velocityAdjustmentRPM -= velocityAdjustmentDeltaRPM;
+	}
+
 	// ── Target calculation / caching ─────────────────────────────────────────────
 
 	public void updateCache() {
@@ -178,7 +192,8 @@ public class Shooter extends SubsystemBase {
 		}
 
 		shooterTargetVelocity =
-				ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetPose);
+				ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetPose)
+						.plus(getVelocityAdjustment());
 	}
 
 	// ── Control helpers ──────────────────────────────────────────────────────────

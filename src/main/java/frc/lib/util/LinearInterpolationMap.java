@@ -68,8 +68,8 @@ public class LinearInterpolationMap {
 	/**
 	 * Returns the inverse-interpolated/extrapolated x-value for a given y.
 	 *
-	 * <p>If the map is not monotonic in y, this uses the first segment that contains y. If none contain y,
-	 * it uses the closest segment by y-distance.
+	 * <p>If the map is not monotonic in y, this uses the first segment that contains y. If none
+	 * contain y, it uses the closest segment by y-distance.
 	 */
 	public double getInverse(double y) {
 		if (points.isEmpty()) {

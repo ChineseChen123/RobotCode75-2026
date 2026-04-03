@@ -1,6 +1,7 @@
 package frc.robot.state;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.IOConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -91,6 +92,8 @@ public class RobotStates {
 
 	public static final DoubleSupplier turretAngle =
 			() -> m_Turret.getPositionFromMotor().in(Degrees);
+	public static final DoubleSupplier shooterVelocityAdjustment =
+			() -> m_Shooter.getVelocityAdjustment().in(RPM);
 
 	// ── Actions ──────────────────────────────────────────────────────────────────
 
@@ -106,8 +109,6 @@ public class RobotStates {
 	public static Trigger trenchAlignDrive = m_Driver.getLeftButton(trenchDriveButton).and(teleop);
 	public static Trigger positionalRotationDrive =
 			m_Driver.getRightButton(trenchDriveButton).and(teleop);
-
-	public static Trigger actionResetSubsystems = m_Operator.start;
 
 	/* Intake actions */
 
@@ -125,6 +126,9 @@ public class RobotStates {
 	/* Shooter actions */
 
 	public static Trigger actionShoot = m_Operator.leftTriggerGreater(operatorDeadband).and(teleop);
+
+	public static Trigger actionDecrementShooter = m_Operator.back.and(teleop);
+	public static Trigger actionIncrementShooter = m_Operator.start.and(teleop);
 
 	/* Turret actions */
 

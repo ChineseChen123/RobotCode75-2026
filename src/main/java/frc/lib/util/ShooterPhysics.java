@@ -163,8 +163,10 @@ public class ShooterPhysics {
 		double secondsToScore =
 				(yComponentInchesPerSecond
 								+ Math.sqrt(
-										Math.max(yComponentInchesPerSecond * yComponentInchesPerSecond
-												- 2 * g * heightDiffInches, 0)))
+										Math.max(
+												yComponentInchesPerSecond * yComponentInchesPerSecond
+														- 2 * g * heightDiffInches,
+												0)))
 						/ g;
 
 		return Seconds.of(secondsToScore);

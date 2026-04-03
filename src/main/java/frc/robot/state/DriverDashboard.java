@@ -36,26 +36,32 @@ public class DriverDashboard {
 			// Transition, hub always active
 			SmartDashboard.putBoolean("Active Hub", true);
 			SmartDashboard.putNumber("Phase Time Remaining", matchTime - 130);
+			SmartDashboard.putNumber("Match Phase", 1);
 		} else if (matchTime > 105) {
 			// Shift 1
 			SmartDashboard.putBoolean("Active Hub", !inactiveFirst);
 			SmartDashboard.putNumber("Phase Time Remaining", matchTime - 105);
+			SmartDashboard.putNumber("Match Phase", 2);
 		} else if (matchTime > 80) {
 			// Shift 2
 			SmartDashboard.putBoolean("Active Hub", inactiveFirst);
 			SmartDashboard.putNumber("Phase Time Remaining", matchTime - 80);
+			SmartDashboard.putNumber("Match Phase", 3);
 		} else if (matchTime > 55) {
 			// Shift 3
 			SmartDashboard.putBoolean("Active Hub", !inactiveFirst);
 			SmartDashboard.putNumber("Phase Time Remaining", matchTime - 55);
+			SmartDashboard.putNumber("Match Phase", 4);
 		} else if (matchTime > 30) {
 			// Shift 4
 			SmartDashboard.putBoolean("Active Hub", inactiveFirst);
 			SmartDashboard.putNumber("Phase Time Remaining", matchTime - 30);
+			SmartDashboard.putNumber("Match Phase", 5);
 		} else {
 			// End game, hub always active.
 			SmartDashboard.putBoolean("Active Hub", true);
 			SmartDashboard.putNumber("Phase Time Remaining", matchTime);
+			SmartDashboard.putNumber("Match Phase", 6);
 		}
 
 		if (!RobotStates.turretIsAligning.getAsBoolean()) {
@@ -69,5 +75,7 @@ public class DriverDashboard {
 		}
 
 		SmartDashboard.putNumber("Turret Angle", RobotStates.turretAngle.getAsDouble());
+		SmartDashboard.putNumber(
+				"Shooter Velocity Adjustment", RobotStates.shooterVelocityAdjustment.getAsDouble());
 	}
 }

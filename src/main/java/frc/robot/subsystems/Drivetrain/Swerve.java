@@ -3,8 +3,8 @@ package frc.robot.subsystems.Drivetrain;
 import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.Constants.IOConstants.oneDriver;
 import static frc.robot.Constants.VisionConstants.useFomWeighting;
-import static frc.robot.Constants.VisionConstants.visionOdometryStdevs;
 
+import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -16,8 +16,6 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
-import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -34,8 +32,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -205,9 +201,9 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
 	public void setRobotRelative(ChassisSpeeds speeds) {
 		if (!fieldRelative) {
-			speeds = new ChassisSpeeds(
-				-speeds.vxMetersPerSecond, -speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond
-			);
+			speeds =
+					new ChassisSpeeds(
+							-speeds.vxMetersPerSecond, -speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
 		}
 		setpointSpeeds = speeds;
 		setControl(robotRequest.withSpeeds(speeds));
@@ -219,7 +215,6 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	/** Convenience for toggling frame. */
-
 	public void resetToggles() {
 		fieldRelative = true;
 		speedClamp = false;
@@ -440,7 +435,10 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		currentPose = this.getState().Pose;
 		currentFieldRelativeSpeeds =
 				ChassisSpeeds.fromRobotRelativeSpeeds(this.getState().Speeds, getHeading());
-		currentSpeedMagnitude = Math.hypot(currentFieldRelativeSpeeds.vxMetersPerSecond, currentFieldRelativeSpeeds.vyMetersPerSecond);
+		currentSpeedMagnitude =
+				Math.hypot(
+						currentFieldRelativeSpeeds.vxMetersPerSecond,
+						currentFieldRelativeSpeeds.vyMetersPerSecond);
 		currentHeading = Rotation2d.fromDegrees(m_Pigeon2.getYaw(true).getValue().in(Degrees));
 	}
 
@@ -459,7 +457,10 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 
 		updateCache();
 
-		if (!Utils.isSimulation() && !RobotStates.auto.getAsBoolean()) {
+		if (!Utils.isSimulation()
+				&& (!RobotStates.auto.getAsBoolean()
+						|| (currentSpeedMagnitude < 0.5
+								&& currentFieldRelativeSpeeds.omegaRadiansPerSecond < 0.25))) {
 			Limelight[] limelights = RobotContainer.getLimelights();
 			if (estimatedPosesFromCameras == null
 					|| limelights.length != estimatedPosesFromCameras.length) {

@@ -4,10 +4,10 @@
 
 package frc.robot.subsystems.EndEffector;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Amps;
 import static frc.robot.Constants.IntakeIndexConstants.IndexerConstants.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
@@ -15,11 +15,9 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -69,7 +67,8 @@ public class Hopper extends SubsystemBase {
 	private boolean runParallel = false;
 	private boolean parallelRunningForward = false;
 	private double timeAtChangeSeconds = 0;
-	private Debouncer parallelJamDebouncer = new Debouncer(timeOfBackwardParallel.in(Seconds), Debouncer.DebounceType.kFalling);
+	private Debouncer parallelJamDebouncer =
+			new Debouncer(timeOfBackwardParallel.in(Seconds), Debouncer.DebounceType.kFalling);
 
 	private AngularVelocity currentHopperVelocity = RotationsPerSecond.of(0);
 	private AngularVelocity currentParallelVelocity = RotationsPerSecond.of(0);
@@ -176,7 +175,8 @@ public class Hopper extends SubsystemBase {
 			// 	}
 			// }
 
-			parallelRunningForward = parallelJamDebouncer.calculate(getParallelCurrent() < parallelJamCurrent.in(Amps));
+			parallelRunningForward =
+					parallelJamDebouncer.calculate(getParallelCurrent() < parallelJamCurrent.in(Amps));
 
 			m_ParallelMotor.setControl(
 					m_ParallelRollerRequest.withVelocity(
