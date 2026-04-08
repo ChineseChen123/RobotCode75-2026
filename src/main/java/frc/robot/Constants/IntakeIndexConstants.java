@@ -32,7 +32,7 @@ public class IntakeIndexConstants {
 
 		public static final Angle pivotZeroPoint = Rotations.of(0);
 
-		public static final Angle pivotEncoderOffset = Rotations.of(0.500);
+		public static final Angle pivotEncoderOffset = Rotations.of(0.529);
 		public static final double pivotMotorToMechanismRatio = 1.0 / 48.0;
 		public static final double pivotToleranceAbsolute = 0.05; // rotations // TODO figure out
 
@@ -211,24 +211,23 @@ public class IntakeIndexConstants {
 		public static final int beamBreakPort = 3;
 
 		public static final AngularVelocity defaultIndexerSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity runningIndexerSpeed = RotationsPerSecond.of(15);
-		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(60);
+   		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(70);
 		public static final AngularVelocity reverseIndexerSpeed = RotationsPerSecond.of(-15);
 
 		public static final AngularVelocity defaultHopperSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity runningHopperSpeed = RotationsPerSecond.of(30);
+		public static final AngularVelocity runningHopperSpeed = RotationsPerSecond.of(20);
 		public static final AngularVelocity reverseHopperSpeed = RotationsPerSecond.of(-15);
 
-		public static final AngularVelocity defaultParallelSpeed = RotationsPerSecond.of(-10);
-		public static final AngularVelocity runningParallelSpeed = RotationsPerSecond.of(30);
+		public static final AngularVelocity defaultParallelSpeed = RotationsPerSecond.of(0);
+		public static final AngularVelocity runningParallelSpeed = RotationsPerSecond.of(25);
 		public static final AngularVelocity reverseParallelSpeed = RotationsPerSecond.of(-20);
 
-		public static final Current parallelJamCurrent = Amps.of(12);
+		public static final Current parallelJamCurrent = Amps.of(10.25);
 
-		public static final double indexerSpeedThresholdRPS = 10;
+		public static final double indexerSpeedThresholdRPS = 10; 
 
-		public static final Time timeOfForwardParallel = Seconds.of(2);
-		public static final Time timeOfBackwardParallel = Seconds.of(0.2);
+		public static final Time timeOfForwardParallel = Seconds.of(.75);
+		public static final Time timeOfBackwardParallel = Seconds.of(0.1);
 
 		public class MotorConfigs {
 			public static final TalonFXConfiguration m_IndexerMotorConfig = new TalonFXConfiguration();
@@ -264,11 +263,11 @@ public class IntakeIndexConstants {
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double indexerVelocityKP = 50;
+			public static final double indexerVelocityKP = 570;
 			public static final double indexerVelocityKI = 0.0;
 			public static final double indexerVelocityKD = 0.0;
 			public static final double indexerVelocityKS = 25;
-			public static final double indexerVelocityKV = 1.3;
+			public static final double indexerVelocityKV = 2.8;
 
 			public static final double hopperVelocityKP = 10;
 			public static final double hopperVelocityKI = 0.0;
@@ -314,6 +313,21 @@ public class IntakeIndexConstants {
 				m_IndexerMotorConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
 
 				return m_IndexerMotorConfig;
+			}
+
+			public static TalonFXConfiguration getIndexerBangBangConfiguration() {
+				TalonFXConfiguration config = getIndexerMotorConfig();
+
+				config.Slot0.kP = 10000;
+				config.Slot0.kD = 0.0;
+				config.Slot0.kV = 0.0;
+				config.Slot0.kA = 0.0;
+				config.TorqueCurrent.PeakForwardTorqueCurrent = 120.0;
+				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
+				config.MotorOutput.PeakForwardDutyCycle = 1.0;
+				config.MotorOutput.PeakReverseDutyCycle = 0.0;
+
+				return config;
 			}
 
 			public static TalonFXConfiguration getHopperMotorConfig() {

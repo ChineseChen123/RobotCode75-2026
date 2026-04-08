@@ -18,6 +18,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -65,7 +66,7 @@ public class Hopper extends SubsystemBase {
 	private HopperStates m_HopperState;
 
 	private boolean runParallel = false;
-	private boolean parallelRunningForward = false;
+	private boolean   parallelRunningForward = false;
 	private double timeAtChangeSeconds = 0;
 	private Debouncer parallelJamDebouncer =
 			new Debouncer(timeOfBackwardParallel.in(Seconds), Debouncer.DebounceType.kFalling);
@@ -146,10 +147,10 @@ public class Hopper extends SubsystemBase {
 		updateCache();
 		updateTunables();
 
-		runParallel =
-				runParallel
-						? !RobotStates.indexerRunning.getAsBoolean()
-						: RobotStates.indexerAtSpeed.getAsBoolean();
+		runParallel = true;
+				// runParallel
+				// 		? !RobotStates.indexerRunning.getAsBoolean()
+				// 		: RobotStates.indexerAtSpeed.getAsBoolean();
 
 		Pose2d robotPose = RobotStates.robotPose.get();
 		runParallel =
@@ -161,26 +162,25 @@ public class Hopper extends SubsystemBase {
 														.getTranslation()
 														.toTranslation2d())
 								> ShooterConstants.minShootingDistance.in(Meters);
-
+		boolean parallelRunningForward2 = true;
 		if (m_HopperState == HopperStates.SHOOTING && runParallel) {
-			// if (parallelRunningForward) {
-			// 	if (Timer.getFPGATimestamp() - timeAtChangeSeconds > timeOfForwardParallel.in(Seconds)) {
-			// 		parallelRunningForward = false;
-			// 		timeAtChangeSeconds = Timer.getFPGATimestamp();
-			// 	}
-			// } else {
-			// 	if (Timer.getFPGATimestamp() - timeAtChangeSeconds > timeOfBackwardParallel.in(Seconds)) {
-			// 		parallelRunningForward = true;
-			// 		timeAtChangeSeconds = Timer.getFPGATimestamp();
-			// 	}
-			// }
+			if (parallelRunningForward) {
+				if (Timer.getFPGATimestamp() - timeAtChangeSeconds > timeOfForwardParallel.in(Seconds)) {
+					parallelRunningForward = false;
+					timeAtChangeSeconds = Timer.getFPGATimestamp();
+				}
+			} else {
+				if (Timer.getFPGATimestamp() - timeAtChangeSeconds > timeOfBackwardParallel.in(Seconds)) {
+					parallelRunningForward = true;/////////////////
+					timeAtChangeSeconds = Timer.getFPGATimestamp();
+				}
+			}
 
-			parallelRunningForward =
-					parallelJamDebouncer.calculate(getParallelCurrent() < parallelJamCurrent.in(Amps));
+			parallelRunningForward2 = parallelJamDebouncer.calculate(getParallelCurrent() < parallelJamCurrent.in(Amps));
 
 			m_ParallelMotor.setControl(
 					m_ParallelRollerRequest.withVelocity(
-							parallelRunningForward ? runningParallelSpeed : reverseParallelSpeed));
+							parallelRunningForward2 ? runningParallelSpeed : reverseParallelSpeed));
 		} else {
 			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(defaultParallelSpeed));
 		}
@@ -195,7 +195,7 @@ public class Hopper extends SubsystemBase {
 			if (m_HopperState == HopperStates.SHOOTING && runParallel) {
 				m_HopperMotor.setControl(
 						m_HopperRequest.withVelocity(
-								parallelRunningForward
+								parallelRunningForward2
 										? m_HopperState.hopperSpeed
 										: m_HopperState.hopperSpeed.unaryMinus()));
 			} else {

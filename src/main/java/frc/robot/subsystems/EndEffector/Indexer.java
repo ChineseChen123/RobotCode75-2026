@@ -54,17 +54,17 @@ public class Indexer extends SubsystemBase {
 		m_IndexerMotor = new TalonFX(indexerMotorCanID, superstructureCANBusName);
 		m_IndexerState = IndexerStates.DEFAULT;
 
-		m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerMotorConfig());
+		m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerBangBangConfiguration());
 
 		m_IndexerTorqueCurrent.UpdateFreqHz = 50;
 
-		indexerConfigs
-				.withKP(MotorConfigs.indexerVelocityKP)
-				.withKD(MotorConfigs.indexerVelocityKD)
-				.withKS(MotorConfigs.indexerVelocityKS)
-				.withKV(MotorConfigs.indexerVelocityKV);
+		// indexerConfigs
+		// 		.withKP(MotorConfigs.indexerVelocityKP)
+		// 		.withKD(MotorConfigs.indexerVelocityKD)
+		// 		.withKS(MotorConfigs.indexerVelocityKS)
+		// 		.withKV(MotorConfigs.indexerVelocityKV);
 
-		initTunables();
+		// initTunables();
 	}
 
 	@Logged(key = "Indexer Velocity", importance = Importance.DEBUG)
@@ -115,7 +115,7 @@ public class Indexer extends SubsystemBase {
 	@Override
 	public void periodic() {
 		updateCache();
-		updateTunables();
+		// updateTunables();
 
 		if (m_IndexerState.indexerSpeed.baseUnitMagnitude() == 0) {
 			m_IndexerMotor.setControl(new CoastOut());
@@ -124,27 +124,27 @@ public class Indexer extends SubsystemBase {
 		}
 	}
 
-	public void initTunables() {
-		if (RobotConstants.TuningModes.tuneIndexer) {
-			indexerKp = new TunableNumber("Indexer/Kp", MotorConfigs.indexerVelocityKP);
-			indexerKd = new TunableNumber("Indexer/Kd", MotorConfigs.indexerVelocityKD);
-			indexerKs = new TunableNumber("Indexer/Ks", MotorConfigs.indexerVelocityKS);
-			indexerKv = new TunableNumber("Indexer/Kv", MotorConfigs.indexerVelocityKV);
-		}
-	}
+	// public void initTunables() {
+	// 	if (RobotConstants.TuningModes.tuneIndexer) {
+	// 		indexerKp = new TunableNumber("Indexer/Kp", MotorConfigs.indexerVelocityKP);
+	// 		indexerKd = new TunableNumber("Indexer/Kd", MotorConfigs.indexerVelocityKD);
+	// 		indexerKs = new TunableNumber("Indexer/Ks", MotorConfigs.indexerVelocityKS);
+	// 		indexerKv = new TunableNumber("Indexer/Kv", MotorConfigs.indexerVelocityKV);
+	// 	}
+	// }
 
-	public void updateTunables() {
-		if (RobotConstants.TuningModes.tuneIndexer
-				&& (indexerKp.getNumber() != indexerConfigs.kP
-						|| indexerKd.getNumber() != indexerConfigs.kD
-						|| indexerKs.getNumber() != indexerConfigs.kS
-						|| indexerKv.getNumber() != indexerConfigs.kV)) {
-			indexerConfigs
-					.withKP(indexerKp.getNumber())
-					.withKD(indexerKd.getNumber())
-					.withKS(indexerKs.getNumber())
-					.withKV(indexerKv.getNumber());
-			m_IndexerMotor.getConfigurator().apply(indexerConfigs);
-		}
-	}
+	// public void updateTunables() {
+	// 	if (RobotConstants.TuningModes.tuneIndexer
+	// 			&& (indexerKp.getNumber() != indexerConfigs.kP
+	// 					|| indexerKd.getNumber() != indexerConfigs.kD
+	// 					|| indexerKs.getNumber() != indexerConfigs.kS
+	// 					|| indexerKv.getNumber() != indexerConfigs.kV)) {
+	// 		indexerConfigs
+	// 				.withKP(indexerKp.getNumber())
+	// 				.withKD(indexerKd.getNumber())
+	// 				.withKS(indexerKs.getNumber())
+	// 				.withKV(indexerKv.getNumber());
+	// 		m_IndexerMotor.getConfigurator().apply(indexerConfigs);
+	// 	}
+	// }
 }
