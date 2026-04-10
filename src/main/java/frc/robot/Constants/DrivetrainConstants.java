@@ -20,6 +20,9 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
+
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 
@@ -264,6 +267,13 @@ public final class DrivetrainConstants {
 
 	private static final Distance kBackRightXPos = trackLength.div(-2);
 	private static final Distance kBackRightYPos = trackWidth.div(-2);
+
+	public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
+		new Translation2d(kFrontLeftXPos.in(Meters), kFrontLeftYPos.in(Meters)),
+		new Translation2d(kFrontRightXPos.in(Meters), kFrontRightYPos.in(Meters)),
+		new Translation2d(kBackLeftXPos.in(Meters), kBackLeftYPos.in(Meters)),
+		new Translation2d(kBackRightXPos.in(Meters), kBackRightYPos.in(Meters))
+	);
 
 	public static final SwerveModuleConstants<
 					TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>

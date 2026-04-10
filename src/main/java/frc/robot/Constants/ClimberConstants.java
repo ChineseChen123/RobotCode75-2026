@@ -102,7 +102,7 @@ public class ClimberConstants {
 			m_ClimberMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent =
 					torqueReverseCurrentLimit.in(Amps);
 
-			m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+			m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
 			m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
 					forwardLimit.in(Rotations);
 			m_ClimberMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;

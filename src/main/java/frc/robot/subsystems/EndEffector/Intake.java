@@ -196,9 +196,9 @@ public class Intake extends SubsystemBase {
 												RobotStates.robotSpeedMagnitude.get()
 														/ DrivetrainConstants.maxVelocity.in(MetersPerSecond)));
 			}
-			// if (RobotStates.auto.getAsBoolean()) {
-			// 	speed = RotationsPerSecond.of(80);
-			// }
+			if (RobotStates.auto.getAsBoolean()) {
+				speed = RotationsPerSecond.of(60);
+			}
 			m_IntakeMotor.setControl(m_IntakeRequest.withVelocity(speed));
 		} else {
 			m_IntakeMotor.setControl(new CoastOut());

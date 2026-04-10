@@ -52,7 +52,7 @@ public class RobotContainer {
 
 	public static final Turret m_Turret = new Turret();
 
-	public static final Climber m_Climber = new Climber();
+	// public static final Climber m_Climber = new Climber();
 
 	// Cameras
 	public static final Limelight m_LimelightTL = new Limelight(topLeftLLName, topLeftLLPose);
@@ -87,7 +87,7 @@ public class RobotContainer {
 		RaiderLog.register("Indexer", m_Indexer);
 		// RaiderLog.register("Hopper", m_Hopper);
 		// RaiderLog.register("Intake", m_Intake);
-		RaiderLog.register("Climber", m_Climber);
+		// RaiderLog.register("Climber", m_Climber);
 	}
 
 	// Configure button bindings based on driving mode
@@ -144,9 +144,9 @@ public class RobotContainer {
 		return m_Turret;
 	}
 
-	public static Climber getClimber() {
-		return m_Climber;
-	}
+	// public static Climber getClimber() {
+	// 	return m_Climber;
+	// }
 
 	public static Limelight[] getLimelights() {
 		return new Limelight[] {m_LimelightTL, m_LimelightTR};

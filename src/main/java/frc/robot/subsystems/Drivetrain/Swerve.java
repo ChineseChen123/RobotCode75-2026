@@ -1,7 +1,9 @@
 package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static frc.robot.Constants.DrivetrainConstants.kinematics;
 import static frc.robot.Constants.IOConstants.oneDriver;
+import static frc.robot.Constants.RobotConstants.loopTimeSecs;
 import static frc.robot.Constants.VisionConstants.useFomWeighting;
 
 import choreo.trajectory.SwerveSample;
@@ -23,6 +25,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -72,6 +75,14 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	private ChassisSpeeds currentFieldRelativeSpeeds = new ChassisSpeeds();
 	private double currentSpeedMagnitude = 0;
 	private Rotation2d currentHeading = new Rotation2d();
+
+	private SwerveModulePosition[] lastModulePositions = // For delta tracking
+        new SwerveModulePosition[] {
+          new SwerveModulePosition(),
+          new SwerveModulePosition(),
+          new SwerveModulePosition(),
+          new SwerveModulePosition()
+        };
 
 	private final SwerveRequest.ApplyFieldSpeeds fieldRequest =
 			new SwerveRequest.ApplyFieldSpeeds()
@@ -180,6 +191,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	public void setFieldRelative(ChassisSpeeds speeds) {
+		speeds = ChassisSpeeds.discretize(speeds, loopTimeSecs);
 		setpointSpeeds = speeds;
 		setControl(fieldRequest.withSpeeds(speeds));
 	}
@@ -200,6 +212,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	public void setRobotRelative(ChassisSpeeds speeds) {
+		speeds = ChassisSpeeds.discretize(speeds, loopTimeSecs);
 		if (!fieldRelative) {
 			speeds =
 					new ChassisSpeeds(
@@ -210,6 +223,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	}
 
 	public void setFieldRelativeClosedLoop(ChassisSpeeds speeds) {
+		speeds = ChassisSpeeds.discretize(speeds, loopTimeSecs);
 		setpointSpeeds = speeds;
 		setControl(closedLoopRequest.withSpeeds(speeds));
 	}
@@ -440,6 +454,18 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 						currentFieldRelativeSpeeds.vxMetersPerSecond,
 						currentFieldRelativeSpeeds.vyMetersPerSecond);
 		currentHeading = Rotation2d.fromDegrees(m_Pigeon2.getYaw(true).getValue().in(Degrees));
+		SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
+		SwerveModulePosition[] modulePositions = this.getModulePositions();
+		for (int i = 0; i < 4; i++) {
+			moduleDeltas[i] =
+            new SwerveModulePosition(
+                modulePositions[i].distanceMeters
+                    - lastModulePositions[i].distanceMeters,
+                modulePositions[i].angle);
+        	lastModulePositions[i] = modulePositions[i];
+		}
+		Twist2d twist = kinematics.toTwist2d(moduleDeltas);
+		currentHeading = currentHeading.plus(new Rotation2d(twist.dtheta));
 	}
 
 	@Override
