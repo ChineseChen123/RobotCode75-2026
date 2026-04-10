@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.robot.Constants.DrivetrainConstants.maxAngularVelocity;
 import static frc.robot.Constants.DrivetrainConstants.maxVelocity;
 import static frc.robot.Constants.DrivetrainConstants.speedClampMultiplier;
+import static frc.robot.Constants.DrivetrainConstants.angularClampMultiplier;
 import static frc.robot.Constants.IOConstants.*;
 
 import edu.wpi.first.math.MathUtil;
@@ -90,7 +91,7 @@ public class Driver extends SubsystemBase {
 		DriverInput[0] *= maxVelocity.in(MetersPerSecond) * (speedClamp ? speedClampMultiplier : 1);
 		DriverInput[1] *= maxVelocity.in(MetersPerSecond) * (speedClamp ? speedClampMultiplier : 1);
 		DriverInput[2] *=
-				maxAngularVelocity.in(RadiansPerSecond) * (speedClamp ? speedClampMultiplier : 1);
+				maxAngularVelocity.in(RadiansPerSecond) * (speedClamp ? angularClampMultiplier : 1);
 
 		return DriverInput;
 	}

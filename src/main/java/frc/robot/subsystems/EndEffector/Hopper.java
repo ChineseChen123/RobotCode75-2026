@@ -75,6 +75,8 @@ public class Hopper extends SubsystemBase {
 	private AngularVelocity currentParallelVelocity = RotationsPerSecond.of(0);
 	private AngularVelocity currentIndexerVelocity = RotationsPerSecond.of(0);
 
+	private boolean parllelJamming = false;
+
 	/** Creates a new Hopper. */
 	public Hopper() {
 		m_HopperMotor = new TalonFX(hopperMotorCanID, superstructureCANBusName);
@@ -142,10 +144,16 @@ public class Hopper extends SubsystemBase {
 		currentParallelVelocity = m_ParallelMotor.getVelocity(true).getValue();
 	}
 
+	public boolean isParallelJammed() {
+		return parllelJamming;
+	}
+
 	@Override
 	public void periodic() {
 		updateCache();
 		updateTunables();
+
+		parllelJamming = parallelJamDebouncer.calculate(getParallelCurrent() < parallelJamCurrent.in(Amps));
 
 		runParallel = true;
 				// runParallel
@@ -171,16 +179,15 @@ public class Hopper extends SubsystemBase {
 				}
 			} else {
 				if (Timer.getFPGATimestamp() - timeAtChangeSeconds > timeOfBackwardParallel.in(Seconds)) {
-					parallelRunningForward = true;/////////////////
+					parallelRunningForward = true;
 					timeAtChangeSeconds = Timer.getFPGATimestamp();
 				}
 			}
 
-			parallelRunningForward2 = parallelJamDebouncer.calculate(getParallelCurrent() < parallelJamCurrent.in(Amps));
 
 			m_ParallelMotor.setControl(
 					m_ParallelRollerRequest.withVelocity(
-							parallelRunningForward2 ? runningParallelSpeed : reverseParallelSpeed));
+							parllelJamming ? runningParallelSpeed : reverseParallelSpeed));
 		} else {
 			m_ParallelMotor.setControl(m_ParallelRollerRequest.withVelocity(defaultParallelSpeed));
 		}
@@ -195,7 +202,7 @@ public class Hopper extends SubsystemBase {
 			if (m_HopperState == HopperStates.SHOOTING && runParallel) {
 				m_HopperMotor.setControl(
 						m_HopperRequest.withVelocity(
-								parallelRunningForward2
+								parllelJamming
 										? m_HopperState.hopperSpeed
 										: m_HopperState.hopperSpeed.unaryMinus()));
 			} else {

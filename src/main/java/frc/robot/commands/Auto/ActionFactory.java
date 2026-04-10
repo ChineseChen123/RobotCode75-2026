@@ -39,7 +39,7 @@ public class ActionFactory {
 		m_Indexer = RobotContainer.getIndexer();
 		m_Hopper = RobotContainer.getHopper();
 		m_Turret = RobotContainer.getTurret();
-		m_Climber = RobotContainer.getClimber();
+		m_Climber = null;//RobotContainer.getClimber();
 	}
 
 	/** returns command associated with action number */
@@ -79,7 +79,7 @@ public class ActionFactory {
 				return new ParallelCommandGroup(
 						new WaitCommand(1.5), m_Intake.setStateCommandPersistent(IntakeStates.INTAKING));
 			case 10:
-				return new WaitCommand(4);
+				return new WaitCommand(3.75);
 			case 11:
 				return m_Climber.positionCommandUntilDone(Climber.ClimberPositions.UP);
 			case 12:

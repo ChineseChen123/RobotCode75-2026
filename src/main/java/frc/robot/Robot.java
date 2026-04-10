@@ -36,7 +36,7 @@ public class Robot extends LoggedRobot {
 		super(RobotConstants.loopTimeSecs);
 
 		// Set up logging
-		Importance minImportance = Importance.DEBUG;
+		Importance minImportance = Importance.CRITICAL;
 		LogMode logMode = LogMode.BASIC;
 		RaiderLog.init(minImportance, logMode);
 		if (logMode == LogMode.REPLAY) {
