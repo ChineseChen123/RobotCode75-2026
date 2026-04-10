@@ -119,7 +119,7 @@ public class Indexer extends SubsystemBase {
 		// updateTunables();
 		
 
-		boolean indexerJammed = RobotStates.indexerJammed.getAsBoolean();
+		boolean indexerJammed = false; //RobotStates.indexerJammed.getAsBoolean();
 
 		if (m_IndexerState.indexerSpeed.baseUnitMagnitude() == 0) {
 			m_IndexerMotor.setControl(new CoastOut());
