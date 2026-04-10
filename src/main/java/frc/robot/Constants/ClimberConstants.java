@@ -22,13 +22,11 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 
 public class ClimberConstants {
-	// from the perspective of looking from the back of the robot forwards
-	public static final int climberMotor1CANID = 61; // left
-	public static final int climberMotor2CANID = 62; // right
+	public static final int climberMotorCANID = 62;
 
 	// position from home
 	public static final Angle stowedPosition = Rotations.of(0);
-	public static final Angle upPosition = Rotations.of(0);
+	public static final Angle upPosition = Rotations.of(60);
 	public static final Angle climbedPosition = Rotations.of(0);
 
 	public static final Voltage raisingVoltage = Volts.of(4);
