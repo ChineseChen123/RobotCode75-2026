@@ -10,16 +10,12 @@ import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-import edu.wpi.first.units.AngleUnit;
-import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -141,7 +137,7 @@ public class Climber extends SubsystemBase {
 	/** return position in rotations from home (bottom) */
 	public Angle getPosition() {
 		return BaseStatusSignal.getLatencyCompensatedValue(
-						m_ClimberMotor.getPosition(), m_ClimberMotor.getVelocity());
+				m_ClimberMotor.getPosition(), m_ClimberMotor.getVelocity());
 	}
 
 	/** return current position setpoint */
@@ -224,7 +220,8 @@ public class Climber extends SubsystemBase {
 		if (m_ClimberState == ClimberState.SETPOINTUP && currentPosition > upPosition.in(Rotations)) {
 			m_ClimberState = ClimberState.HOLDING;
 		}
-		if (m_ClimberState == ClimberState.SETPOINTDOWN && currentPosition < climbedPosition.in(Rotations)) {
+		if (m_ClimberState == ClimberState.SETPOINTDOWN
+				&& currentPosition < climbedPosition.in(Rotations)) {
 			m_ClimberState = ClimberState.HOLDING;
 		}
 

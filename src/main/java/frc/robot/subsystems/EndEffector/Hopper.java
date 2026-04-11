@@ -66,7 +66,7 @@ public class Hopper extends SubsystemBase {
 	private HopperStates m_HopperState;
 
 	private boolean runParallel = false;
-	private boolean   parallelRunningForward = false;
+	private boolean parallelRunningForward = false;
 	private double timeAtChangeSeconds = 0;
 	private Debouncer parallelJamDebouncer =
 			new Debouncer(timeOfBackwardParallel.in(Seconds), Debouncer.DebounceType.kFalling);
@@ -153,12 +153,13 @@ public class Hopper extends SubsystemBase {
 		updateCache();
 		updateTunables();
 
-		parllelJamming = parallelJamDebouncer.calculate(getParallelCurrent() < parallelJamCurrent.in(Amps));
+		parllelJamming =
+				parallelJamDebouncer.calculate(getParallelCurrent() < parallelJamCurrent.in(Amps));
 
 		runParallel = true;
-				// runParallel
-				// 		? !RobotStates.indexerRunning.getAsBoolean()
-				// 		: RobotStates.indexerAtSpeed.getAsBoolean();
+		// runParallel
+		// 		? !RobotStates.indexerRunning.getAsBoolean()
+		// 		: RobotStates.indexerAtSpeed.getAsBoolean();
 
 		Pose2d robotPose = RobotStates.robotPose.get();
 		runParallel =
@@ -183,7 +184,6 @@ public class Hopper extends SubsystemBase {
 					timeAtChangeSeconds = Timer.getFPGATimestamp();
 				}
 			}
-
 
 			m_ParallelMotor.setControl(
 					m_ParallelRollerRequest.withVelocity(

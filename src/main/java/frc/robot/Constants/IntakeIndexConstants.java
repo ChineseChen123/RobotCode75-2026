@@ -211,7 +211,7 @@ public class IntakeIndexConstants {
 		public static final int beamBreakPort = 3;
 
 		public static final AngularVelocity defaultIndexerSpeed = RotationsPerSecond.of(0);
-   		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(70);
+		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(70);
 		public static final AngularVelocity reverseIndexerSpeed = RotationsPerSecond.of(-15);
 
 		public static final AngularVelocity defaultHopperSpeed = RotationsPerSecond.of(0);
@@ -224,7 +224,7 @@ public class IntakeIndexConstants {
 
 		public static final Current parallelJamCurrent = Amps.of(10.25);
 
-		public static final double indexerSpeedThresholdRPS = 10; 
+		public static final double indexerSpeedThresholdRPS = 10;
 
 		public static final Time timeOfForwardParallel = Seconds.of(.75);
 		public static final Time timeOfBackwardParallel = Seconds.of(0.1);
@@ -326,6 +326,19 @@ public class IntakeIndexConstants {
 				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
 				config.MotorOutput.PeakForwardDutyCycle = 1.0;
 				config.MotorOutput.PeakReverseDutyCycle = 0.0;
+
+				return config;
+			}
+
+			public static TalonFXConfiguration getIndexerReverseBangBangConfiguration() {
+				TalonFXConfiguration config = getIndexerMotorConfig();
+
+				config.Slot0.kP = 10000;
+				config.Slot0.kD = 0.0;
+				config.Slot0.kV = 0.0;
+				config.Slot0.kA = 0.0;
+				config.TorqueCurrent.PeakForwardTorqueCurrent = 0.0;
+				config.TorqueCurrent.PeakReverseTorqueCurrent = -120.0;
 
 				return config;
 			}

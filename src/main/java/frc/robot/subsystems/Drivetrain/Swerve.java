@@ -77,12 +77,12 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	private Rotation2d currentHeading = new Rotation2d();
 
 	private SwerveModulePosition[] lastModulePositions = // For delta tracking
-        new SwerveModulePosition[] {
-          new SwerveModulePosition(),
-          new SwerveModulePosition(),
-          new SwerveModulePosition(),
-          new SwerveModulePosition()
-        };
+			new SwerveModulePosition[] {
+				new SwerveModulePosition(),
+				new SwerveModulePosition(),
+				new SwerveModulePosition(),
+				new SwerveModulePosition()
+			};
 
 	private final SwerveRequest.ApplyFieldSpeeds fieldRequest =
 			new SwerveRequest.ApplyFieldSpeeds()
@@ -458,11 +458,10 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		SwerveModulePosition[] modulePositions = this.getModulePositions();
 		for (int i = 0; i < 4; i++) {
 			moduleDeltas[i] =
-            new SwerveModulePosition(
-                modulePositions[i].distanceMeters
-                    - lastModulePositions[i].distanceMeters,
-                modulePositions[i].angle);
-        	lastModulePositions[i] = modulePositions[i];
+					new SwerveModulePosition(
+							modulePositions[i].distanceMeters - lastModulePositions[i].distanceMeters,
+							modulePositions[i].angle);
+			lastModulePositions[i] = modulePositions[i];
 		}
 		Twist2d twist = kinematics.toTwist2d(moduleDeltas);
 		currentHeading = currentHeading.plus(new Rotation2d(twist.dtheta));

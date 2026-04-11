@@ -6,10 +6,10 @@ package frc.robot.state;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static frc.robot.Constants.DrivetrainConstants.angularClampMultiplier;
 import static frc.robot.Constants.DrivetrainConstants.maxAngularVelocity;
 import static frc.robot.Constants.DrivetrainConstants.maxVelocity;
 import static frc.robot.Constants.DrivetrainConstants.speedClampMultiplier;
-import static frc.robot.Constants.DrivetrainConstants.angularClampMultiplier;
 import static frc.robot.Constants.IOConstants.*;
 
 import edu.wpi.first.math.MathUtil;

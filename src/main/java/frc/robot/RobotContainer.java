@@ -26,7 +26,6 @@ import frc.robot.subsystems.EndEffector.Intake;
 import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
 import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Turret;
-import frc.robot.subsystems.Endgame.Climber;
 import frc.robot.subsystems.Vision.Limelight;
 
 public class RobotContainer {

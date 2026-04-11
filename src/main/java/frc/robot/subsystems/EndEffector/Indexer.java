@@ -21,8 +21,6 @@ import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.Constants.IntakeIndexConstants.IndexerConstants.MotorConfigs;
-import frc.robot.Constants.RobotConstants;
-import frc.robot.state.RobotStates;
 
 public class Indexer extends SubsystemBase {
 
@@ -96,6 +94,13 @@ public class Indexer extends SubsystemBase {
 	}
 
 	public void setState(IndexerStates state) {
+		if (state != m_IndexerState) {
+			if (state == IndexerStates.SHOOTING) {
+				m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerBangBangConfiguration());
+			} else if (state == IndexerStates.REVERSING) {
+				m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerReverseBangBangConfiguration());
+			}
+		}
 		m_IndexerState = state;
 	}
 
@@ -117,14 +122,15 @@ public class Indexer extends SubsystemBase {
 	public void periodic() {
 		updateCache();
 		// updateTunables();
-		
 
-		boolean indexerJammed = false; //RobotStates.indexerJammed.getAsBoolean();
+		boolean indexerJammed = false; // RobotStates.indexerJammed.getAsBoolean();
 
 		if (m_IndexerState.indexerSpeed.baseUnitMagnitude() == 0) {
 			m_IndexerMotor.setControl(new CoastOut());
 		} else {
-			m_IndexerMotor.setControl(m_IndexerTorqueCurrent.withVelocity(indexerJammed ? RotationsPerSecond.of(-15) : m_IndexerState.indexerSpeed));
+			m_IndexerMotor.setControl(
+					m_IndexerTorqueCurrent.withVelocity(
+							indexerJammed ? RotationsPerSecond.of(-15) : m_IndexerState.indexerSpeed));
 		}
 	}
 

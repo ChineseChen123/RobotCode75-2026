@@ -48,6 +48,7 @@ public class Bindings {
 		// shoot
 		RobotStates.actionIndexerShoot
 				.and(RobotStates.turretIsInDeadzone.negate())
+				.and(RobotStates.actionShoot)
 				.whileTrue(
 						new ParallelCommandGroup(
 								m_Indexer.setStateCommand(IndexerStates.SHOOTING),

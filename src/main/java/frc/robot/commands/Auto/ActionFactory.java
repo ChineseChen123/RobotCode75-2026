@@ -2,6 +2,7 @@ package frc.robot.commands.Auto;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
@@ -39,7 +40,7 @@ public class ActionFactory {
 		m_Indexer = RobotContainer.getIndexer();
 		m_Hopper = RobotContainer.getHopper();
 		m_Turret = RobotContainer.getTurret();
-		m_Climber = null;//RobotContainer.getClimber();
+		m_Climber = null; // RobotContainer.getClimber();
 	}
 
 	/** returns command associated with action number */
@@ -80,12 +81,19 @@ public class ActionFactory {
 						new WaitCommand(1.5), m_Intake.setStateCommandPersistent(IntakeStates.INTAKING));
 			case 10:
 				return new WaitCommand(3.75);
+			// case 11:
+			// 	return m_Climber.positionCommandUntilDone(Climber.ClimberPositions.UP);
+			// case 12:
+			// 	return m_Climber.positionCommandUntilDone(Climber.ClimberPositions.CLIMBED);
+			// case 13:
+			// 	return m_Climber.positionCommandUntilDone(Climber.ClimberPositions.STOW);
 			case 11:
-				return m_Climber.positionCommandUntilDone(Climber.ClimberPositions.UP);
-			case 12:
-				return m_Climber.positionCommandUntilDone(Climber.ClimberPositions.CLIMBED);
-			case 13:
-				return m_Climber.positionCommandUntilDone(Climber.ClimberPositions.STOW);
+				return new ParallelRaceGroup(
+					new WaitCommand(1.5),
+					m_Intake.jiggleCommand()
+				).andThen(
+					m_Intake.setStateCommandPersistent(IntakeStates.INTAKING)
+				);
 		}
 		return null;
 	}
@@ -108,17 +116,19 @@ public class ActionFactory {
 			case 7:
 				return "Shoot Preload";
 			case 8:
-				return "Intake Agitate";
+				return "Intake Agitate Repeatedly";
 			case 9:
 				return "Delayed Start Intaking";
 			case 10:
 				return "Wait 4s";
+			// case 11:
+			// 	return "Climber Up";
+			// case 12:
+			// 	return "Climb";
+			// case 13:
+			// 	return "Stow Climber";
 			case 11:
-				return "Climber Up";
-			case 12:
-				return "Climb";
-			case 13:
-				return "Stow Climber";
+				return "Intake Agitate Once";
 		}
 		return null;
 	}

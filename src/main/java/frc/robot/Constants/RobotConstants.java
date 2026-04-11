@@ -16,7 +16,7 @@ import edu.wpi.first.units.measure.Distance;
  */
 public final class RobotConstants {
 	public static final String superstructureCANBusName = "superstructure";
-	public static final boolean TUNING_MODE = true; // Set to true for tunable numbers
+	public static final boolean TUNING_MODE = false; // Set to true for tunable numbers
 
 	public static final double loopTimeSecs = 0.02;
 
@@ -30,6 +30,6 @@ public final class RobotConstants {
 		public static final boolean tuneIndexer = false && TUNING_MODE;
 		public static final boolean tuneHopper = false && TUNING_MODE;
 		public static final boolean tuneParallel = false && TUNING_MODE;
-		public static final boolean tuneShooter = true && TUNING_MODE;
+		public static final boolean tuneShooter = false && TUNING_MODE;
 	}
 }
