@@ -152,7 +152,7 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 		// Pigeon already instantiated by Phoenix Swerve API
 		m_Pigeon2 = this.getPigeon2();
 		m_Pigeon2.getConfigurator().apply(new Pigeon2Configuration());
-		zeroGyro();
+		zeroGyroAutoStart();
 
 		rController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -345,6 +345,12 @@ public class Swerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> impleme
 	public void zeroGyro() {
 		final double yawDeg =
 				DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? 0 : 180;
+		m_Pigeon2.setYaw(yawDeg);
+	}
+
+	public void zeroGyroAutoStart() {
+		final double yawDeg =
+				DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? 180 : 0;
 		m_Pigeon2.setYaw(yawDeg);
 	}
 

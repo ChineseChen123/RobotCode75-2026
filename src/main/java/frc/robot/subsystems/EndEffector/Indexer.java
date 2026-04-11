@@ -66,7 +66,7 @@ public class Indexer extends SubsystemBase {
 		// initTunables();
 	}
 
-	@Logged(key = "Indexer Velocity", importance = Importance.DEBUG)
+	@Logged(key = "Indexer Velocity", importance = Importance.CRITICAL)
 	public double getIndexerVelocityRPS() {
 		return currentIndexerVelocity.in(RotationsPerSecond);
 	}

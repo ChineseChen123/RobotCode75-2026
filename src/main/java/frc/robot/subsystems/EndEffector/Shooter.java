@@ -134,6 +134,11 @@ public class Shooter extends SubsystemBase {
 				> (shooterTargetVelocity.in(RPM) - shooterVelocityTolerance);
 	}
 
+	public boolean goodToShoot() {
+		return currentShooterVelocity.in(RPM)
+				> (shooterTargetVelocity.in(RPM) - 500);
+	}
+
 	@Logged(key = "Shooter State", importance = Importance.DEBUG)
 	public ShooterStates getShooterState() {
 		return m_ShooterState;
@@ -177,7 +182,7 @@ public class Shooter extends SubsystemBase {
 		if (!RobotStates.turretIsAligning.getAsBoolean()
 				|| (RobotStates.turretIsAligning.getAsBoolean()
 						&& RobotStates.actionAimTurretHold.getAsBoolean())) {
-			shooterTargetVelocity = minShootingAngularVelocity.plus(maxShootingAngularVelocity).div(2.0);
+			shooterTargetVelocity = RPM.of(2400);
 			return;
 		}
 

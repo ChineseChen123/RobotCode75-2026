@@ -99,6 +99,8 @@ public class RobotStates {
 	public static final DoubleSupplier shooterVelocityAdjustment =
 			() -> m_Shooter.getVelocityAdjustment().in(RPM);
 
+	public static final Trigger shooterGoodToShoot = new Trigger(m_Shooter::goodToShoot);
+
 	// ── Actions ──────────────────────────────────────────────────────────────────
 
 	/** Swerve actions */

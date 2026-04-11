@@ -73,7 +73,7 @@ public class ShooterPhysics {
 			return minShootingAngularVelocity;
 		}
 
-		return RPM.of(distanceToRPMMap.get(distanceToTarget));
+		return RPM.of(Math.min(distanceToRPMMap.get(distanceToTarget), maxShootingAngularVelocity.in(RPM)));
 	}
 
 	public static Distance wheelAngularVelocityToDistance(AngularVelocity velocity) {
@@ -177,9 +177,11 @@ public class ShooterPhysics {
 		Pose3d virtualTargetPose = PeddieBounds.getShootingTargetPose(robotPose);
 		Pose3d originalTarget = virtualTargetPose;
 
-		// if (!PeddieBounds.isInOwnZone(robotPose)) {
-		// 	return originalTarget.toPose2d(); // TODO: unfade sotm
-		// }
+		double speedMultiplier = 1;
+
+		if (!PeddieBounds.isInOwnZone(robotPose)) {
+			speedMultiplier = 0.75;
+		}
 
 		// Compensate for system delay by projecting robot motion forward.
 		ChassisSpeeds robotRelativeSpeeds =
@@ -254,8 +256,8 @@ public class ShooterPhysics {
 
 			Translation2d targetTranslation =
 					new Translation2d(
-							MetersPerSecond.of(-turretVelocityX).times(unchoppedtofEstimateDragComp),
-							MetersPerSecond.of(-turretVelocityY).times(unchoppedtofEstimateDragComp));
+							MetersPerSecond.of(-turretVelocityX).times(unchoppedtofEstimateDragComp).times(speedMultiplier),
+							MetersPerSecond.of(-turretVelocityY).times(unchoppedtofEstimateDragComp).times(speedMultiplier));
 
 			virtualTargetPose =
 					originalTarget.plus(

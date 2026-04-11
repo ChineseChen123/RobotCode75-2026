@@ -16,6 +16,7 @@ import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Timer;
@@ -63,13 +64,16 @@ public class Hopper extends SubsystemBase {
 	private TunableNumber parallelKv;
 	private TunableNumber parallelSpeed;
 
+	private TunableNumber parallelBackwardTime;
+
 	private HopperStates m_HopperState;
 
 	private boolean runParallel = false;
 	private boolean parallelRunningForward = false;
 	private double timeAtChangeSeconds = 0;
+	private double backwardParallelDuration = timeOfBackwardParallel.in(Seconds);
 	private Debouncer parallelJamDebouncer =
-			new Debouncer(timeOfBackwardParallel.in(Seconds), Debouncer.DebounceType.kFalling);
+			new Debouncer(backwardParallelDuration, Debouncer.DebounceType.kFalling);
 
 	private AngularVelocity currentHopperVelocity = RotationsPerSecond.of(0);
 	private AngularVelocity currentParallelVelocity = RotationsPerSecond.of(0);
@@ -225,6 +229,7 @@ public class Hopper extends SubsystemBase {
 			parallelKv = new TunableNumber("Parallel/Kv", MotorConfigs.parallelVelocityKV);
 			parallelSpeed =
 					new TunableNumber("Parallel/Speed", runningParallelSpeed.in(RotationsPerSecond));
+			parallelBackwardTime = new TunableNumber("Parallel/Backward Time", timeOfBackwardParallel.in(Seconds));
 		}
 	}
 
@@ -251,6 +256,11 @@ public class Hopper extends SubsystemBase {
 					.withKS(parallelKs.getNumber())
 					.withKV(parallelKv.getNumber());
 			m_ParallelMotor.getConfigurator().apply(parallelConfigs);
+		}
+
+		if (RobotConstants.TuningModes.tuneParallel && backwardParallelDuration != parallelBackwardTime.getNumber()) {
+			backwardParallelDuration = parallelBackwardTime.getNumber();
+			parallelJamDebouncer = new Debouncer(backwardParallelDuration, DebounceType.kFalling);
 		}
 	}
 }

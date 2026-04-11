@@ -55,7 +55,7 @@ public class ShooterTurretConstants {
 
 		public static final double shooterVelocityTolerance = 150.0; // rpm
 
-		public static final Distance feedingDistPastBump = Meters.of(2);
+		public static final Distance feedingDistPastBump = Meters.of(3);
 
 		// Note that the flywheel MOI effective to the motors is multiplied by the gear ratio squared.
 		// <-- from recalc
@@ -75,7 +75,7 @@ public class ShooterTurretConstants {
 
 		public static final Distance minShootingDistance = Meters.of(2.058);
 		public static final AngularVelocity minShootingAngularVelocity = RPM.of(2026);
-		public static final AngularVelocity maxShootingAngularVelocity = RPM.of(3800);
+		public static final AngularVelocity maxShootingAngularVelocity = RPM.of(4500);
 		public static final LinearInterpolationMap distanceToRPMMap =
 				new LinearInterpolationMap()
 						.add(minShootingDistance.in(Meters), minShootingAngularVelocity.in(RPM))
