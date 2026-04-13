@@ -66,7 +66,7 @@ public class Shooter extends SubsystemBase {
 	private AngularVelocity shooterTargetVelocity = RPM.of(0);
 	private AngularVelocity currentShooterVelocity = RPM.of(0);
 
-	private double velocityAdjustmentRPM = 0;
+	private double velocityAdjustmentRPM = 10;
 
 	private final Debouncer atSetpointDebouncer = new Debouncer(0.025, DebounceType.kFalling);
 	private boolean lastAtSetpoint = false;
@@ -118,6 +118,11 @@ public class Shooter extends SubsystemBase {
 				.getValue()
 				.plus(m_ShooterMotor2.getVelocity(true).getValue())
 				.div(2);
+	}
+
+	@Logged(key = "Shooter Stator Current", importance = Importance.CRITICAL)
+	public double getStatorCurrent() {
+		return (m_ShooterMotor1.getStatorCurrent(true).getValueAsDouble() + m_ShooterMotor2.getStatorCurrent(true).getValueAsDouble()) / 2.0;
 	}
 
 	@Logged(key = "Shooter Target Velocity RPM", importance = Importance.CRITICAL)

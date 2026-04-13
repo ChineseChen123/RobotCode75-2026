@@ -6,7 +6,7 @@ public class Presets {
 	public static final String outpostSideNZOutpost = "so nzo9 to1 3 o8 8";
 	public static final String outpostSideNZFeed = "5 so 1 nzo3 6";
 	public static final String outpostSideNZFeedCorner = "5 so 1 nzo3 o 8";
-	public static final String outpostSideDoubleSwipe = "so nzo9 to1 3 o8 6 10 4 2 nzo9 to1 3 o8 8";
+	public static final String outpostSideDoubleSwipe = "so nzodsa9 6 tods1 3 10 4 2 nzodsb9 6 tods1 3 8";
 
 	public static final String depotSideNZDepot = "sd nzd9 td1 3 d11 8";
 	public static final String depotSideNZFeed = "5 sd 1 nzd3 6";

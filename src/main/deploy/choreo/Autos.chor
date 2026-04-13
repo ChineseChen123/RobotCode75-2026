@@ -236,6 +236,20 @@
      "exp":"0 deg",
      "val":0.0
     }
+   },
+   "tods_pose":{
+    "x":{
+     "exp":"tdds_pose.x",
+     "val":4.194070339202881
+    },
+    "y":{
+     "exp":"8.02 m - tdds_pose.y",
+     "val":0.5499999999999998
+    },
+    "heading":{
+     "exp":"tdds_pose.heading",
+     "val":3.141592653589793
+    }
    }
   }
  },
