@@ -108,7 +108,7 @@ public class Intake extends SubsystemBase {
 		m_IntakeMotor1.getConfigurator().apply(getIntakeBangBangConfiguration());
 
 		TalonFXConfiguration intakeMotor2Config = getIntakeBangBangConfiguration();
-		intakeMotor2Config.Feedback.SensorToMechanismRatio = 1; // TODO find
+		intakeMotor2Config.Feedback.SensorToMechanismRatio = 0.75; // TODO find
 		m_IntakeMotor2.getConfigurator().apply(intakeMotor2Config);
 
 		m_FollowerRequest = new Follower(m_IntakeMotor1.getDeviceID(), MotorAlignmentValue.Opposed);
@@ -213,15 +213,17 @@ public class Intake extends SubsystemBase {
 												RobotStates.robotSpeedMagnitude.get()
 														/ DrivetrainConstants.maxVelocity.in(MetersPerSecond)));
 			}
-			if (RobotStates.auto.getAsBoolean()) {
+			/*if (RobotStates.auto.getAsBoolean()) {
 				speed = RotationsPerSecond.of(60);
 			}
+			*/
 			m_IntakeMotor1.setControl(m_IntakeRequest.withVelocity(speed));
+			m_IntakeMotor2.setControl(m_IntakeRequest.withVelocity(speed));
+
 		} else {
 			m_IntakeMotor1.setControl(new CoastOut());
+			m_IntakeMotor2.setControl(new CoastOut());
 		}
-
-		m_IntakeMotor2.setControl(m_FollowerRequest);
 		m_PivotMotor.setControl(m_PivotRequest.withPosition(m_IntakeState.pivotPosition));
 	}
 
