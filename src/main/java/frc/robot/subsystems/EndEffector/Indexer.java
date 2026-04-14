@@ -10,10 +10,15 @@ import static frc.robot.Constants.IntakeIndexConstants.IndexerConstants.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
+
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -36,7 +41,8 @@ public class Indexer extends SubsystemBase {
 		}
 	}
 
-	private final TalonFX m_IndexerMotor;
+	private final TalonFX m_IndexerMotor1;
+	private final TalonFX m_IndexerMotor2;
 	private final VelocityTorqueCurrentFOC m_IndexerTorqueCurrent = new VelocityTorqueCurrentFOC(0);
 
 	private final Slot0Configs indexerConfigs = new Slot0Configs();
@@ -48,12 +54,23 @@ public class Indexer extends SubsystemBase {
 	private IndexerStates m_IndexerState;
 	private AngularVelocity currentIndexerVelocity = RotationsPerSecond.of(0);
 
+	private final Follower m_FollowerRequest;
+
+
 	/** Creates a new Indexer. */
 	public Indexer() {
-		m_IndexerMotor = new TalonFX(indexerMotorCanID, superstructureCANBusName);
+		m_IndexerMotor1 = new TalonFX(indexerMotor1CanID, superstructureCANBusName);
+		m_IndexerMotor2 = new TalonFX(indexerMotor2CanID, superstructureCANBusName);
 		m_IndexerState = IndexerStates.DEFAULT;
 
-		m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerBangBangConfiguration());
+		m_IndexerMotor1.getConfigurator().apply(MotorConfigs.getIndexerBangBangConfiguration());
+
+		TalonFXConfiguration indexerMotor2Config = MotorConfigs.getIndexerBangBangConfiguration();
+		indexerMotor2Config.Feedback.SensorToMechanismRatio = 1; // TODO find
+		m_IndexerMotor2.getConfigurator().apply(indexerMotor2Config);
+
+		m_FollowerRequest = new Follower(m_IndexerMotor1.getDeviceID(), MotorAlignmentValue.Opposed);
+		m_IndexerMotor2.setControl(m_FollowerRequest);
 
 		m_IndexerTorqueCurrent.UpdateFreqHz = 50;
 
@@ -72,12 +89,12 @@ public class Indexer extends SubsystemBase {
 	}
 
 	public AngularVelocity getIndexerVelocity() {
-		return m_IndexerMotor.getVelocity(true).getValue();
+		return m_IndexerMotor1.getVelocity(true).getValue();
 	}
 
 	@Logged(key = "Indexer Current", importance = Importance.DEBUG)
 	public double getIndexerCurrent() {
-		return m_IndexerMotor.getStatorCurrent(true).getValue().in(Amps);
+		return m_IndexerMotor1.getStatorCurrent(true).getValue().in(Amps);
 	}
 
 	public boolean isIndexerUpToSpeed() {
@@ -96,9 +113,9 @@ public class Indexer extends SubsystemBase {
 	public void setState(IndexerStates state) {
 		if (state != m_IndexerState) {
 			if (state == IndexerStates.SHOOTING) {
-				m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerBangBangConfiguration());
+				m_IndexerMotor1.getConfigurator().apply(MotorConfigs.getIndexerBangBangConfiguration());
 			} else if (state == IndexerStates.REVERSING) {
-				m_IndexerMotor.getConfigurator().apply(MotorConfigs.getIndexerReverseBangBangConfiguration());
+				m_IndexerMotor1.getConfigurator().apply(MotorConfigs.getIndexerReverseBangBangConfiguration());
 			}
 		}
 		m_IndexerState = state;
@@ -115,7 +132,7 @@ public class Indexer extends SubsystemBase {
 	}
 
 	public void updateCache() {
-		currentIndexerVelocity = m_IndexerMotor.getVelocity(true).getValue();
+		currentIndexerVelocity = m_IndexerMotor1.getVelocity(true).getValue();
 	}
 
 	@Override
@@ -126,12 +143,14 @@ public class Indexer extends SubsystemBase {
 		boolean indexerJammed = false; // RobotStates.indexerJammed.getAsBoolean();
 
 		if (m_IndexerState.indexerSpeed.baseUnitMagnitude() == 0) {
-			m_IndexerMotor.setControl(new CoastOut());
+			m_IndexerMotor1.setControl(new CoastOut());
 		} else {
-			m_IndexerMotor.setControl(
+			m_IndexerMotor1.setControl(
 					m_IndexerTorqueCurrent.withVelocity(
 							indexerJammed ? RotationsPerSecond.of(-15) : m_IndexerState.indexerSpeed));
 		}
+
+		m_IndexerMotor2.setControl(m_FollowerRequest);
 	}
 
 	// public void initTunables() {

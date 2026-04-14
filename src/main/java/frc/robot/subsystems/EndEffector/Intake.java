@@ -12,11 +12,15 @@ import static frc.robot.Constants.IntakeIndexConstants.IntakeConstants.MotorConf
 import static frc.robot.Constants.RobotConstants.*;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -57,7 +61,8 @@ public class Intake extends SubsystemBase {
 
 	// ── Hardware ─────────────────────────────────────────────────────────────────
 
-	private final TalonFX m_IntakeMotor;
+	private final TalonFX m_IntakeMotor1;
+	private final TalonFX m_IntakeMotor2;
 	private final TalonFX m_PivotMotor;
 	private final DutyCycleEncoder m_absoluteEncoder;
 
@@ -66,6 +71,9 @@ public class Intake extends SubsystemBase {
 	private final VelocityTorqueCurrentFOC m_IntakeRequest = new VelocityTorqueCurrentFOC(0);
 	private final MotionMagicExpoTorqueCurrentFOC m_PivotRequest =
 			new MotionMagicExpoTorqueCurrentFOC(0);
+
+	private final Follower m_FollowerRequest;
+
 
 	// ── Internal state ───────────────────────────────────────────────────────────
 
@@ -92,11 +100,20 @@ public class Intake extends SubsystemBase {
 
 	/** Creates a new Intake. */
 	public Intake() {
-		m_IntakeMotor = new TalonFX(intakeMotorCanID, superstructureCANBusName);
+		m_IntakeMotor1 = new TalonFX(intakeMotor1CanID, superstructureCANBusName);
+		m_IntakeMotor2 = new TalonFX(intakeMotor2CanID, superstructureCANBusName);
 		m_PivotMotor = new TalonFX(pivotCanID, superstructureCANBusName);
 
 		m_PivotMotor.getConfigurator().apply(getPivotConfiguration());
-		m_IntakeMotor.getConfigurator().apply(getIntakeBangBangConfiguration());
+		m_IntakeMotor1.getConfigurator().apply(getIntakeBangBangConfiguration());
+
+		TalonFXConfiguration intakeMotor2Config = getIntakeBangBangConfiguration();
+		intakeMotor2Config.Feedback.SensorToMechanismRatio = 1; // TODO find
+		m_IntakeMotor2.getConfigurator().apply(intakeMotor2Config);
+
+		m_FollowerRequest = new Follower(m_IntakeMotor1.getDeviceID(), MotorAlignmentValue.Opposed);
+
+		m_IntakeMotor2.setControl(m_FollowerRequest);
 
 		m_IntakeState = IntakeStates.DEFAULT;
 
@@ -134,8 +151,8 @@ public class Intake extends SubsystemBase {
 	}
 
 	@Logged(key = "Intake Velocity", importance = Importance.DEBUG)
-	public double getIntakeVelocity() {
-		return m_IntakeMotor.getVelocity().getValue().in(RotationsPerSecond);
+	public double getIntakeVelocity() { // TODO: need to add intake motor 2, prob fine for now
+		return m_IntakeMotor1.getVelocity().getValue().in(RotationsPerSecond);
 	}
 
 	@Logged(key = "Intake State", importance = Importance.CRITICAL)
@@ -199,11 +216,12 @@ public class Intake extends SubsystemBase {
 			if (RobotStates.auto.getAsBoolean()) {
 				speed = RotationsPerSecond.of(60);
 			}
-			m_IntakeMotor.setControl(m_IntakeRequest.withVelocity(speed));
+			m_IntakeMotor1.setControl(m_IntakeRequest.withVelocity(speed));
 		} else {
-			m_IntakeMotor.setControl(new CoastOut());
+			m_IntakeMotor1.setControl(new CoastOut());
 		}
 
+		m_IntakeMotor2.setControl(m_FollowerRequest);
 		m_PivotMotor.setControl(m_PivotRequest.withPosition(m_IntakeState.pivotPosition));
 	}
 
@@ -252,7 +270,8 @@ public class Intake extends SubsystemBase {
 			IntakeMotorPIDConfig.kS = intakeMotorKs.getNumber();
 			IntakeMotorPIDConfig.kV = intakeMotorKv.getNumber();
 
-			m_IntakeMotor.getConfigurator().apply(IntakeMotorPIDConfig);
+			m_IntakeMotor1.getConfigurator().apply(IntakeMotorPIDConfig);
+			m_IntakeMotor2.getConfigurator().apply(IntakeMotorPIDConfig);
 		}
 	}
 }

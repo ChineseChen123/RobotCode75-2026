@@ -25,7 +25,8 @@ import edu.wpi.first.units.measure.Time;
 public class IntakeIndexConstants {
 
 	public class IntakeConstants {
-		public static final int intakeMotorCanID = 52; // Kraken X44
+		public static final int intakeMotor1CanID = 52; // Kraken x60
+		public static final int intakeMotor2CanID = 0; // kracken x60
 		public static final int pivotCanID = 51; // Kraken X60
 
 		public static final int pivotEncoderPort = 0;
@@ -204,7 +205,9 @@ public class IntakeIndexConstants {
 
 	public class IndexerConstants {
 
-		public static final int indexerMotorCanID = 54;
+		public static final int indexerMotor1CanID = 54;
+		public static final int indexerMotor2CanID = 0;
+
 		public static final int hopperMotorCanID = 53;
 		public static final int parallelMotorCanID = 55;
 
