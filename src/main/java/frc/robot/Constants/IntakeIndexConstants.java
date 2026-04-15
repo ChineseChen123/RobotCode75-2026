@@ -98,7 +98,7 @@ public class IntakeIndexConstants {
 			public static final double pivotKI = 0.0;
 			public static final double pivotKD = 7;
 			public static final double pivotKS = 20;
-			public static final double pivotKG = 9;
+			public static final double pivotKG = 11;
 
 			public static final double pivotMMKa = 0;
 			public static final double pivotMMKv = 0;
@@ -325,7 +325,7 @@ public class IntakeIndexConstants {
 				config.Slot0.kD = 0.0;
 				config.Slot0.kV = 0.0;
 				config.Slot0.kA = 0.0;
-				config.TorqueCurrent.PeakForwardTorqueCurrent = 120.0;
+				config.TorqueCurrent.PeakForwardTorqueCurrent = 80.0;
 				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
 				config.MotorOutput.PeakForwardDutyCycle = 1.0;
 				config.MotorOutput.PeakReverseDutyCycle = 0.0;
@@ -341,7 +341,7 @@ public class IntakeIndexConstants {
 				config.Slot0.kV = 0.0;
 				config.Slot0.kA = 0.0;
 				config.TorqueCurrent.PeakForwardTorqueCurrent = 0.0;
-				config.TorqueCurrent.PeakReverseTorqueCurrent = -120.0;
+				config.TorqueCurrent.PeakReverseTorqueCurrent = -80.0;
 
 				return config;
 			}

@@ -19,6 +19,7 @@ import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
 import edu.wpi.first.units.measure.Angle;
@@ -108,6 +109,8 @@ public class Intake extends SubsystemBase {
 		m_IntakeMotor1.getConfigurator().apply(getIntakeBangBangConfiguration());
 
 		TalonFXConfiguration intakeMotor2Config = getIntakeBangBangConfiguration();
+
+		intakeMotor2Config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 		intakeMotor2Config.Feedback.SensorToMechanismRatio = 0.75; // TODO find
 		m_IntakeMotor2.getConfigurator().apply(intakeMotor2Config);
 

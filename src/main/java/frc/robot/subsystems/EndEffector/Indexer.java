@@ -15,6 +15,7 @@ import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -67,6 +68,7 @@ public class Indexer extends SubsystemBase {
 
 		TalonFXConfiguration indexerMotor2Config = MotorConfigs.getIndexerBangBangConfiguration();
 		indexerMotor2Config.Feedback.SensorToMechanismRatio = 0.733; // TODO find
+		indexerMotor2Config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 		m_IndexerMotor2.getConfigurator().apply(indexerMotor2Config);
 
 		m_FollowerRequest = new Follower(m_IndexerMotor1.getDeviceID(), MotorAlignmentValue.Opposed);
