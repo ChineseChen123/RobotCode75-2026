@@ -214,7 +214,7 @@ public class IntakeIndexConstants {
 		public static final int beamBreakPort = 3;
 
 		public static final AngularVelocity defaultIndexerSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(70);
+		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(60);
 		public static final AngularVelocity reverseIndexerSpeed = RotationsPerSecond.of(-15);
 
 		public static final AngularVelocity defaultHopperSpeed = RotationsPerSecond.of(0);
