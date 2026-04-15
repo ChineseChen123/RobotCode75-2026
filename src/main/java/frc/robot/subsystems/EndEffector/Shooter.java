@@ -66,7 +66,7 @@ public class Shooter extends SubsystemBase {
 	private AngularVelocity shooterTargetVelocity = RPM.of(0);
 	private AngularVelocity currentShooterVelocity = RPM.of(0);
 
-	private double velocityAdjustmentRPM = 10;
+	private double velocityAdjustmentRPM = 40;
 
 	private final Debouncer atSetpointDebouncer = new Debouncer(0.025, DebounceType.kFalling);
 	private boolean lastAtSetpoint = false;

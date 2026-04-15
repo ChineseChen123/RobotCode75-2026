@@ -45,7 +45,7 @@ public class IntakeIndexConstants {
 		public static final Angle pivotUpAngle = Rotations.of(0.3);
 
 		public static final AngularVelocity defaultIntakeSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(50);
+		public static final AngularVelocity intakeRunningSpeed = RotationsPerSecond.of(45);
 		public static final AngularVelocity intakeReversingSpeed = RotationsPerSecond.of(-30);
 
 		public static final class MotorConfigs {
@@ -214,15 +214,15 @@ public class IntakeIndexConstants {
 		public static final int beamBreakPort = 3;
 
 		public static final AngularVelocity defaultIndexerSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(60);
+		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(70);
 		public static final AngularVelocity reverseIndexerSpeed = RotationsPerSecond.of(-15);
 
 		public static final AngularVelocity defaultHopperSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity runningHopperSpeed = RotationsPerSecond.of(20);
+		public static final AngularVelocity runningHopperSpeed = RotationsPerSecond.of(40);
 		public static final AngularVelocity reverseHopperSpeed = RotationsPerSecond.of(-15);
 
 		public static final AngularVelocity defaultParallelSpeed = RotationsPerSecond.of(-10);
-		public static final AngularVelocity runningParallelSpeed = RotationsPerSecond.of(25);
+		public static final AngularVelocity runningParallelSpeed = RotationsPerSecond.of(40);
 		public static final AngularVelocity reverseParallelSpeed = RotationsPerSecond.of(-20);
 
 		public static final Current parallelJamCurrent = Amps.of(10.25);
