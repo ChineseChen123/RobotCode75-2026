@@ -66,7 +66,7 @@ public class Indexer extends SubsystemBase {
 		m_IndexerMotor1.getConfigurator().apply(MotorConfigs.getIndexerBangBangConfiguration());
 
 		TalonFXConfiguration indexerMotor2Config = MotorConfigs.getIndexerBangBangConfiguration();
-		indexerMotor2Config.Feedback.SensorToMechanismRatio = 1; // TODO find
+		indexerMotor2Config.Feedback.SensorToMechanismRatio = 0.733; // TODO find
 		m_IndexerMotor2.getConfigurator().apply(indexerMotor2Config);
 
 		m_FollowerRequest = new Follower(m_IndexerMotor1.getDeviceID(), MotorAlignmentValue.Opposed);
@@ -144,13 +144,17 @@ public class Indexer extends SubsystemBase {
 
 		if (m_IndexerState.indexerSpeed.baseUnitMagnitude() == 0) {
 			m_IndexerMotor1.setControl(new CoastOut());
+			m_IndexerMotor2.setControl(new CoastOut());
+
 		} else {
 			m_IndexerMotor1.setControl(
 					m_IndexerTorqueCurrent.withVelocity(
 							indexerJammed ? RotationsPerSecond.of(-15) : m_IndexerState.indexerSpeed));
+			m_IndexerMotor2.setControl(
+					m_IndexerTorqueCurrent.withVelocity(
+							indexerJammed ? RotationsPerSecond.of(-15) : m_IndexerState.indexerSpeed));
 		}
 
-		m_IndexerMotor2.setControl(m_FollowerRequest);
 	}
 
 	// public void initTunables() {
