@@ -33,14 +33,15 @@ public class IntakeIndexConstants {
 
 		public static final Angle pivotZeroPoint = Rotations.of(0);
 
-		public static final Angle pivotEncoderOffset = Rotations.of(0.529);
+		public static final Angle pivotEncoderOffset = Rotations.of(0.700);
 		public static final double pivotMotorToMechanismRatio = 1.0 / 48.0;
 		public static final double pivotToleranceAbsolute = 0.05; // rotations // TODO figure out
 
 		// TODO figure out
 		public static final Angle pivotDownAngle = Rotations.of(-0.1);
 		public static final Angle pivotHalfwayAngle = Rotations.of(0.12);
-		public static final Angle pivotJiggleAngleOne = Rotations.of(0.2);
+		public static final Angle pivotJiggleAngleOne 
+		= Rotations.of(0.2);
 		public static final Angle pivotJiggleAngleTwo = Rotations.of(-0.1);
 		public static final Angle pivotUpAngle = Rotations.of(0.3);
 
@@ -214,7 +215,7 @@ public class IntakeIndexConstants {
 		public static final int beamBreakPort = 3;
 
 		public static final AngularVelocity defaultIndexerSpeed = RotationsPerSecond.of(0);
-		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(70);
+		public static final AngularVelocity shootingIndexerSpeed = RotationsPerSecond.of(65);
 		public static final AngularVelocity reverseIndexerSpeed = RotationsPerSecond.of(-15);
 
 		public static final AngularVelocity defaultHopperSpeed = RotationsPerSecond.of(0);
@@ -225,12 +226,12 @@ public class IntakeIndexConstants {
 		public static final AngularVelocity runningParallelSpeed = RotationsPerSecond.of(40);
 		public static final AngularVelocity reverseParallelSpeed = RotationsPerSecond.of(-20);
 
-		public static final Current parallelJamCurrent = Amps.of(10.25);
+		public static final Current parallelJamCurrent = Amps.of(12.5);
 
 		public static final double indexerSpeedThresholdRPS = 10;
 
 		public static final Time timeOfForwardParallel = Seconds.of(.75);
-		public static final Time timeOfBackwardParallel = Seconds.of(0.1);
+		public static final Time timeOfBackwardParallel = Seconds.of(0.15);
 
 		public class MotorConfigs {
 			public static final TalonFXConfiguration m_IndexerMotorConfig = new TalonFXConfiguration();
@@ -325,7 +326,7 @@ public class IntakeIndexConstants {
 				config.Slot0.kD = 0.0;
 				config.Slot0.kV = 0.0;
 				config.Slot0.kA = 0.0;
-				config.TorqueCurrent.PeakForwardTorqueCurrent = 80.0;
+				config.TorqueCurrent.PeakForwardTorqueCurrent = 60.0;
 				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
 				config.MotorOutput.PeakForwardDutyCycle = 1.0;
 				config.MotorOutput.PeakReverseDutyCycle = 0.0;
@@ -341,7 +342,7 @@ public class IntakeIndexConstants {
 				config.Slot0.kV = 0.0;
 				config.Slot0.kA = 0.0;
 				config.TorqueCurrent.PeakForwardTorqueCurrent = 0.0;
-				config.TorqueCurrent.PeakReverseTorqueCurrent = -80.0;
+				config.TorqueCurrent.PeakReverseTorqueCurrent = -60.0;
 
 				return config;
 			}

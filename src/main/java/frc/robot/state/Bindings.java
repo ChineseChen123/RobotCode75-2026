@@ -45,6 +45,8 @@ public class Bindings {
 		RobotStates.actionIncrementShooter.onTrue(
 				new InstantCommand(() -> m_Shooter.incrementAdjustment()));
 
+		RobotStates.actionReverseShooter.whileTrue(m_Shooter.setStateCommand(ShooterStates.REVERSING));
+
 		// shoot
 		RobotStates.actionIndexerShoot
 				.and(RobotStates.turretIsInDeadzone.negate())

@@ -37,6 +37,7 @@ public class Shooter extends SubsystemBase {
 
 	public enum ShooterStates {
 		DEFAULT(defaultShooterSpeed),
+		REVERSING(RPM.of(-1000)),
 		SHOOTING(null);
 
 		public final AngularVelocity shooterSpeed;
@@ -66,7 +67,7 @@ public class Shooter extends SubsystemBase {
 	private AngularVelocity shooterTargetVelocity = RPM.of(0);
 	private AngularVelocity currentShooterVelocity = RPM.of(0);
 
-	private double velocityAdjustmentRPM = 40;
+	private double velocityAdjustmentRPM = 0.0;
 
 	private final Debouncer atSetpointDebouncer = new Debouncer(0.025, DebounceType.kFalling);
 	private boolean lastAtSetpoint = false;
@@ -107,6 +108,20 @@ public class Shooter extends SubsystemBase {
 		return currentShooterVelocity.in(RPM);
 	}
 
+	@Logged(key = "Shooter Motor Velocity RPM 1", importance = Importance.CRITICAL)
+	public double getMotorVelocityRPM1() {
+		return m_ShooterMotor1
+				.getVelocity(true)
+				.getValue().in(RPM);
+	}
+
+	@Logged(key = "Shooter Motor Velocity RPM 2", importance = Importance.CRITICAL)
+	public double getMotorVelocityRPM2() {
+		return m_ShooterMotor2
+				.getVelocity(true)
+				.getValue().in(RPM);
+	}
+
 	@Logged(key = "Shooter Wheel Velocity RPM", importance = Importance.DEBUG)
 	public double getWheelVelocityRPM() {
 		return getMotorVelocityRPM() * shooterGearRatio;
@@ -123,6 +138,17 @@ public class Shooter extends SubsystemBase {
 	@Logged(key = "Shooter Stator Current", importance = Importance.CRITICAL)
 	public double getStatorCurrent() {
 		return (m_ShooterMotor1.getStatorCurrent(true).getValueAsDouble() + m_ShooterMotor2.getStatorCurrent(true).getValueAsDouble()) / 2.0;
+	}
+
+
+	@Logged(key = "Shooter Stator Current 1", importance = Importance.CRITICAL)
+	public double getStatorCurrent1() {
+		return m_ShooterMotor1.getStatorCurrent(true).getValueAsDouble();
+	}
+
+	@Logged(key = "Shooter Stator Current 2", importance = Importance.CRITICAL)
+	public double getStatorCurrent2() {
+		return m_ShooterMotor2.getStatorCurrent(true).getValueAsDouble();
 	}
 
 	@Logged(key = "Shooter Target Velocity RPM", importance = Importance.CRITICAL)
@@ -153,7 +179,7 @@ public class Shooter extends SubsystemBase {
 		m_ShooterState = state;
 	}
 
-	@Logged(key = "Shooter Shots Fired", importance = Importance.CRITICAL)
+	@Logged(key = "Shooter Shots Fired", importance = Importance.DEBUG)
 	public int getShotsFired() {
 		return shotsFired;
 	}
@@ -202,8 +228,8 @@ public class Shooter extends SubsystemBase {
 		}
 
 		shooterTargetVelocity =
-				ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetPose)
-						.plus(getVelocityAdjustment());
+				 ShooterPhysics.calculateShooterSpeed(RobotStates.robotPose.get(), targetPose)
+				 		.plus(getVelocityAdjustment());
 	}
 
 	// ── Control helpers ──────────────────────────────────────────────────────────
@@ -214,6 +240,7 @@ public class Shooter extends SubsystemBase {
 		boolean debouncedAtSetpoint = atSetpointDebouncer.calculate(aboveTargetVelocity());
 
 		m_ShooterMotor1.setControl(m_TorqueCurrentBangBang.withVelocity(shooterTargetVelocity));
+		// m_ShooterMotor1.setControl(m_TorqueCurrentBangBang.withVelocity(RPM.of(1000)));
 
 		return debouncedAtSetpoint;
 	}

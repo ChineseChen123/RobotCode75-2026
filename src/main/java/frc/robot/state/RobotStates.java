@@ -142,6 +142,8 @@ public class RobotStates {
 	public static Trigger actionAimTurretToggle = m_Operator.upDpad.and(teleop);
 	public static Trigger actionResetTurret = m_Operator.X.and(teleop);
 
+	public static Trigger actionReverseShooter = m_Operator.leftDpad.and(teleop);
+
 	/* Climber actions */
 
 	public static Trigger actionClimberUp =

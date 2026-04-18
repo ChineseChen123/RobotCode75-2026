@@ -32,13 +32,13 @@ public class FieldConstants {
 	public static final Pose2d blueBumpRight =
 			new Pose2d(blueHub.getMeasureX(), Meters.of(2.513244390487671), Rotation2d.kZero);
 	public static final Pose2d blueCornerDepot =
-			new Pose2d(Meters.of(0.828855574131012), Meters.of(7.3211541175842285), Rotation2d.kZero);
+			new Pose2d(Meters.of(1.1), Meters.of(7.1), Rotation2d.kZero);
 	public static final Pose2d redCornerDepot =
-			new Pose2d(Meters.of(15.863212585449219), Meters.of(0.7376258969306946), Rotation2d.kZero);
+			new Pose2d(Meters.of(15.1), Meters.of(0.9), Rotation2d.kZero);
 	public static final Pose2d blueCornerOutpost =
-			new Pose2d(Meters.of(0.828855574131012), Meters.of(0.7376258969306946), Rotation2d.kZero);
+			new Pose2d(Meters.of(1.1), Meters.of(0.9), Rotation2d.kZero);
 	public static final Pose2d redCornerOutpost =
-			new Pose2d(Meters.of(15.863212585449219), Meters.of(7.3211541175842285), Rotation2d.kZero);
+			new Pose2d(Meters.of(15.1), Meters.of(7.1), Rotation2d.kZero);
 
 	public static final Pose2d redBumpLeft =
 			new Pose2d(redHub.getMeasureX(), Meters.of(2.513244390487671), Rotation2d.kZero);

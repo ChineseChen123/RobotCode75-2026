@@ -103,6 +103,12 @@ public class AutoSelector {
 		presetChooser.addOption("Depot Side Double Swipe", Presets.depotSideDoubleSwipe);
 		presetChooser.addOption("Outpost Side Double Swipe", Presets.outpostSideDoubleSwipe);
 
+		presetChooser.addOption("Mid Depot", Presets.midDepot);
+		presetChooser.addOption("Mid Outpost", Presets.midOutpost);
+
+		presetChooser.addOption("Depot Side Steal", Presets.depotSideSteal);
+		presetChooser.addOption("Outpost Side Steal", Presets.outpostSideSteal);
+
 		// define auto factory for autos
 		choreoFactory =
 				new AutoFactory(

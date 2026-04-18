@@ -203,7 +203,7 @@ public class PeddieBounds {
 
 	public static Pose3d getShootingTargetPose(Pose2d pose) {
 		if (isInOwnZone(pose)) return onBlueAlliance() ? FieldConstants.blueHub : FieldConstants.redHub;
-		if (DriverStation.isAutonomous()) return new Pose3d(getNearestCorner(pose));
+		if (DriverStation.isAutonomous()) return new Pose3d(getNearestBump(pose));
 
 		Pose3d bump = new Pose3d(getNearestBump(pose));
 		bump = new Pose3d(bump.getMeasureX(), bump.getMeasureY(), Meters.of(0), bump.getRotation());

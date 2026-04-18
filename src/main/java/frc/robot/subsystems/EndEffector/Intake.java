@@ -158,6 +158,12 @@ public class Intake extends SubsystemBase {
 		return m_IntakeMotor1.getVelocity().getValue().in(RotationsPerSecond);
 	}
 
+	
+	@Logged(key = "Intake Current", importance = Importance.DEBUG)
+	public double getIntakeCurrent() { // TODO: need to add intake motor 2, prob fine for now
+		return m_IntakeMotor1.getStatorCurrent(true).getValueAsDouble();
+	}
+
 	@Logged(key = "Intake State", importance = Importance.CRITICAL)
 	public IntakeStates getIntakeState() {
 		return m_IntakeState;

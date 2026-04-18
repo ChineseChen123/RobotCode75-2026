@@ -94,7 +94,7 @@ public class Indexer extends SubsystemBase {
 		return m_IndexerMotor1.getVelocity(true).getValue();
 	}
 
-	@Logged(key = "Indexer Current", importance = Importance.DEBUG)
+	@Logged(key = "Indexer Current", importance = Importance.CRITICAL)
 	public double getIndexerCurrent() {
 		return m_IndexerMotor1.getStatorCurrent(true).getValue().in(Amps);
 	}

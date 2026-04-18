@@ -94,6 +94,13 @@ public class ActionFactory {
 				).andThen(
 					m_Intake.setStateCommandPersistent(IntakeStates.INTAKING)
 				);
+
+			case 12:
+				m_Intake.setStateCommandPersistent(IntakeStates.JIGGLINGUP);
+			case 13:
+				return new WaitCommand(0);
+			case 14:
+				return new WaitCommand(2.7);
 		}
 		return null;
 	}
@@ -129,6 +136,12 @@ public class ActionFactory {
 			// 	return "Stow Climber";
 			case 11:
 				return "Intake Agitate Once";
+			case 12:
+				return "Intake Agitate Up Position";
+			case 13:
+				return "Wait Before Moving For Steal";
+			case 14:
+				return "Wait at mid line";
 		}
 		return null;
 	}

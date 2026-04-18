@@ -36,7 +36,7 @@ import frc.lib.util.LinearInterpolationMap;
 public class ShooterTurretConstants {
 
 	public static final boolean useVirtualTarget = true;
-	public static final int virtualTargetSolveIterations = 24;
+	public static final int virtualTargetSolveIterations = 12;
 
 	public static final double phaseDelay = 0.05;
 	public static final double additionalPhaseDelayShooterSpeeds = 0.05;
@@ -75,7 +75,7 @@ public class ShooterTurretConstants {
 
 		public static final Distance minShootingDistance = Meters.of(2.058);
 		public static final AngularVelocity minShootingAngularVelocity = RPM.of(2026);
-		public static final AngularVelocity maxShootingAngularVelocity = RPM.of(4500);
+		public static final AngularVelocity maxShootingAngularVelocity = RPM.of(5500);
 		public static final LinearInterpolationMap distanceToRPMMap =
 				new LinearInterpolationMap()
 						.add(minShootingDistance.in(Meters), minShootingAngularVelocity.in(RPM))
@@ -166,13 +166,14 @@ public class ShooterTurretConstants {
 				config.Slot0.kD = 0.0;
 				config.Slot0.kV = 0.0;
 				config.Slot0.kA = 0.0;
-				config.TorqueCurrent.PeakForwardTorqueCurrent = 100.0;
+				config.TorqueCurrent.PeakForwardTorqueCurrent = 60.0;
 				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
 				config.MotorOutput.PeakForwardDutyCycle = 1.0;
 				config.MotorOutput.PeakReverseDutyCycle = 0.0;
 
 				return config;
 			}
+
 		}
 	}
 

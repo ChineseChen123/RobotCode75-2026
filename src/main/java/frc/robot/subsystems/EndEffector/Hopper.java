@@ -119,10 +119,16 @@ public class Hopper extends SubsystemBase {
 		return currentParallelVelocity.in(RotationsPerSecond);
 	}
 
-	@Logged(key = "Parallel Roller Current", importance = Importance.DEBUG)
+	@Logged(key = "Parallel Roller Current", importance = Importance.CRITICAL)
 	public double getParallelCurrent() {
 		return m_ParallelMotor.getStatorCurrent(true).getValueAsDouble();
 	}
+
+	@Logged(key = "Hopper Current", importance = Importance.CRITICAL)
+	public double getHopperCurrent() {
+		return m_HopperMotor.getStatorCurrent(true).getValueAsDouble();
+	}
+
 
 	@Logged(key = "Hopper State", importance = Importance.DEBUG)
 	public HopperStates getHopperState() {
