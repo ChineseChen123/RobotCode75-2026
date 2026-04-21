@@ -75,7 +75,7 @@ public class ShooterTurretConstants {
 
 		public static final Distance minShootingDistance = Meters.of(2.058);
 		public static final AngularVelocity minShootingAngularVelocity = RPM.of(2026);
-		public static final AngularVelocity maxShootingAngularVelocity = RPM.of(5500);
+		public static final AngularVelocity maxShootingAngularVelocity = RPM.of(3800);
 		public static final LinearInterpolationMap distanceToRPMMap =
 				new LinearInterpolationMap()
 						.add(minShootingDistance.in(Meters), minShootingAngularVelocity.in(RPM))
@@ -106,17 +106,17 @@ public class ShooterTurretConstants {
 
 			public static final Current shooterMotorSupplyCurrentLimit = Amps.of(40);
 			public static final Current shooterMotorCurrentLowerThreshold = Amps.of(30);
-			public static final Current shooterMotorStatorCurrentLimit = Amps.of(80);
+			public static final Current shooterMotorStatorCurrentLimit = Amps.of(60);
 
 			// Torque PI
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double shooterMotorVelocityKP = 35;
+			public static final double shooterMotorVelocityKP = 50;
 			public static final double shooterMotorVelocityKI = 0.0;
 			public static final double shooterMotorVelocityKD = 0.0;
 			public static final double shooterMotorVelocityKS = 0.45181;
-			public static final double shooterMotorVelocityKV = 0.25;
+			public static final double shooterMotorVelocityKV = 0.7;
 			public static final double shooterMotorVelocityKA = 0.025;
 
 			public static TalonFXConfiguration getShooterMotorConfiguration() {

@@ -26,7 +26,7 @@ public final class RobotConstants {
 	public static final class TuningModes {
 		public static final boolean tuneTurret = false && TUNING_MODE;
 		public static final boolean tuneIntake = false && TUNING_MODE;
-		public static final boolean tunePivot = true && TUNING_MODE;
+		public static final boolean tunePivot = false && TUNING_MODE;
 		public static final boolean tuneIndexer = false && TUNING_MODE;
 		public static final boolean tuneHopper = false && TUNING_MODE;
 		public static final boolean tuneParallel = false && TUNING_MODE;

@@ -251,14 +251,14 @@ public class IntakeIndexConstants {
 			// Indexer current limits
 			public static final Current indexerSupplyCurrentLimit = Amps.of(40);
 			public static final Current indexerCurrentLowerThreshold = Amps.of(30);
-			public static final Current hopperSupplyCurrentLimit = Amps.of(40);
+			public static final Current hopperSupplyCurrentLimit = Amps.of(30);
 			public static final Current hopperCurrentLowerThreshold = Amps.of(30);
-			public static final Current parallelSupplyCurrentLimit = Amps.of(40);
+			public static final Current parallelSupplyCurrentLimit = Amps.of(30);
 			public static final Current parallelCurrentLowerThreshold = Amps.of(30);
 
-			public static final Current indexerStatorCurrentLimit = Amps.of(80);
-			public static final Current hopperStatorCurrentLimit = Amps.of(60);
-			public static final Current parallelStatorCurrentLimit = Amps.of(60);
+			public static final Current indexerStatorCurrentLimit = Amps.of(60);
+			public static final Current hopperStatorCurrentLimit = Amps.of(40);
+			public static final Current parallelStatorCurrentLimit = Amps.of(50);
 
 			public static final Time indexerCurrentThresholdTime = Seconds.of(0.50);
 			public static final Time hopperCurrentThresholdTime = Seconds.of(0.50);
