@@ -230,7 +230,7 @@ public class ShooterTurretConstants {
 			public static final double turretKA = 0; // voltage per unit of acceleration
 			public static final double turretKG = 0; // voltage to overcome gravity
 			public static final double turretKS = 8; // voltage to overcome static friction
-			public static final double turretKV = 0.1; // voltage per unit of requested velocity
+			public static final double turretKV = 4; // voltage per unit of requested velocity
 			public static final double turretKP = 80.0;
 			public static final double turretKI = 0;
 			public static final double turretKD = 3;
