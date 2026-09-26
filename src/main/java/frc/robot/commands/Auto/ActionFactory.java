@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.Hopper;
+import frc.robot.subsystems.EndEffector.Hopper.HopperStates;
 import frc.robot.subsystems.EndEffector.Indexer;
 import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
 import frc.robot.subsystems.EndEffector.Intake;
@@ -15,6 +17,7 @@ import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Shooter.ShooterStates;
 import frc.robot.subsystems.EndEffector.Turret;
 import frc.robot.subsystems.EndEffector.Turret.TurretStates;
+import frc.robot.subsystems.Endgame.Climber;
 
 /*
  * Each command used in auto selector needs to be a separate object
@@ -26,14 +29,18 @@ public class ActionFactory {
 	private Shooter m_Shooter;
 	private Intake m_Intake;
 	private Indexer m_Indexer;
+	private Hopper m_Hopper;
 	private Turret m_Turret;
+	private Climber m_Climber;
 
 	public ActionFactory() {
 		m_Swerve = RobotContainer.getSwerve();
 		m_Shooter = RobotContainer.getShooter();
 		m_Intake = RobotContainer.getIntake();
 		m_Indexer = RobotContainer.getIndexer();
+		m_Hopper = RobotContainer.getHopper();
 		m_Turret = RobotContainer.getTurret();
+		m_Climber = null; // RobotContainer.getClimber();
 	}
 
 	/** returns command associated with action number */
@@ -48,9 +55,13 @@ public class ActionFactory {
 						m_Shooter.setStateCommandPersistent(ShooterStates.DEFAULT),
 						m_Turret.setStateCommandPersistent(TurretStates.IDLE));
 			case 3:
-				return m_Indexer.setStateCommandPersistent(IndexerStates.SHOOTING);
+				return new ParallelCommandGroup(
+						m_Indexer.setStateCommandPersistent(IndexerStates.SHOOTING),
+						m_Hopper.setStateCommandPersistent(HopperStates.SHOOTING));
 			case 4:
-				return m_Indexer.setStateCommandPersistent(IndexerStates.DEFAULT);
+				return new ParallelCommandGroup(
+						m_Indexer.setStateCommandPersistent(IndexerStates.DEFAULT),
+						m_Hopper.setStateCommandPersistent(HopperStates.DEFAULT));
 
 			case 5:
 				return m_Intake.setStateCommandPersistent(IntakeStates.INTAKING);
@@ -64,13 +75,32 @@ public class ActionFactory {
 						m_Turret.setStateCommandPersistent(TurretStates.IDLE),
 						m_Shooter.setStateCommandPersistent(ShooterStates.DEFAULT));
 			case 8:
-				return new SequentialCommandGroup(
-								m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT),
-								new WaitCommand(0.75),
-								m_Intake.setStateCommandPersistent(IntakeStates.INTAKING),
-								new WaitCommand(0.75))
-						.repeatedly()
-						.finallyDo(() -> m_Intake.setStateCommandPersistent(IntakeStates.DEFAULT));
+				return m_Intake.jiggleCommand();
+			case 9:
+				return new ParallelCommandGroup(
+						new WaitCommand(1.5), m_Intake.setStateCommandPersistent(IntakeStates.INTAKING));
+			case 10:
+				return new WaitCommand(3.75);
+			// case 11:
+			// 	return m_Climber.positionCommandUntilDone(Climber.ClimberPositions.UP);
+			// case 12:
+			// 	return m_Climber.positionCommandUntilDone(Climber.ClimberPositions.CLIMBED);
+			// case 13:
+			// 	return m_Climber.positionCommandUntilDone(Climber.ClimberPositions.STOW);
+			case 11:
+				return new ParallelRaceGroup(
+					new WaitCommand(1.5),
+					m_Intake.jiggleCommand()
+				).andThen(
+					m_Intake.setStateCommandPersistent(IntakeStates.INTAKING)
+				);
+
+			case 12:
+				m_Intake.setStateCommandPersistent(IntakeStates.JIGGLINGUP);
+			case 13:
+				return new WaitCommand(0);
+			case 14:
+				return new WaitCommand(2.7);
 		}
 		return null;
 	}
@@ -93,7 +123,25 @@ public class ActionFactory {
 			case 7:
 				return "Shoot Preload";
 			case 8:
-				return "Intake Agitate";
+				return "Intake Agitate Repeatedly";
+			case 9:
+				return "Delayed Start Intaking";
+			case 10:
+				return "Wait 4s";
+			// case 11:
+			// 	return "Climber Up";
+			// case 12:
+			// 	return "Climb";
+			// case 13:
+			// 	return "Stow Climber";
+			case 11:
+				return "Intake Agitate Once";
+			case 12:
+				return "Intake Agitate Up Position";
+			case 13:
+				return "Wait Before Moving For Steal";
+			case 14:
+				return "Wait at mid line";
 		}
 		return null;
 	}

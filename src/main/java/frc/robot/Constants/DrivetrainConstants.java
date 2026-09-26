@@ -20,6 +20,8 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 
@@ -50,17 +52,6 @@ public final class DrivetrainConstants {
 			public static final double tP = 3;
 			public static final double tI = 0.0;
 			public static final double tD = 0.0;
-		}
-
-		// yolo controller only
-		public static final class VisionAlign {
-			public static final double xP = 0.0;
-			public static final double xI = 0.0;
-			public static final double xD = 0.0;
-
-			public static final double yP = 0.7;
-			public static final double yI = 0.0;
-			public static final double yD = 0.0;
 		}
 
 		// only applicable when robot is being controlled by a PID controller
@@ -124,7 +115,7 @@ public final class DrivetrainConstants {
 
 	// The stator current at which the wheels start to slip;
 	// This needs to be tuned to your individual robot
-	private static final Current kSlipCurrent = Amps.of(120.0);
+	private static final Current kSlipCurrent = Amps.of(80.0);
 
 	// Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
 	// Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
@@ -184,6 +175,9 @@ public final class DrivetrainConstants {
 	public static final LinearVelocity maxVelocity = MetersPerSecond.of(3.5);
 
 	public static final LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(3);
+
+	public static final double speedClampMultiplier = 0.25;
+	public static final double angularClampMultiplier = 0.1;
 
 	// radians per second
 	public static final AngularVelocity maxAngularVelocity =
@@ -272,6 +266,13 @@ public final class DrivetrainConstants {
 
 	private static final Distance kBackRightXPos = trackLength.div(-2);
 	private static final Distance kBackRightYPos = trackWidth.div(-2);
+
+	public static final SwerveDriveKinematics kinematics =
+			new SwerveDriveKinematics(
+					new Translation2d(kFrontLeftXPos.in(Meters), kFrontLeftYPos.in(Meters)),
+					new Translation2d(kFrontRightXPos.in(Meters), kFrontRightYPos.in(Meters)),
+					new Translation2d(kBackLeftXPos.in(Meters), kBackLeftYPos.in(Meters)),
+					new Translation2d(kBackRightXPos.in(Meters), kBackRightYPos.in(Meters)));
 
 	public static final SwerveModuleConstants<
 					TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>

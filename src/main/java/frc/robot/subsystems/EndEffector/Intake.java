@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.EndEffector;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.IntakeIndexConstants.IntakeConstants.*;
@@ -11,23 +12,32 @@ import static frc.robot.Constants.IntakeIndexConstants.IntakeConstants.MotorConf
 import static frc.robot.Constants.RobotConstants.*;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
+import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.state.RobotStates;
+import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
 
 public class Intake extends SubsystemBase {
 
@@ -37,7 +47,9 @@ public class Intake extends SubsystemBase {
 		STOWED(pivotUpAngle, defaultIntakeSpeed),
 		DEFAULT(pivotHalfwayAngle, defaultIntakeSpeed),
 		INTAKING(pivotDownAngle, intakeRunningSpeed),
-		REVERSING(pivotDownAngle, intakeReversingSpeed);
+		REVERSING(pivotDownAngle, intakeReversingSpeed),
+		JIGGLINGUP(pivotJiggleAngleOne, intakeRunningSpeed),
+		JIGGLINGDOWN(pivotJiggleAngleTwo, intakeRunningSpeed);
 
 		Angle pivotPosition;
 		AngularVelocity intakeSpeed;
@@ -50,7 +62,8 @@ public class Intake extends SubsystemBase {
 
 	// ── Hardware ─────────────────────────────────────────────────────────────────
 
-	private final TalonFX m_IntakeMotor;
+	private final TalonFX m_IntakeMotor1;
+	private final TalonFX m_IntakeMotor2;
 	private final TalonFX m_PivotMotor;
 	private final DutyCycleEncoder m_absoluteEncoder;
 
@@ -59,6 +72,9 @@ public class Intake extends SubsystemBase {
 	private final VelocityTorqueCurrentFOC m_IntakeRequest = new VelocityTorqueCurrentFOC(0);
 	private final MotionMagicExpoTorqueCurrentFOC m_PivotRequest =
 			new MotionMagicExpoTorqueCurrentFOC(0);
+
+	private final Follower m_FollowerRequest;
+
 
 	// ── Internal state ───────────────────────────────────────────────────────────
 
@@ -85,11 +101,22 @@ public class Intake extends SubsystemBase {
 
 	/** Creates a new Intake. */
 	public Intake() {
-		m_IntakeMotor = new TalonFX(intakeMotorCanID, superstructureCANBusName);
+		m_IntakeMotor1 = new TalonFX(intakeMotor1CanID, superstructureCANBusName);
+		m_IntakeMotor2 = new TalonFX(intakeMotor2CanID, superstructureCANBusName);
 		m_PivotMotor = new TalonFX(pivotCanID, superstructureCANBusName);
 
 		m_PivotMotor.getConfigurator().apply(getPivotConfiguration());
-		m_IntakeMotor.getConfigurator().apply(getIntakeBangBangConfiguration());
+		m_IntakeMotor1.getConfigurator().apply(getIntakeBangBangConfiguration());
+
+		TalonFXConfiguration intakeMotor2Config = getIntakeBangBangConfiguration();
+
+		intakeMotor2Config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+		intakeMotor2Config.Feedback.SensorToMechanismRatio = 0.75; // TODO find
+		m_IntakeMotor2.getConfigurator().apply(intakeMotor2Config);
+
+		m_FollowerRequest = new Follower(m_IntakeMotor1.getDeviceID(), MotorAlignmentValue.Opposed);
+
+		m_IntakeMotor2.setControl(m_FollowerRequest);
 
 		m_IntakeState = IntakeStates.DEFAULT;
 
@@ -127,8 +154,14 @@ public class Intake extends SubsystemBase {
 	}
 
 	@Logged(key = "Intake Velocity", importance = Importance.DEBUG)
-	public double getIntakeVelocity() {
-		return m_IntakeMotor.getVelocity().getValue().in(RotationsPerSecond);
+	public double getIntakeVelocity() { // TODO: need to add intake motor 2, prob fine for now
+		return m_IntakeMotor1.getVelocity().getValue().in(RotationsPerSecond);
+	}
+
+	
+	@Logged(key = "Intake Current", importance = Importance.DEBUG)
+	public double getIntakeCurrent() { // TODO: need to add intake motor 2, prob fine for now
+		return m_IntakeMotor1.getStatorCurrent(true).getValueAsDouble();
 	}
 
 	@Logged(key = "Intake State", importance = Importance.CRITICAL)
@@ -157,6 +190,16 @@ public class Intake extends SubsystemBase {
 		return new InstantCommand(() -> setState(state), this);
 	}
 
+	public Command jiggleCommand() {
+		return new SequentialCommandGroup(
+						setStateCommandPersistent(IntakeStates.JIGGLINGUP),
+						new WaitCommand(0.5),
+						setStateCommandPersistent(IntakeStates.JIGGLINGDOWN),
+						new WaitCommand(1))
+				.repeatedly()
+				.finallyDo(() -> setState(IntakeStates.DEFAULT));
+	}
+
 	@Override
 	public void periodic() {
 
@@ -170,11 +213,26 @@ public class Intake extends SubsystemBase {
 		// }
 
 		if (m_IntakeState.intakeSpeed.abs(RotationsPerSecond) > 0) {
-			m_IntakeMotor.setControl(m_IntakeRequest.withVelocity(m_IntakeState.intakeSpeed));
-		} else {
-			m_IntakeMotor.setControl(new CoastOut());
-		}
+			AngularVelocity speed = m_IntakeState.intakeSpeed;
+			if (m_IntakeState == IntakeStates.INTAKING) {
+				speed =
+						speed.plus(
+								RotationsPerSecond.of(15)
+										.times(
+												RobotStates.robotSpeedMagnitude.get()
+														/ DrivetrainConstants.maxVelocity.in(MetersPerSecond)));
+			}
+			/*if (RobotStates.auto.getAsBoolean()) {
+				speed = RotationsPerSecond.of(60);
+			}
+			*/
+			m_IntakeMotor1.setControl(m_IntakeRequest.withVelocity(speed));
+			m_IntakeMotor2.setControl(m_IntakeRequest.withVelocity(speed));
 
+		} else {
+			m_IntakeMotor1.setControl(new CoastOut());
+			m_IntakeMotor2.setControl(new CoastOut());
+		}
 		m_PivotMotor.setControl(m_PivotRequest.withPosition(m_IntakeState.pivotPosition));
 	}
 
@@ -223,7 +281,8 @@ public class Intake extends SubsystemBase {
 			IntakeMotorPIDConfig.kS = intakeMotorKs.getNumber();
 			IntakeMotorPIDConfig.kV = intakeMotorKv.getNumber();
 
-			m_IntakeMotor.getConfigurator().apply(IntakeMotorPIDConfig);
+			m_IntakeMotor1.getConfigurator().apply(IntakeMotorPIDConfig);
+			m_IntakeMotor2.getConfigurator().apply(IntakeMotorPIDConfig);
 		}
 	}
 }

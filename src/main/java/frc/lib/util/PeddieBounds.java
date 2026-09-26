@@ -115,6 +115,17 @@ public class PeddieBounds {
 		return bumpRight;
 	}
 
+	public static Pose2d getNearestCorner(Pose2d currentPose) {
+		Pose2d cornerDepot = onBlueAlliance() ? blueCornerDepot : redCornerDepot;
+		Pose2d cornerOutpost = onBlueAlliance() ? blueCornerOutpost : redCornerOutpost;
+		double distToDepot = cornerDepot.getTranslation().getDistance(currentPose.getTranslation());
+		double distToOutpost = cornerOutpost.getTranslation().getDistance(currentPose.getTranslation());
+
+		if (distToDepot < distToOutpost) return cornerDepot;
+		if (distToDepot >= distToOutpost) return cornerOutpost; // readability
+		return cornerOutpost;
+	}
+
 	public static Pose2d getOptimalFeedPose(Pose2d currentPose) {
 		// TODO: this does NOT take into account the hub
 		// im just too lazy to do this rn but basically need to find where ball might clip corner of hub
@@ -192,7 +203,11 @@ public class PeddieBounds {
 
 	public static Pose3d getShootingTargetPose(Pose2d pose) {
 		if (isInOwnZone(pose)) return onBlueAlliance() ? FieldConstants.blueHub : FieldConstants.redHub;
-		return new Pose3d(getNearestBump(pose));
+		if (DriverStation.isAutonomous()) return new Pose3d(getNearestBump(pose));
+
+		Pose3d bump = new Pose3d(getNearestBump(pose));
+		bump = new Pose3d(bump.getMeasureX(), bump.getMeasureY(), Meters.of(0), bump.getRotation());
+		return bump;
 	}
 
 	public static boolean isInNeutralZone(Pose2d pose) {

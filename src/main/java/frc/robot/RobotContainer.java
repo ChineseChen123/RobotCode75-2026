@@ -18,6 +18,8 @@ import frc.robot.state.Bindings;
 import frc.robot.state.Driver;
 import frc.robot.state.Operator;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.Hopper;
+import frc.robot.subsystems.EndEffector.Hopper.HopperStates;
 import frc.robot.subsystems.EndEffector.Indexer;
 import frc.robot.subsystems.EndEffector.Indexer.IndexerStates;
 import frc.robot.subsystems.EndEffector.Intake;
@@ -43,6 +45,7 @@ public class RobotContainer {
 	public static final Intake m_Intake = new Intake();
 
 	public static final Indexer m_Indexer = new Indexer();
+	public static final Hopper m_Hopper = new Hopper();
 
 	public static final Shooter m_Shooter = new Shooter();
 
@@ -80,8 +83,9 @@ public class RobotContainer {
 		RaiderLog.register("Turret", m_Turret);
 		// RaiderLog.register("Limelight TR", m_LimelightTR);
 		// RaiderLog.register("Limelight TL", m_LimelightTL);
-		// RaiderLog.register("Indexer", m_Indexer);
-		// RaiderLog.register("Intake", m_Intake);
+		RaiderLog.register("Indexer", m_Indexer);
+		// RaiderLog.register("Hopper", m_Hopper);
+		RaiderLog.register("Intake", m_Intake);
 		// RaiderLog.register("Climber", m_Climber);
 	}
 
@@ -107,8 +111,10 @@ public class RobotContainer {
 	public static void resetSubsystems() {
 		m_Intake.setState(IntakeStates.DEFAULT);
 		m_Indexer.setState(IndexerStates.DEFAULT);
+		m_Hopper.setState(HopperStates.DEFAULT);
 		m_Shooter.setState(Shooter.ShooterStates.DEFAULT);
 		m_Turret.setState(Turret.TurretStates.IDLE);
+		m_Swerve.resetToggles();
 	}
 
 	// Methods to return instances of static subsystems
@@ -123,6 +129,10 @@ public class RobotContainer {
 
 	public static Indexer getIndexer() {
 		return m_Indexer;
+	}
+
+	public static Hopper getHopper() {
+		return m_Hopper;
 	}
 
 	public static Shooter getShooter() {

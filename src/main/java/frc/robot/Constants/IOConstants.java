@@ -9,10 +9,14 @@ public final class IOConstants {
 	public static final int rightStickPort = 1;
 	public static final int controllerPort = 2;
 
-	public static final int robotRelativeButton = 2;
-	public static final int resetHeadingButton = 3;
-	public static final int xstanceButton = 5;
+	// left stick
 	public static final int trenchDriveButton = 1;
+	public static final int resetHeadingButton = 3;
+	public static final int speedClampButton = 2;
+
+	// right stick
+	public static final int robotRelativeButton = 2;
+	public static final int xstanceButton = 1;
 
 	// Joystick value adjusted to 0 if within -deadband and deadband
 	public static final double stickDeadband = oneDriver ? 0.05 : 0.08;

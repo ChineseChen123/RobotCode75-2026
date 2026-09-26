@@ -17,6 +17,7 @@ import frc.lib.util.RaiderLog.RaiderLog.Importance;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.LimelightHelpers;
 import frc.robot.state.RobotStates;
+import java.util.Arrays;
 
 public class Limelight extends SubsystemBase {
 
@@ -111,10 +112,7 @@ public class Limelight extends SubsystemBase {
 
 		double fom = 0;
 
-		double linearSpeed =
-				Math.hypot(
-						RobotStates.fieldRelativeSpeeds.get().vxMetersPerSecond,
-						RobotStates.fieldRelativeSpeeds.get().vyMetersPerSecond);
+		double linearSpeed = RobotStates.robotSpeedMagnitude.get();
 		fom += 0.5 * linearSpeed / DrivetrainConstants.maxVelocity.in(MetersPerSecond);
 
 		double angularSpeed = RobotStates.fieldRelativeSpeeds.get().omegaRadiansPerSecond;
@@ -125,6 +123,27 @@ public class Limelight extends SubsystemBase {
 		fom += 4 * minAmbiguity;
 
 		return fom / pose.tagCount;
+	}
+
+	public double getStdev(LimelightHelpers.PoseEstimate estimate) {
+		double linearSpeed = RobotStates.robotSpeedMagnitude.get();
+		double rotationalSpeed = RobotStates.fieldRelativeSpeeds.get().omegaRadiansPerSecond;
+		return estimate != null && estimate.rawFiducials.length > 0
+				? 1
+						+ Math.pow(
+										Arrays.stream(estimate.rawFiducials)
+												.mapToDouble(fiducial -> fiducial.distToCamera)
+												.min()
+												.getAsDouble(),
+										2)
+								/ estimate.tagCount
+						+ (linearSpeed > 2 ? Math.pow(linearSpeed, 2) : 2 * linearSpeed)
+						+ 10 * rotationalSpeed
+				: Double.MAX_VALUE;
+	}
+
+	public void setCooling(boolean cooling) {
+		LimelightHelpers.SetThrottle(llName, cooling ? 200 : 0);
 	}
 
 	@Override

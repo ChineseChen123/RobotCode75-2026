@@ -4,9 +4,8 @@
 
 package frc.robot;
 
-import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.util.RaiderLog.RaiderLog;
@@ -15,7 +14,7 @@ import frc.lib.util.RaiderLog.RaiderLog.LogMode;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.state.DriverDashboard;
 import frc.robot.state.RobotStates;
-
+import frc.robot.subsystems.Vision.Limelight;
 import org.littletonrobotics.junction.LoggedRobot;
 
 /**
@@ -37,8 +36,8 @@ public class Robot extends LoggedRobot {
 		super(RobotConstants.loopTimeSecs);
 
 		// Set up logging
-		Importance minImportance = Importance.CRITICAL;
-		LogMode logMode = LogMode.COMP;
+		Importance minImportance = Importance.DEBUG;
+		LogMode logMode = LogMode.BASIC;
 		RaiderLog.init(minImportance, logMode);
 		if (logMode == LogMode.REPLAY) {
 			setUseTiming(false); // Allows simulation to run as fast as possible
@@ -47,7 +46,7 @@ public class Robot extends LoggedRobot {
 		m_robotContainer = new RobotContainer();
 
 		// Configure PhotonVision debug tab
-		// PortForwarder.add(5800, "photon-cams26.local", 5801);
+		PortForwarder.add(5800, "photonvision.local", 5800);
 		// CameraServer.startAutomaticCapture();
 	}
 
@@ -64,6 +63,11 @@ public class Robot extends LoggedRobot {
 
 	@Override
 	public void autonomousInit() {
+
+		for (Limelight limelight : RobotContainer.getLimelights()) {
+			limelight.setCooling(false);
+		}
+
 		m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
 		if (m_autonomousCommand != null) {
@@ -76,19 +80,30 @@ public class Robot extends LoggedRobot {
 
 	@Override
 	public void teleopInit() {
+
+		for (Limelight limelight : RobotContainer.getLimelights()) {
+			limelight.setCooling(false);
+		}
+
 		if (m_autonomousCommand != null) {
 			CommandScheduler.getInstance().cancel(m_autonomousCommand);
+		}
+
+		RobotContainer.resetSubsystems();
+	}
+
+	@Override
+	public void teleopPeriodic() {}
+
+	@Override
+	public void disabledInit() {
+		for (Limelight limelight : RobotContainer.getLimelights()) {
+			limelight.setCooling(true);
 		}
 	}
 
 	@Override
-	public void disabledInit() {}
-
-	@Override
 	public void disabledPeriodic() {}
-
-	@Override
-	public void teleopPeriodic() {}
 
 	@Override
 	public void testInit() {

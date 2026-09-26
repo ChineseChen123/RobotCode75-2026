@@ -48,6 +48,6 @@ public class RotationController {
 
 	/** returns whether we are at our target heading */
 	public boolean atGoal() {
-		return controller.atSetpoint() || this.output <= 0.03;
+		return controller.atSetpoint() || Math.abs(this.output) <= 0.03;
 	}
 }

@@ -24,11 +24,12 @@ public final class RobotConstants {
 	public static final Distance bumperWidth = Inches.of(27.5 + 2 * bumperThickness.in(Inches));
 
 	public static final class TuningModes {
-		public static final boolean tuneTurret = false && TUNING_MODE;
+		public static final boolean tuneTurret = true && TUNING_MODE;
 		public static final boolean tuneIntake = false && TUNING_MODE;
 		public static final boolean tunePivot = false && TUNING_MODE;
 		public static final boolean tuneIndexer = false && TUNING_MODE;
 		public static final boolean tuneHopper = false && TUNING_MODE;
 		public static final boolean tuneParallel = false && TUNING_MODE;
+		public static final boolean tuneShooter = false && TUNING_MODE;
 	}
 }

@@ -1,6 +1,7 @@
 package frc.robot.state;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.Constants.IOConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -13,10 +14,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.Hopper;
+import frc.robot.subsystems.EndEffector.Indexer;
+import frc.robot.subsystems.EndEffector.Intake;
+import frc.robot.subsystems.EndEffector.Intake.IntakeStates;
 import frc.robot.subsystems.EndEffector.Shooter;
 import frc.robot.subsystems.EndEffector.Turret;
 import frc.robot.subsystems.EndEffector.Turret.TurretStates;
-
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -27,10 +31,11 @@ public class RobotStates {
 
 	public static final Swerve m_Swerve = RobotContainer.getSwerve();
 
-	// public static final Intake m_Intake = RobotContainer.getIntake();
-	// public static final Indexer m_Indexer = RobotContainer.getIndexer();
+	public static final Intake m_Intake = RobotContainer.getIntake();
+	public static final Indexer m_Indexer = RobotContainer.getIndexer();
 	public static final Shooter m_Shooter = RobotContainer.getShooter();
 	public static final Turret m_Turret = RobotContainer.getTurret();
+	public static final Hopper m_Hopper = RobotContainer.getHopper();
 
 	/** Game time triggers */
 	public static final Trigger sim = new Trigger(Robot::isSimulation);
@@ -48,6 +53,7 @@ public class RobotStates {
 	public static final Supplier<Rotation2d> robotHeading = m_Swerve::getHeading;
 	public static final Supplier<ChassisSpeeds> fieldRelativeSpeeds =
 			m_Swerve::getFieldRelativeChassisSpeeds;
+	public static final Supplier<Double> robotSpeedMagnitude = m_Swerve::getSpeedMagnitude;
 
 	public static Alliance robotAlliance = DriverStation.Alliance.Blue;
 	public static boolean isAllianceConfirmed = false;
@@ -62,13 +68,18 @@ public class RobotStates {
 	// 		new Trigger(() -> PeddieBounds.isInTrench(robotPose.get()));
 
 	/** Intake states */
-	// public static final Trigger isIntakeDown =
-	// 		new Trigger(() -> m_Intake.isAtPosition(IntakeStates.INTAKING));
+	public static final Trigger isIntakeDown =
+			new Trigger(() -> m_Intake.getIntakeState() == IntakeStates.INTAKING);
 
 	// public static final Trigger isIntakeUp =
 	// 		new Trigger(() -> m_Intake.isAtPosition(IntakeStates.STOWED));
 
 	/** Indexer states */
+	public static final Trigger indexerAtSpeed = new Trigger(m_Indexer::isIndexerUpToSpeed);
+
+	public static final Trigger indexerRunning = new Trigger(m_Indexer::isIndexerRunning);
+
+	public static final Trigger indexerJammed = new Trigger(m_Hopper::isParallelJammed);
 
 	/** Shooter states */
 	public static final Trigger shooterAtSpeed = new Trigger(m_Shooter::atTargetVelocity);
@@ -83,13 +94,20 @@ public class RobotStates {
 	public static final Trigger turretIsAligning =
 			new Trigger(() -> m_Turret.getTurretState() == TurretStates.SCORING);
 
-	public static final DoubleSupplier turretAngle = () -> m_Turret.getPositionFromMotor().in(Degrees);
+	public static final DoubleSupplier turretAngle =
+			() -> m_Turret.getPositionFromMotor().in(Degrees);
+	public static final DoubleSupplier shooterVelocityAdjustment =
+			() -> m_Shooter.getVelocityAdjustment().in(RPM);
+
+	public static final Trigger shooterGoodToShoot = new Trigger(m_Shooter::goodToShoot);
 
 	// ── Actions ──────────────────────────────────────────────────────────────────
 
 	/** Swerve actions */
 	public static Trigger actionRobotRelative =
 			m_Driver.getRightButton(robotRelativeButton).and(teleop);
+
+	public static Trigger actionSpeedClamp = m_Driver.getLeftButton(speedClampButton).and(teleop);
 
 	public static Trigger actionXStance = m_Driver.getRightButton(xstanceButton).and(teleop);
 	public static Trigger actionResetGyro = m_Driver.getLeftButton(resetHeadingButton).and(teleop);
@@ -98,12 +116,12 @@ public class RobotStates {
 	public static Trigger positionalRotationDrive =
 			m_Driver.getRightButton(trenchDriveButton).and(teleop);
 
-	public static Trigger actionResetSubsystems = m_Operator.start;
-
 	/* Intake actions */
 
 	public static Trigger actionIntakeDown = m_Operator.A.and(teleop);
 	public static Trigger actionStowIntake = m_Operator.Y.and(teleop);
+	public static Trigger actionJiggleIntake = m_Operator.B.and(teleop);
+	public static Trigger actionReverseIntake = m_Operator.leftBumper.and(teleop);
 
 	/* Indexer actions */
 
@@ -115,11 +133,16 @@ public class RobotStates {
 
 	public static Trigger actionShoot = m_Operator.leftTriggerGreater(operatorDeadband).and(teleop);
 
+	public static Trigger actionDecrementShooter = m_Operator.back.and(teleop);
+	public static Trigger actionIncrementShooter = m_Operator.start.and(teleop);
+
 	/* Turret actions */
 
 	public static Trigger actionAimTurretHold = m_Operator.downDpad.and(teleop);
 	public static Trigger actionAimTurretToggle = m_Operator.upDpad.and(teleop);
 	public static Trigger actionResetTurret = m_Operator.X.and(teleop);
+
+	public static Trigger actionReverseShooter = m_Operator.leftDpad.and(teleop);
 
 	/* Climber actions */
 

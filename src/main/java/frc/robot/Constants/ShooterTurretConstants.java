@@ -14,6 +14,7 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+import static frc.robot.Constants.ShooterTurretConstants.ShooterConstants.minShootingDistance;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -29,15 +30,16 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
+import frc.lib.util.LinearInterpolationMap;
 
 /** Add your docs here. */
 public class ShooterTurretConstants {
 
 	public static final boolean useVirtualTarget = true;
-	public static final int virtualTargetSolveIterations = 24;
+	public static final int virtualTargetSolveIterations = 12;
 
-	public static final double phaseDelay = 0.1;
-	public static final double additionalPhaseDelayShooterSpeeds = 0.08;
+	public static final double phaseDelay = 0.05;
+	public static final double additionalPhaseDelayShooterSpeeds = 0.05;
 
 	public class ShooterConstants {
 		// Kraken X60s
@@ -53,7 +55,7 @@ public class ShooterTurretConstants {
 
 		public static final double shooterVelocityTolerance = 150.0; // rpm
 
-		public static final Distance feedingDistPastBump = Meters.of(1);
+		public static final Distance feedingDistPastBump = Meters.of(3);
 
 		// Note that the flywheel MOI effective to the motors is multiplied by the gear ratio squared.
 		// <-- from recalc
@@ -71,13 +73,23 @@ public class ShooterTurretConstants {
 		public static final Angle shooterAngleWithVertical = Degrees.of(25);
 		public static final Distance shooterHeight = Inches.of(19.5);
 
-		public static final double shooterRegressionA = 254.63148;
-		public static final double shooterRegressionB = 1853.47554;
-		public static final double shooterRegressionC = 2.1;
-
-		public static final Distance minShootingDistance = Meters.of(2.263119);
-		public static final AngularVelocity minShootingAngularVelocity = RPM.of(2430);
+		public static final Distance minShootingDistance = Meters.of(2.058);
+		public static final AngularVelocity minShootingAngularVelocity = RPM.of(2026);
 		public static final AngularVelocity maxShootingAngularVelocity = RPM.of(3800);
+		public static final LinearInterpolationMap distanceToRPMMap =
+				new LinearInterpolationMap()
+						.add(minShootingDistance.in(Meters), minShootingAngularVelocity.in(RPM))
+						.add(2.418, 2150)
+						.add(2.88, 2280)
+						.add(3.07, 2350)
+						.add(3.365, 2425)
+						.add(3.855, 2550)
+						.add(4.00, 2640)
+						.add(4.24, 2680)
+						.add(4.68, 2815)
+						.add(5.26, 3000);
+
+		public static final double velocityAdjustmentDeltaRPM = 10;
 
 		public static final class MotorConfigs {
 
@@ -94,17 +106,17 @@ public class ShooterTurretConstants {
 
 			public static final Current shooterMotorSupplyCurrentLimit = Amps.of(40);
 			public static final Current shooterMotorCurrentLowerThreshold = Amps.of(30);
-			public static final Current shooterMotorStatorCurrentLimit = Amps.of(80);
+			public static final Current shooterMotorStatorCurrentLimit = Amps.of(60);
 
 			// Torque PI
 			public static final double openLoopRamp = 0.1;
 			public static final double closedLoopRamp = 0.1;
 
-			public static final double shooterMotorVelocityKP = 35;
+			public static final double shooterMotorVelocityKP = 50;
 			public static final double shooterMotorVelocityKI = 0.0;
 			public static final double shooterMotorVelocityKD = 0.0;
 			public static final double shooterMotorVelocityKS = 0.45181;
-			public static final double shooterMotorVelocityKV = 0.25;
+			public static final double shooterMotorVelocityKV = 0.7;
 			public static final double shooterMotorVelocityKA = 0.025;
 
 			public static TalonFXConfiguration getShooterMotorConfiguration() {
@@ -154,13 +166,14 @@ public class ShooterTurretConstants {
 				config.Slot0.kD = 0.0;
 				config.Slot0.kV = 0.0;
 				config.Slot0.kA = 0.0;
-				// config.TorqueCurrent.PeakForwardTorqueCurrent = 100.0;
+				config.TorqueCurrent.PeakForwardTorqueCurrent = 60.0;
 				config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
 				config.MotorOutput.PeakForwardDutyCycle = 1.0;
 				config.MotorOutput.PeakReverseDutyCycle = 0.0;
 
 				return config;
 			}
+
 		}
 	}
 
@@ -184,8 +197,8 @@ public class ShooterTurretConstants {
 		public static final Angle turretStowAngle = Degrees.of(-90);
 
 		// at CW limit
-		public static final Angle encoder1ZeroPoint = Degrees.of(15.102);
-		public static final Angle encoder2ZeroPoint = Degrees.of(166.717);
+		public static final Angle encoder1ZeroPoint = Degrees.of(48.831);
+		public static final Angle encoder2ZeroPoint = Degrees.of(107.516);
 
 		// discrepancy threshold between encoders to accept solution
 		public static final Angle goodMatchTolerance = Degrees.of(10);
@@ -216,8 +229,8 @@ public class ShooterTurretConstants {
 
 			public static final double turretKA = 0; // voltage per unit of acceleration
 			public static final double turretKG = 0; // voltage to overcome gravity
-			public static final double turretKS = 3.2; // voltage to overcome static friction
-			public static final double turretKV = 0.1; // voltage per unit of requested velocity
+			public static final double turretKS = 8; // voltage to overcome static friction
+			public static final double turretKV = 4; // voltage per unit of requested velocity
 			public static final double turretKP = 80.0;
 			public static final double turretKI = 0;
 			public static final double turretKD = 3;

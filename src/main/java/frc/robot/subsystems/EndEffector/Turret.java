@@ -74,6 +74,7 @@ public class Turret extends SubsystemBase {
 	private TunableNumber turretD;
 	private TunableNumber turretS;
 	private TunableNumber turretV;
+	private double kV = MotorConfigs.turretKV;
 
 	// ── Internal state ───────────────────────────────────────────────────────────
 
@@ -260,10 +261,10 @@ public class Turret extends SubsystemBase {
 		return turretTargetAngle.in(Degrees);
 	}
 
-	// @Logged(key = "Turret Distance", importance = Importance.DEBUG)
-	// public double getTurretDistance() {
-	// 	return getTurretPose().getTranslation().getDistance(getHubPose().getTranslation());
-	// }
+	@Logged(key = "Turret Distance", importance = Importance.DEBUG)
+	public double getTurretDistance() {
+		return getTurretPose().getTranslation().getDistance(getShootingTargetPose().getTranslation());
+	}
 
 	@Logged(key = "Turret Target Velocity DPS", importance = Importance.DEBUG)
 	public double getTurretTargetVelocityDPS() {
@@ -365,7 +366,7 @@ public class Turret extends SubsystemBase {
 				break;
 			case SCORING:
 				updateTurretTarget();
-				m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngle));
+				m_TurretMotor.setControl(turretRequest.withPosition(turretTargetAngle).withFeedForward(kV * RobotStates.fieldRelativeSpeeds.get().omegaRadiansPerSecond * 0.5 / Math.PI));
 				break;
 		}
 	}
@@ -386,11 +387,11 @@ public class Turret extends SubsystemBase {
 				&& (turretP.getNumber() != turretConfigs.kP
 						|| turretD.getNumber() != turretConfigs.kD
 						|| turretS.getNumber() != turretConfigs.kS
-						|| turretV.getNumber() != turretConfigs.kV)) {
+						|| turretV.getNumber() != kV)) {
 			turretConfigs.kP = turretP.getNumber();
 			turretConfigs.kD = turretD.getNumber();
 			turretConfigs.kS = turretS.getNumber();
-			turretConfigs.kV = turretV.getNumber();
+			kV = turretV.getNumber();
 			m_TurretMotor.getConfigurator().apply(turretConfigs);
 		}
 	}

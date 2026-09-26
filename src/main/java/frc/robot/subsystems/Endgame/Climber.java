@@ -10,24 +10,22 @@ import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-import edu.wpi.first.units.AngleUnit;
-import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.RaiderLog.Logged;
 import frc.lib.util.RaiderLog.RaiderLog.Importance;
+import frc.robot.state.RobotStates;
 
 public class Climber extends SubsystemBase {
 
@@ -49,7 +47,8 @@ public class Climber extends SubsystemBase {
 		RAISING(raisingVoltage),
 		LOWERING(loweringVoltage),
 		HOLDING(holdingVoltage),
-		SETPOINT(null);
+		SETPOINTUP(raisingVoltage),
+		SETPOINTDOWN(loweringVoltage);
 
 		public final Voltage voltage;
 
@@ -62,13 +61,11 @@ public class Climber extends SubsystemBase {
 	private ClimberState m_ClimberState = ClimberState.HOLDING;
 
 	// define motors
-	private final TalonFX m_ClimberMotor1;
-	private final TalonFX m_ClimberMotor2;
+	private final TalonFX m_ClimberMotor;
 
 	// define control requests
 	private final PositionTorqueCurrentFOC m_PositionRequest;
 	private final VoltageOut m_VoltageRequest;
-	private final Follower m_FollowerRequest;
 
 	// private final TunableNumber climberKp;
 	// private final TunableNumber climberKi;
@@ -82,23 +79,19 @@ public class Climber extends SubsystemBase {
 
 	public Climber() {
 		// initialize motors, using the non drivetrain CANivore bus
-		m_ClimberMotor1 = new TalonFX(climberMotor1CANID, superstructureCANBusName);
-		m_ClimberMotor2 = new TalonFX(climberMotor2CANID, superstructureCANBusName);
+		m_ClimberMotor = new TalonFX(climberMotorCANID, superstructureCANBusName);
 
 		m_ClimberState = ClimberState.HOLDING;
 
 		// initialize control requests
 		m_PositionRequest = new PositionTorqueCurrentFOC(0);
 		m_VoltageRequest = new VoltageOut(0);
-		m_FollowerRequest = new Follower(climberMotor1CANID, MotorAlignmentValue.Aligned);
 
 		// configure motors with correct inverts
-		m_ClimberMotor1.getConfigurator().apply(MotorConfigs.getClimberMotorConfig());
-		m_ClimberMotor2.getConfigurator().apply(MotorConfigs.getClimberMotorConfig());
+		m_ClimberMotor.getConfigurator().apply(MotorConfigs.getClimberMotorConfig());
 
 		// reset the position of the climber
-		m_ClimberMotor1.setPosition(ClimberPositions.STOW.Rotations);
-		m_ClimberMotor2.setPosition(ClimberPositions.STOW.Rotations);
+		m_ClimberMotor.setPosition(ClimberPositions.STOW.Rotations);
 
 		m_PositionRequest.UpdateFreqHz = 0;
 		m_PositionRequest.UseTimesync = true;
@@ -128,8 +121,7 @@ public class Climber extends SubsystemBase {
 
 		Timer.delay(5);
 
-		m_ClimberMotor1.setPosition(0);
-		m_ClimberMotor2.setPosition(0);
+		m_ClimberMotor.setPosition(0);
 	}
 
 	/**
@@ -139,18 +131,13 @@ public class Climber extends SubsystemBase {
 	 */
 	public void setPosition(ClimberPositions position) {
 		m_SetpointPosition = position;
+		// m_ClimberState = ClimberState.SETPOINT;
 	}
 
 	/** return position in rotations from home (bottom) */
 	public Angle getPosition() {
-		Measure<AngleUnit> motor1Position =
-				BaseStatusSignal.getLatencyCompensatedValue(
-						m_ClimberMotor1.getPosition(), m_ClimberMotor1.getVelocity());
-		Measure<AngleUnit> motor2Position =
-				BaseStatusSignal.getLatencyCompensatedValue(
-						m_ClimberMotor2.getPosition(), m_ClimberMotor2.getVelocity());
-
-		return Rotations.of((motor1Position.in(Rotations) + motor2Position.in(Rotations)) / 2);
+		return BaseStatusSignal.getLatencyCompensatedValue(
+				m_ClimberMotor.getPosition(), m_ClimberMotor.getVelocity());
 	}
 
 	/** return current position setpoint */
@@ -160,7 +147,7 @@ public class Climber extends SubsystemBase {
 	}
 
 	/** position as a double for logging */
-	@Logged(key = "Climber Position", importance = Importance.DEBUG)
+	@Logged(key = "Climber Position", importance = Importance.CRITICAL)
 	public double logPosition() {
 		return getPosition().in(Rotations);
 	}
@@ -181,8 +168,7 @@ public class Climber extends SubsystemBase {
 				.repeatedly()
 				.finallyDo(
 						() -> {
-							m_ClimberMotor1.setControl(new StaticBrake());
-							m_ClimberMotor2.setControl(new StaticBrake());
+							m_ClimberMotor.setControl(new StaticBrake());
 						});
 	}
 
@@ -227,15 +213,22 @@ public class Climber extends SubsystemBase {
 		// 	m_ClimberMotor2.getConfigurator().apply(config);
 		// }
 
+		if (!RobotStates.teleop.getAsBoolean() || DriverStation.getMatchTime() > 30) {
+			return;
+		}
+
+		if (m_ClimberState == ClimberState.SETPOINTUP && currentPosition > upPosition.in(Rotations)) {
+			m_ClimberState = ClimberState.HOLDING;
+		}
+		if (m_ClimberState == ClimberState.SETPOINTDOWN
+				&& currentPosition < climbedPosition.in(Rotations)) {
+			m_ClimberState = ClimberState.HOLDING;
+		}
+
 		if (m_ClimberState == ClimberState.HOLDING) {
-			m_ClimberMotor1.setControl(new StaticBrake());
-			m_ClimberMotor2.setControl(new StaticBrake());
+			m_ClimberMotor.setControl(new StaticBrake());
 		} else if (m_ClimberState.voltage != null) {
-			m_ClimberMotor1.setControl(m_VoltageRequest.withOutput(m_ClimberState.voltage));
-			m_ClimberMotor2.setControl(m_FollowerRequest);
-		} else if (m_ClimberState == ClimberState.SETPOINT) {
-			m_ClimberMotor1.setControl(m_PositionRequest.withPosition(targetRotations));
-			m_ClimberMotor2.setControl(m_FollowerRequest);
+			m_ClimberMotor.setControl(m_VoltageRequest.withOutput(m_ClimberState.voltage));
 		}
 	}
 }
